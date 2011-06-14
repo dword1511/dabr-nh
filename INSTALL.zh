@@ -1,0 +1,38 @@
+dabr-nh 安装手册
+
+ * 注意！！！ *
+此手册的内容仍未经过测试，并且可能缺乏某些必要的细节。
+
+系统需求：
+ * 安装有现代的 Linux 系统的 PC 或者 VPS （此说明以 Ubuntu 10.10 为例）。
+ * 这台 PC 或者 VPS 必须有 *自由* 的 Internet 连接（能顺利访问 twitter）。
+ * 惯用的包管理器（此说明以 apt-get 为例）。
+
+步骤一：安装必要的软件包。
+ * sudo apt-get install php5 php5-curl php5-mcrypt apache2 libapache2-mod-php5 vim
+ * 在此处假定发行版提供的 PHP5 软件包版本在 5.2 以上，且 Apache2 软件包包含 mod-ssl 和 mod-rewrite
+
+步骤二：安装 dabr-nh 。
+ * cd /var/www
+ * sudo git clone <INSERT URL HERE!>
+ * cp config.example.php config.php
+
+步骤三：申请 twitter application 。
+ * 在（开了代理的）浏览器里打开 http://dev.twitter.com/apps （你需要先在 twitter 中登录）。单击“ Register a new app ”。
+ * 根据提示完成申请。注意：类型要选 Browser，权限至少要 Read & Write 才能发推。 Callback 形式为： http://example.com/someurl/dabr-nh/oauth 。
+ * 完成后记下 Consumer key 和 Consumer secret ，填入 config.php 中对应的位置。
+ * 同时记得更改 config.php 中的 ENCRYPTION_KEY 。
+
+步骤四：启用 rewrite 和 SSL 。
+ * sudo a2enmod ssl rewrite
+ * sudo a2ensite default-ssl
+ * sudo make-ssl-cert generate-default-snakeoil --force-overwrite
+ * sudo /etc/init.d/apache2 restart
+
+步骤五：为 dabr-nh 启用 .htaccess 。
+ * sudo vim /etc/apache2/sites-enabled/default-ssl
+ * 在其中的 Directory /var/www/ 一节中将 AllowOverride none 改为 AllowOverride all 。最好为 dabr-nh 的 URL 新建一节再应用此规则。
+ * 可能有安全风险。
+
+Enjoy！
+
