@@ -14,7 +14,7 @@ dabr-nh 安装手册
 
 步骤二：安装 dabr-nh 。
  * cd /var/www
- * sudo git clone <INSERT URL HERE!>
+ * sudo git clone git://github.com/dword1511/dabr-nh.git
  * cp config.example.php config.php
 
 步骤三：申请 twitter application 。
@@ -22,6 +22,7 @@ dabr-nh 安装手册
  * 根据提示完成申请。注意：类型要选 Browser，权限至少要 Read & Write 才能发推。 Callback 形式为： http://example.com/someurl/dabr-nh/oauth 。
  * 完成后记下 Consumer key 和 Consumer secret ，填入 config.php 中对应的位置。
  * 同时记得更改 config.php 中的 ENCRYPTION_KEY 。
+ * 必要的话你也可以申请 bit.ly 、 twitpic 等的 Application 。
 
 步骤四：启用 rewrite 和 SSL 。
  * sudo a2enmod ssl rewrite
