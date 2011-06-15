@@ -919,7 +919,7 @@ function twitter_directs_page($query) {
 			twitter_refresh('directs/sent');
 
 		case 'sent':
-			$request = API_URL.'direct_messages/sent.json?page='.intval($_GET['page']);
+			$request = API_URL.'direct_messages/sent.json?page='.intval($_GET['page']).'&include_entities=true';
 			$tl = twitter_standard_timeline(twitter_process($request), 'directs_sent');
 			$content = theme_directs_menu();
 			$content .= theme('timeline', $tl);
@@ -1391,7 +1391,7 @@ function twitter_standard_timeline($feed, $source) {
 				}
 				unset($new->sender, $new->recipient);
 				$new->is_direct = true;
-				$output[] = $new;
+				$output[$new->id_str] = $new;
 			}
 			return $output;
 
@@ -1585,7 +1585,8 @@ function twitter_is_reply($status) {
 	$found = Twitter_Extractor::create($status->text)->extractMentionedUsernames();
 	foreach($found as $mentions)
 	{
-		if ($mentions == $user) 
+		// Case insensitive compare
+		if (strcasecmp($mentions, $user) == 0)
 		{
 			return true;
 		}
