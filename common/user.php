@@ -225,11 +225,12 @@ function theme_login() {
 <table><tr>
 	<td><a href="oauth"><img src="images/twitter_button_2_lo.gif" alt="Sign in with Twitter/OAuth" width="165" height="28" /></a></td>
 	<td><a href="oauth">Sign in via Twitter.com</a></td>
-	<th>WARNING: USERS BEHINDE THE GFW SHOULD NEVER CLICK ON ANY OF THOSE ON THE LEFT!</th>
-<tr></table>
+</tr><tr>
+	<th>WARNING: USERS BEHIND THE GFW SHOULD NEVER CLICK ON ANY OF THOSE ABOVE!</th>
+</tr></table>
 <p>Twitter no longer allow you to log in directly with a username and password so we can\'t show the standard login form. There\'s some more information on the <a href="http://blog.dabr.co.uk/">Dabr blog</a>.</p>';
 
-	$content .='<h2>Oauth proxy</h2>
+	$content .='<h2>OAuth proxy</h2>
 <em>(Oh plz don\'t trust me :D)</em>
 <form action="'.BASE_URL.'oauth" method="post">
 <table>
