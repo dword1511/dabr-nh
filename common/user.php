@@ -223,7 +223,7 @@ function user_login() {
 function theme_login() {
 	$content = '<div style="margin:1em; font-size: 1.2em">
 <table><tr>
-	<td><a href="oauth"><img src="images/twitter_button_2_lo.gif" alt="Sign in with Twitter/OAuth" width="165" height="28" /></a></td>
+	<td><a href="oauth"><img src="'.BASE_URL.'images/twitter_button_2_lo.gif" alt="Sign in with Twitter/OAuth" width="165" height="28" /></a></td>
 	<td><a href="oauth">Sign in via Twitter.com</a></td>
 </tr><tr>
 	<th>WARNING: USERS BEHIND THE GFW SHOULD NEVER CLICK ON ANY OF THOSE ABOVE!</th>

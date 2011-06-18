@@ -1785,7 +1785,7 @@ function theme_action_icons($status) {
 	$actions = array();
 
 	if (!$status->is_direct) {
-		$actions[] = theme('action_icon', "user/{$from}/reply/{$status->id}", 'images/reply.png', '@');
+		$actions[] = theme('action_icon', "user/{$from}/reply/{$status->id}", BASE_URL.'images/reply.png', '@');
 	}
 	//Reply All functionality.
 	if(substr_count(($status->text), '@') >= 1)
@@ -1801,50 +1801,50 @@ function theme_action_icons($status) {
 			
 		if (count($to_users) >= 1)
 		{
-			$actions[] = theme('action_icon', "user/{$from}/replyall/{$status->id}", 'images/replyall.png', 'REPLY ALL');
+			$actions[] = theme('action_icon', "user/{$from}/replyall/{$status->id}", BASE_URL.'images/replyall.png', 'REPLY ALL');
 		}
 	}
 	if (!user_is_current_user($from)) {
-		$actions[] = theme('action_icon', "directs/create/{$from}", 'images/dm.png', 'DM');
+		$actions[] = theme('action_icon', "directs/create/{$from}", BASE_URL.'images/dm.png', 'DM');
 	}
 	if (!$status->is_direct) {
 		if ($status->favorited == '1') {
-			$actions[] = theme('action_icon', "unfavourite/{$status->id}", 'images/star.png', 'UNFAV');
+			$actions[] = theme('action_icon', "unfavourite/{$status->id}", BASE_URL.'images/star.png', 'UNFAV');
 		} else {
-			$actions[] = theme('action_icon', "favourite/{$status->id}", 'images/star_grey.png', 'FAV');
+			$actions[] = theme('action_icon', "favourite/{$status->id}", BASE_URL.'images/star_grey.png', 'FAV');
 		}
 		if ($retweeted_by) // Show a diffrent retweet icon to indicate to the user this is an RT
 		{
-			$actions[] = theme('action_icon', "retweet/{$status->id}", 'images/retweeted.png', 'RT');
+			$actions[] = theme('action_icon', "retweet/{$status->id}", BASE_URL.'images/retweeted.png', 'RT');
 		}
 		else
 		{
-			$actions[] = theme('action_icon', "retweet/{$status->id}", 'images/retweet.png', 'RT');
+			$actions[] = theme('action_icon', "retweet/{$status->id}", BASE_URL.'images/retweet.png', 'RT');
 		}
 		if (user_is_current_user($from))
 		{
-			$actions[] = theme('action_icon', "confirm/delete/{$status->id}", 'images/trash.gif', 'DEL');
+			$actions[] = theme('action_icon', "confirm/delete/{$status->id}", BASE_URL.'images/trash.gif', 'DEL');
 		}
 		if ($retweeted_by) //Allow users to delete what they have retweeted
 		{
 			if (user_is_current_user($retweeted_by))
 			{
-				$actions[] = theme('action_icon', "confirm/delete/{$retweeted_id}", 'images/trash.gif', 'DEL');
+				$actions[] = theme('action_icon', "confirm/delete/{$retweeted_id}", BASE_URL.'images/trash.gif', 'DEL');
 			}
 		}
 
 	} else {
-		$actions[] = theme('action_icon', "confirm/deleteDM/{$status->id}", 'images/trash.gif', 'DEL');
+		$actions[] = theme('action_icon', "confirm/deleteDM/{$status->id}", BASE_URL.'images/trash.gif', 'DEL');
 	}
 	if ($geo !== null)
 	{
 		$latlong = $geo->coordinates;
 		$lat = $latlong[0];
 		$long = $latlong[1];
-		$actions[] = theme('action_icon', "http://maps.google.co.uk/m?q={$lat},{$long}", 'images/map.png', 'MAP');
+		$actions[] = theme('action_icon', "http://maps.google.co.uk/m?q={$lat},{$long}", BASE_URL.'images/map.png', 'MAP');
 	}
 	//Search for @ to a user
-	$actions[] = theme('action_icon',"search?query=%40{$from}",'images/q.png','?');
+	$actions[] = theme('action_icon',"search?query=%40{$from}",BASE_URL.'images/q.png','?');
 
 	return implode(' ', $actions);
 }
