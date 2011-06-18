@@ -1841,7 +1841,7 @@ function theme_action_icons($status) {
 		$latlong = $geo->coordinates;
 		$lat = $latlong[0];
 		$long = $latlong[1];
-		$actions[] = theme('action_icon', "http://maps.google.co.uk/m?q={$lat},{$long}", BASE_URL.'images/map.png', 'MAP');
+		$actions[] = theme('action_icon', "http://maps.google.com/m?q={$lat},{$long}", BASE_URL.'images/map.png', 'MAP');
 	}
 	//Search for @ to a user
 	$actions[] = theme('action_icon',"search?query=%40{$from}",BASE_URL.'images/q.png','?');
