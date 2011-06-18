@@ -2,7 +2,7 @@
 function desktop_theme_status_form($text = '', $in_reply_to_id = NULL) {
 	if (user_is_authenticated()) {
 		$output = '<form method="post" action="update">
-  <fieldset><legend><img src="http://si0.twimg.com/images/dev/cms/intents/bird/bird_blue/bird_16_blue.png" width="16" height="16" /> What\'s Happening?</legend>
+  <fieldset><legend><img src="'.BASE_URL.'twimg/bird_16_blue.png" width="16" height="16" /> What\'s Happening?</legend>
   <textarea id="status" name="status" rows="3" style="width:95%; max-width: 400px;">'.$text.'</textarea>
   <div><input name="in_reply_to_id" value="'.$in_reply_to_id.'" type="hidden" /><input type="submit" value="Tweet" /> <span id="remaining">140</span> 
   <span id="geo" style="display: none; float: right;"><input onclick="goGeo()" type="checkbox" id="geoloc" name="location" /> <label for="geoloc" id="lblGeo"></label></span></div>
