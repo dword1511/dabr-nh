@@ -222,13 +222,22 @@ function user_login() {
 
 function theme_login() {
 	$content = '<div style="margin:1em; font-size: 1.2em">
-<table><tr><td><a href="oauth"><img src="images/twitter_button_2_lo.gif" alt="Sign in with Twitter/OAuth" width="165" height="28" /></a></td><td><a href="oauth">Sign in via Twitter.com</a></td><tr></table>
+<table><tr>
+	<td><a href="oauth"><img src="images/twitter_button_2_lo.gif" alt="Sign in with Twitter/OAuth" width="165" height="28" /></a></td>
+	<td><a href="oauth">Sign in via Twitter.com</a></td>
+	<th>WARNING: USERS BEHINDE THE GFW SHOULD NEVER CLICK ON ANY OF THOSE ON THE LEFT!</th>
+<tr></table>
 <p>Twitter no longer allow you to log in directly with a username and password so we can\'t show the standard login form. There\'s some more information on the <a href="http://blog.dabr.co.uk/">Dabr blog</a>.</p>';
 
-    $content .='<h2>Oauth proxy</h2><em>(Oh plz don\'t trust me :-&gt;)</em><form action="'.BASE_URL.'oauth" method="post">
-<table><tr><th>Username:</th><td><input type="text" name="username"/></td></tr>
-<tr><th>Password:</th><td><input type="password" name="password"/></td></tr></table>
-<p><input type="submit" value="Login"/></p></form>';
+	$content .='<h2>Oauth proxy</h2>
+<em>(Oh plz don\'t trust me :D)</em>
+<form action="'.BASE_URL.'oauth" method="post">
+<table>
+	<tr><th>Username:</th><td><input type="text" name="username"/></td></tr>
+	<tr><th>Password:</th><td><input type="password" name="password"/></td></tr>
+</table>
+<p><input type="submit" value="Login"/></p>
+</form>';
 
 	if (MYSQL_USERS == 'ON') $content .= '<p>No access to Twitter.com? <a href="login">Sign in with your Dabr account</a></p>';
 	$content .= '</div>';
