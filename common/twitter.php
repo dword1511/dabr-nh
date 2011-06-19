@@ -1274,7 +1274,7 @@ function theme_user_header($user) {
 
 function theme_avatar($url, $force_large = false) {
 	$size = $force_large ? 48 : 24;
-	return "<img src='$url' height='$size' width='$size' />";
+	return "<img src='".BASE_URL."simpleproxy.php?url=".$url."' height='$size' width='$size' />";
 }
 
 function theme_status_time_link($status, $is_link = true) {
