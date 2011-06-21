@@ -360,7 +360,7 @@ function twitter_twitpic_page($query) {
 			}
 		}
 		elseif ($query[1] == 'confirm') {
-			$content = "<p>Upload success. Image posted to Twitter.</p><p><img src='http://twitpic.com/show/thumb/{$query[2]}' alt='' /></p>";
+			$content = "<p>Upload success. Image posted to Twitter.</p><p><img src='".BASE_URL."simpleproxy.php?url=http://twitpic.com/show/thumb/{$query[2]}' alt='' /></p>";
 		}
 		else {
 			$content = "<form method='post' action='twitpic' enctype='multipart/form-data'>Image <input type='file' name='media' /><br />Message (optional):<br /><textarea name='message' style='width:90%; max-width: 400px;' rows='3' id='message'></textarea><br><input type='submit' value='Send'><span id='remaining'>110</span></form>";
