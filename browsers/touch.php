@@ -85,7 +85,7 @@ function touch_theme_status_time_link($status, $is_link = true) {
 
 function touch_theme_css() {
 	$out = theme_css();
-	$out .= '<link rel="stylesheet" href="browsers/touch.css" />';
+	$out .= '<link rel="stylesheet" href="'.BASE_URL.'browsers/touch.css" />';
 	$out .= '<script type="text/javascript">'.file_get_contents('browsers/touch.js').'</script>';
 	return $out;
 }

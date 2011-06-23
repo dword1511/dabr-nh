@@ -102,7 +102,7 @@ function settings_page($args) {
 	}
 
 	$content .= '<form action="settings/save" method="post"><p>Colour scheme:<br /><select name="colours">';
-	$content .= theme('options', $colour_schemes, setting_fetch('colours', 1));
+	$content .= theme('options', $colour_schemes, setting_fetch('colours', 5));
 	$content .= '</select></p><p>Mode:<br /><select name="browser">';
 	$content .= theme('options', $modes, $GLOBALS['current_theme']);
 	$content .= '</select></p><p>External links go:<br /><select name="gwt">';

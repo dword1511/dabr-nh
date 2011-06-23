@@ -413,6 +413,8 @@ function twitter_process($url, $post_data = false)
 	curl_setopt($ch, CURLOPT_TIMEOUT, 10);
 	curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
 	curl_setopt($ch, CURLOPT_HEADER, FALSE);
+	curl_setopt($ch, CURLINFO_HEADER_OUT, TRUE);
+	curl_setopt($ch, CURLOPT_VERBOSE, true);
 
 	$response = curl_exec($ch);
 	$response_info=curl_getinfo($ch);
@@ -421,6 +423,10 @@ function twitter_process($url, $post_data = false)
 	curl_close($ch);
 
 	global $api_time;
+	global $rate_limit;
+	//Doesn't bloody work. No idea why!
+	$rate_limit = $response_info['X-RateLimit-Limit'];
+
 	$api_time += microtime(1) - $api_start;
 
 	switch( intval( $response_info['http_code'] ) )
@@ -452,11 +458,11 @@ function twitter_process($url, $post_data = false)
 			{
 				$result = 'Something broke on Twitter\'s end.' ;
 			/*
-			 foreach ($response_info as $key => $value)
-			 {
+			foreach ($response_info as $key => $value)
+			{
 				$result .= "Key: $key; Value: $value<br />";
-				}
-				*/
+			}
+			*/	
 			}
 			theme('error', "<h2>An error occured while calling the Twitter API</h2><p>{$response_info['http_code']}: {$result}</p><hr>");
 	}
@@ -866,12 +872,42 @@ function twitter_update() {
 			$geo = 'Y';
 			$post_data['lat'] = $lat;
 			$post_data['long'] = $long;
-	  // $post_data['display_coordinates'] = 'false';
+			// $post_data['display_coordinates'] = 'false';
+	  		
+  			// Turns out, we don't need to manually send a place ID
+/*	  		$place_id = twitter_get_place($lat, $long);
+	  		if ($place_id) {
+	  		
+	  			// $post_data['place_id'] = $place_id;
+	  		}
+*/	  		
 		}
 		setcookie_year('geo', $geo);
 		$b = twitter_process($request, $post_data);
 	}
 	twitter_refresh($_POST['from'] ? $_POST['from'] : '');
+}
+
+function twitter_get_place($lat, $long) {
+	//	http://dev.twitter.com/doc/get/geo/reverse_geocode
+	//	http://api.twitter.com/version/geo/reverse_geocode.format 
+	
+	//	This will look up a place ID based on lat / long.
+	//	Not needed (Twitter include it automagically
+	//	Left in just incase we ever need it...
+	$request = API_URL.'geo/reverse_geocode.json';
+	$request .= '?lat='.$lat.'&long='.$long.'&max_results=1';
+	
+	$locations = twitter_process($request);
+	$places = $locations->result->places;
+	foreach($places as $place)
+	{
+		if ($place->id) 
+		{
+			return $place->id;
+		}
+	}
+	return false;
 }
 
 function twitter_retweet($query) {
@@ -1502,6 +1538,9 @@ function theme_timeline($feed)
 		$actions = theme('action_icons', $status);
 		$avatar = theme('avatar', theme_get_avatar($status->from));
 		$source = $status->source ? " from ".str_replace('rel="nofollow"', 'rel="nofollow" target="_blank"', preg_replace('/&(?![a-z][a-z0-9]*;|#[0-9]+;|#x[0-9a-f]+;)/i', '&amp;', $status->source)) : ''; //need to replace & in links with &amps and force new window on links
+		if ($status->place->name) {
+			$source .= " " . $status->place->name . ", " . $status->place->country;
+		}
 		if ($status->in_reply_to_status_id)	{
 			$source .= " <a href='status/{$status->in_reply_to_status_id_str}'>in reply to {$status->in_reply_to_screen_name}</a>";
 		}
