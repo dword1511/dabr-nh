@@ -13,11 +13,11 @@ $twitterPassword = isset($_POST['p']) ? $_POST['p'] : base64_decode($_GET['p']);
 $page_auth = file_get_html($oAuthEntryPage);
 if($page_auth === FALSE){
   echo "Cannot load http resource using file_get_contents";
-  exit();
+  die(1);
 }
 
-$oauth_token = $page_auth->find('input[name=oauth_token]', 0)->attr['value'];
-$authenticity_token = $page_auth->find('input[name=authenticity_token]', 0)->attr['value'];
+$oauth_token = $page_auth -> find('input[name=oauth_token]', 0) -> attr['value'];
+$authenticity_token = $page_auth -> find('input[name=authenticity_token]', 0) -> attr['value'];
 $login_fields = Array(
   'oauth_token' => urlencode($oauth_token),
   'authenticity_token' => urlencode($authenticity_token),
@@ -25,7 +25,7 @@ $login_fields = Array(
   'session[password]' => urlencode($twitterPassword)
 );
 
-foreach($login_fields as $key=>$value) {
+foreach($login_fields as $key => $value) {
   $login_string .= $key.'='.$value.'&';
 }
 
