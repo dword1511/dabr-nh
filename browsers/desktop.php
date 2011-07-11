@@ -27,17 +27,18 @@ function geoStatus(msg) {
 	document.getElementById("geo").style.display = "inline";
 	document.getElementById("lblGeo").innerHTML = msg;
 }
-function geoError(msg) {
+function geoError(error) {
 	document.getElementById("geo").style.display = "inline";
+	document.getElementById("lblGeo").innerHTML = error;
 	switch(error.code) {
 		case error.TIMEOUT:
-			document.getElementById("lblGeo").innerHTML = msg + ": Location timed out. Please check your network.";
+			document.getElementById("lblGeo").innerHTML = error + ": Location timed out. Please check your network.";
 		break;
 		case error.PERMISSION_DENIED:
-			document.getElementById("lblGeo").innerHTML = msg + ": Permission denied. Please check your browser\'s ettings.";
+			document.getElementById("lblGeo").innerHTML = error + ": Permission denied. Please check your browser\'s ettings.";
 		break;
 		case error.POSITION_UNAVAILABLE:
-			document.getElementById("lblGeo").innerHTML = msg + ": We are sorry. But you are on Mars.";
+			document.getElementById("lblGeo").innerHTML = error + ": We are sorry. But you are on Mars.";
 		break;
 	};
 }
