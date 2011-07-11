@@ -23,9 +23,23 @@ function goGeo(node) {
 	geoStatus("Locating...");
 	navigator.geolocation.getCurrentPosition(geoSuccess, geoStatus);
 }
-function geoStatus(msg) {
+<!-- function geoStatus(msg) {
 	document.getElementById("geo").style.display = "inline";
 	document.getElementById("lblGeo").innerHTML = msg;
+} -->
+function geoStatus(msg) {
+	document.getElementById("geo").style.display = "inline";
+	switch(error.code) {
+		case error.TIMEOUT:
+			document.getElementById("lblGeo").innerHTML = msg + ": Location timed out. Please check your network.";
+		break;
+		case error.PERMISSION_DENIED:
+			document.getElementById("lblGeo").innerHTML = msg + ": Permission denied. Please check your browser\'s ettings.";
+		break;
+		case error.POSITION_UNAVAILABLE:
+			document.getElementById("lblGeo").innerHTML = msg + ": We are sorry. But you are on Mars.";
+		break;
+	};
 }
 function geoSuccess(position) {
 	geoStatus("Tweet my <a href=\'http://maps.google.com.hk/m?q=" + position.coords.latitude + "," + position.coords.longitude + "\' target=\'blank\'>location</a>");
