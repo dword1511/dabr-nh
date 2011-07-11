@@ -11,8 +11,7 @@ function desktop_theme_status_form($text = '', $in_reply_to_id = NULL) {
 started = false;
 chkbox = document.getElementById("geoloc");
 if (navigator.geolocation) {
-	document.getElementById("geo").style.display = "inline";
-	document.getElementById("lblGeo").innerHTML = "Tweet my location";
+	geoStatus("Tweet my location");
 	if ("'.$_COOKIE['geo'].'"=="Y") {
 		chkbox.checked = true;
 		goGeo();
@@ -22,13 +21,13 @@ function goGeo(node) {
 	if (started) return;
 	started = true;
 	geoStatus("Locating...");
-	navigator.geolocation.getCurrentPosition(geoSuccess, geoErr);
+	navigator.geolocation.getCurrentPosition(geoSuccess, geoError);
 }
-<!-- function geoStatus(msg) {
+function geoStatus(msg) {
 	document.getElementById("geo").style.display = "inline";
 	document.getElementById("lblGeo").innerHTML = msg;
-} -->
-function geoErr(msg) {
+}
+function geoError(msg) {
 	document.getElementById("geo").style.display = "inline";
 	switch(error.code) {
 		case error.TIMEOUT:
