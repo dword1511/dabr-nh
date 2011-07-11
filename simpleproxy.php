@@ -36,6 +36,6 @@ echo $magic;
 flush();
 fpassthru($fp);
 flush();
-close($fp);
+fclose($fp);
 exit;
 ?>
