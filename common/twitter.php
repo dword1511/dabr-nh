@@ -643,10 +643,22 @@ function twitter_status_page($query) {
 		$request = API_URL."statuses/show/{$id}.json?include_entities=true";
 		$status = twitter_process($request);
 		$content = theme('status', $status);
-		if (!$status->user->protected) {
+		$thread_id = $status->id_str;
+		$request = API_URL."related_results/show/{$thread_id}.json";
+		$threadstatus = twitter_process($request);
+		if ($threadstatus && $threadstatus[0] && $threadstatus[0]->results) {
+			$array = array_reverse($threadstatus[0]->results);
+			$tl = array();
+			foreach ($array as $key=>$value) {
+				array_push($tl, $value->value);
+				if ($value->value->in_reply_to_status_id_str && $value->value->in_reply_to_status_id_str == $status->id_str) {
+					array_push($tl, $status);
+				}
+			}
+			$tl = twitter_standard_timeline($tl, 'replies');
+			$content .= '<p>related_results</p>'.theme('timeline', $tl);
+		} elseif (!$status->user->protected) {
 			$thread = twitter_thread_timeline($id);
-		}
-		if ($thread) {
 			$content .= '<p>And the experimental conversation view...</p>'.theme('timeline', $thread);
 			$content .= "<p>Don't like the thread order? Go to <a href='settings'>settings</a> to reverse it. Either way - the dates/times are not always accurate.</p>";
 		}
