@@ -28,17 +28,16 @@ function geoStatus(msg) {
 	document.getElementById("lblGeo").innerHTML = msg;
 }
 function geoError(error) {
-	document.getElementById("geo").style.display = "inline";
-	document.getElementById("lblGeo").innerHTML = error;
+	geoStatus(error);
 	switch(error.code) {
 		case error.TIMEOUT:
-			document.getElementById("lblGeo").innerHTML = error + ": Location timed out. Please check your network.";
+			document.getElementById("lblGeo").innerHTML += ": Location timed out. Please check your network.";
 		break;
 		case error.PERMISSION_DENIED:
-			document.getElementById("lblGeo").innerHTML = error + ": Permission denied. Please check your browser\'s ettings.";
+			document.getElementById("lblGeo").innerHTML += ": Permission denied. Please check your browser\'s ettings.";
 		break;
 		case error.POSITION_UNAVAILABLE:
-			document.getElementById("lblGeo").innerHTML = error + ": We are sorry. But you are on Mars.";
+			document.getElementById("lblGeo").innerHTML += ": We are sorry. But you are on Mars.";
 		break;
 	};
 }
@@ -57,4 +56,15 @@ function desktop_theme_search_form($query) {
 	$query = stripslashes(htmlentities($query,ENT_QUOTES,"UTF-8"));
 	return "<form action='search' method='get'><input name='query' value=\"$query\" style='width:100%; max-width: 300px' /><input type='submit' value='Search' /></form>";
 }
+
+function desktop_theme_avatar($url, $force_large = false) {
+	return "<img src='".BASE_URL."simpleproxy.php?url=".$url."' height='48' width='48' />";
+}
+
+function desktop_theme_css() {
+	$out = theme_css();
+	$out .= "<style type='text/css'>.avatar{display:block; height:50px; width:50px; left:5px; margin:0; overflow:hidden; position:absolute;}</style>"
+	return $out;
+}
+
 ?>

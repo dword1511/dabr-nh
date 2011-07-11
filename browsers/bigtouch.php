@@ -19,7 +19,7 @@ function bigtouch_theme_search_form($query) {
 }
 
 function bigtouch_theme_avatar($url, $force_large = false) {
-	return "<img src='$url' width='48' height='48' />";
+	return "<img src='".BASE_URL."simpleproxy.php?url=".$url."' height='48' width='48' />";
 }
 
 function bigtouch_theme_page($title, $content) {
