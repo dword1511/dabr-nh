@@ -1,4 +1,6 @@
 .svn
 config.php
 *~
+*.rej
+*.orig
 
