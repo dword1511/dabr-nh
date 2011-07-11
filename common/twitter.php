@@ -656,7 +656,7 @@ function twitter_status_page($query) {
 				}
 			}
 			$tl = twitter_standard_timeline($tl, 'replies');
-			$content .= '<p>related_results</p>'.theme('timeline', $tl);
+			$content .= '<p>Thread:</p>'.theme('timeline', $tl);
 		} elseif (!$status->user->protected) {
 			$thread = twitter_thread_timeline($id);
 			$content .= '<p>And the experimental conversation view...</p>'.theme('timeline', $thread);
