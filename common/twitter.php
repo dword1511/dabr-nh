@@ -141,6 +141,20 @@ menu_register(array(
         )
 ));
 
+// How should external links be opened?
+function get_target()
+{
+	// Kindle doesn't support opening in a new window
+	if (stristr($_SERVER['HTTP_USER_AGENT'], "Kindle/"))
+	{
+		return "_self";
+	}
+	else 
+	{
+		return "_blank";
+	}
+}
+
 function long_url($shortURL)
 {
 	if (!defined('LONGURL_KEY'))
@@ -477,12 +491,12 @@ function twitter_url_shorten_callback($match) {
 		return 'http://flic.kr/p/'.flickr_encode($matches[1]);
 	}
 	if (BITLY_API_KEY == '') return $match[0];
-	$request = 'http://api.bit.ly/shorten?version=2.0.1&longUrl='.urlencode($match[0]).'&login='.BITLY_LOGIN.'&apiKey='.BITLY_API_KEY;
+	// http://code.google.com/p/bitly-api/wiki/ApiDocumentation#/v3/shorten
+	$request = 'https://api-ssl.bitly.com/v3/shorten?login='.BITLY_LOGIN.'&apiKey='.BITLY_API_KEY.'&longUrl='.urlencode($match[0]).'&format=json';
 	$json = json_decode(twitter_fetch($request));
-	if ($json->errorCode == 0) {
-		$results = (array) $json->results;
-		$result = array_pop($results);
-		return $result->shortUrl;
+
+	if ($json->status_code == 200) {
+		return $json->data->url;
 	} else {
 		return $match[0];
 	}
@@ -508,7 +522,7 @@ function twitter_fetch($url) {
 function twitter_get_media($status) {
 	if($status->entities->media) {
 	
-		$media_html = "<a href=\"" . $status->entities->media[0]->media_url_https . "\" target='_blank'>";
+		$media_html = "<a href=\"" . $status->entities->media[0]->media_url_https . "\" target='" . get_target() . "'>";
 		$media_html .= 	"<img src=\"" . $status->entities->media[0]->media_url_https . ":thumb\" width=\"" . $status->entities->media[0]->sizes->thumb->w . 
 								"\" height=\"" . $status->entities->media[0]->sizes->thumb->h . "\" />";
 		$media_html .= "</a><br />";
@@ -540,7 +554,7 @@ function twitter_parse_tags($input, $entities = false) {
 				$link = $urls->url;
 			}
 			
-			$link_html = '<a href="' . $link . '" target="_blank">' . $display_url . '</a>';
+			$link_html = '<a href="' . $link . '" target="' . get_target() . '">' . $display_url . '</a>';
 			$url = $urls->url;
 			
 			// Replace all URLs *UNLESS* they have already been linked (for example to an image)
@@ -560,7 +574,7 @@ function twitter_parse_tags($input, $entities = false) {
 			foreach($urls as $url) 
 			{
 				$encoded = urlencode($url);
-				$out = str_replace($url, "<a href='http://google.com/gwt/n?u={$encoded}' target='_blank'>{$url}</a>", $out);
+				$out = str_replace($url, "<a href='http://google.com/gwt/n?u={$encoded}' target='" . get_target() . "'>{$url}</a>", $out);
 			}	
 		} else 
 		{
@@ -1265,7 +1279,7 @@ function theme_user_header($user) {
 
 	$out .= "Bio: {$bio}<br />";
 	$out .= "Link: {$link}<br />";
-	$out .= "Location: <a href=\"http://maps.google.com.hk/m?q={$cleanLocation}\" target=\"_blank\">{$user->location}</a><br />";
+	$out .= "Location: <a href=\"http://maps.google.com.hk/m?q={$cleanLocation}\" target=\"" . get_target() . "\">{$user->location}</a><br />";
 	$out .= "Joined: {$date_joined} (~" . pluralise('tweet', $tweets_per_day, true) . " per day)";
 	$out .= "</span></span>";
 	$out .= "<div class='features'>";
@@ -1512,7 +1526,10 @@ function theme_timeline($feed)
 	// Only embed images in suitable browsers
 	if (!in_array(setting_fetch('browser'), array('text', 'worksafe')))
 	{
-		embedly_embed_thumbnails($feed);
+		if (EMBEDLY_KEY !== '')
+		{
+			embedly_embed_thumbnails($feed);
+		}
 	}
 
 	foreach ($feed as $status)
@@ -1549,7 +1566,7 @@ function theme_timeline($feed)
 		$link = theme('status_time_link', $status, !$status->is_direct);
 		$actions = theme('action_icons', $status);
 		$avatar = theme('avatar', theme_get_avatar($status->from));
-		$source = $status->source ? " from ".str_replace('rel="nofollow"', 'rel="nofollow" target="_blank"', preg_replace('/&(?![a-z][a-z0-9]*;|#[0-9]+;|#x[0-9a-f]+;)/i', '&amp;', $status->source)) : ''; //need to replace & in links with &amps and force new window on links
+		$source = $status->source ? " from ".str_replace('rel="nofollow"', 'rel="nofollow" target="' . get_target() . '"', preg_replace('/&(?![a-z][a-z0-9]*;|#[0-9]+;|#x[0-9a-f]+;)/i', '&amp;', $status->source)) : ''; //need to replace & in links with &amps and force new window on links
 		if ($status->place->name) {
 			$source .= " " . $status->place->name . ", " . $status->place->country;
 		}
@@ -1784,11 +1801,11 @@ function theme_external_link($url, $content = null) {
 	{
 		//Used to wordwrap long URLs
 		//return "<a href='$url' target='_blank'>". wordwrap(long_url($url), 64, "\n", true) ."</a>";
-		return "<a href='$url' target='_blank'>". long_url($url) ."</a>";
+		return "<a href='$url' target='" . get_target() . "'>". long_url($url) ."</a>";
 	}
 	else
 	{
-		return "<a href='$url' target='_blank'>$content</a>";
+		return "<a href='$url' target='" . get_target() . "'>$content</a>";
 	}
 
 }
@@ -1904,7 +1921,7 @@ function theme_action_icon($url, $image_url, $text) {
 	// alt attribute left off to reduce bandwidth by about 720 bytes per page
 	if ($text == 'MAP')
 	{
-		return "<a href='$url' alt='$text' target='_blank'><img src='$image_url' /></a>";
+		return "<a href='$url' alt='$text' target='" . get_target() . "'><img src='$image_url' /></a>";
 	}
 
 	return "<a href='$url'><img src='$image_url' alt='$text' /></a>";
