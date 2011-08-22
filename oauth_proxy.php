@@ -49,7 +49,7 @@ if(strlen($login_error) > 8) {
   die(-1);
 }
 
-$targetURL = $login_obj -> find('div[class=happy notice] a', 0) -> href;
+$targetURL = $login_obj -> find('div[class=happy notice callback] a', 0) -> href;
 header('HTTP/1.1 302 Found');
 header('Status: 302 Found');
 header("Location: $targetURL");
