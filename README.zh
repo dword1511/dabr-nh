@@ -1,9 +1,14 @@
-这是修改好的免翻墙版 dabr —— S60 上推的救星……
-带有 OAuth 模拟，允许用户使用账户名和密码登录。具有强制 SSL 的功能。
+这是修改好的免翻墙版 dabr —— 某些情况下 S60 上推的救星……
+带有 OAuth 代理，允许用户使用账户名和密码登录。具有强制 SSL 的功能。
 使用前请参阅 INSTALL.zh 文件。
 
-警告：请勿在不认识的 dabr 上输入您的 twitter 帐号与密码。
-演示地址： http://dword1511.4pu.com/dword/t/
+警告：
+    请您只在自己或熟识的朋友搭建的 dabr 上输入您的 twitter 帐号与密码，因为被修改过的代码可能会被用于窃取您的账户信息。
+实例：
+    http://dword1511.4pu.com/t/
 
-Thanks: @dabr @yegle @shellexy @tifan
+Thanks:
+    @dabr @davidcarrington @whatleydude : The original dabr version
+    @yegle @tifan : OAuth proxy that bypasses the GFW
+    @shellexy : Better thread lookup method
 
