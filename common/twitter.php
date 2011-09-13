@@ -122,9 +122,9 @@ menu_register(array(
 		'hidden' => true,
 		'callback' => 'twitter_hashtag_page',
 	),
-	'twitpic' => array(
+	'picture' => array(
 		'security' => true,
-		'callback' => 'twitter_twitpic_page',
+		'callback' => 'twitter_media_page',
 	),
 	'trends' => array(
 		'security' => true,
@@ -243,7 +243,7 @@ function twitter_trends_page($query)
 	$trends = twitter_process($request);
 	$search_url = 'search?query=';
 	foreach($trends[0]->trends as $trend) {
-		$row = array('<strong><a href="' . str_replace('http://search.twitter.com/search?q=', $search_url, $trend->url) . '">' . $trend->name . '</a></strong>');
+		$row = array('<strong><a href="' . str_replace('http://twitter.com/search/', $search_url, $trend->url) . '">' . $trend->name . '</a></strong>');
 		$rows[] = array('data' => $row,  'class' => 'tweet');
 	}
 	$headers = array($header);
@@ -273,116 +273,79 @@ updateCount();
 	return $script;
 }
 
-function twitter_twitpic_page($query) {
-	if (user_type() == 'oauth') {
-		//V2 of the Twitpic API allows for OAuth
-		//http://dev.twitpic.com/docs/2/upload/
+function twitter_media_page($query) 
+{
+	$content = "";
+	$status = stripslashes($_POST['message']);
+	
+	if ($_POST['message'] && $_FILES['image']['tmp_name']) 
+	{
+		require 'tmhOAuth.php';
+		
+		list($oauth_token, $oauth_token_secret) = explode('|', $GLOBALS['user']['password']);
+		
+		$tmhOAuth = new tmhOAuth(array(
+			'consumer_key'    => OAUTH_CONSUMER_KEY,
+			'consumer_secret' => OAUTH_CONSUMER_SECRET,
+			'user_token'      => $oauth_token,
+			'user_secret'     => $oauth_token_secret,
+		));
 
-		//Has the user submitted an image and message?
-		if ($_POST['message']) {
-			$twitpicURL = 'http://api.twitpic.com/2/upload.json';
+		$image = "{$_FILES['image']['tmp_name']};type={$_FILES['image']['type']};filename={$_FILES['image']['name']}";
 
-			//Set the initial headers
-			$header = array(
-				'X-Auth-Service-Provider: https://api.twitter.com/1/account/verify_credentials.json', 
-				'X-Verify-Credentials-Authorization: OAuth realm="http://api.twitter.com/"'
-			);
+		$code = $tmhOAuth->request('POST', 'https://upload.twitter.com/1/statuses/update_with_media.json',
+											  array(
+												 'media[]'  => "@{$image}",
+												 'status'   => " " . $status //A space is needed because twitter b0rks if first char is an @
+											  ),
+											  true, // use auth
+											  true  // multipart
+										);
 
-			//Using Abraham's OAuth library
-			require_once('OAuth.php');
+		if ($code == 200) {
+			$json = json_decode($tmhOAuth->response['response']);
+			
+			$image_url = $json->entities->media[0]->media_url_https;
 
-			// instantiating OAuth customer
-			$consumer = new OAuthConsumer(OAUTH_CONSUMER_KEY, OAUTH_CONSUMER_SECRET);
-
-			// instantiating signer
-			$sha1_method = new OAuthSignatureMethod_HMAC_SHA1();
-
-			// user's token
-			list($oauth_token, $oauth_token_secret) = explode('|', $GLOBALS['user']['password']);
-			$token = new OAuthConsumer($oauth_token, $oauth_token_secret);
-
-			// Generate all the OAuth parameters needed
-			$signingURL = 'https://api.twitter.com/1/account/verify_credentials.json';
-			$request = OAuthRequest::from_consumer_and_token($consumer, $token, 'GET', $signingURL, array());
-			$request->sign_request($sha1_method, $consumer, $token);
-
-			$header[1] .= ", oauth_consumer_key=\"" . $request->get_parameter('oauth_consumer_key') ."\"";
-			$header[1] .= ", oauth_signature_method=\"" . $request->get_parameter('oauth_signature_method') ."\"";
-			$header[1] .= ", oauth_token=\"" . $request->get_parameter('oauth_token') ."\"";
-			$header[1] .= ", oauth_timestamp=\"" . $request->get_parameter('oauth_timestamp') ."\"";
-			$header[1] .= ", oauth_nonce=\"" . $request->get_parameter('oauth_nonce') ."\"";
-			$header[1] .= ", oauth_version=\"" . $request->get_parameter('oauth_version') ."\"";
-			$header[1] .= ", oauth_signature=\"" . urlencode($request->get_parameter('oauth_signature')) ."\"";
-
-			//open connection
-			$ch = curl_init();
-										
-			//Set paramaters
-			curl_setopt($ch, CURLOPT_HTTPHEADER, $header);
-			curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
-			curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
-
-			//set the url, number of POST vars, POST data
-			curl_setopt($ch,CURLOPT_URL,$twitpicURL);
-										
-			//TwitPic requires the data to be sent as POST
-			$media_data = array(
-				'media' => '@'.$_FILES['media']['tmp_name'],
-				'message' => ' ' . stripslashes($_POST['message']), //A space is needed because twitpic b0rks if first char is an @
-				'key'=>TWITPIC_API_KEY
-			);
-
-			curl_setopt($ch, CURLOPT_POST, true);
-			curl_setopt($ch,CURLOPT_POSTFIELDS,$media_data);
-
-			//execute post
-			$result = curl_exec($ch);
-			$response_info=curl_getinfo($ch);
-
-			//close connection
-			curl_close($ch);
-
-			if ($response_info['http_code'] == 200) { //Success
-				//Decode the response
-				$json = json_decode($result);
-				$id = $json->id;
-				$twitpicURL = $json->url;
-				$text = $json->text;
-				$message = trim($text) . " " . $twitpicURL;
-
-				//Send the user's message to twitter
-				$request = API_URL.'statuses/update.json';
-
-				$post_data = array('source' => 'dabr', 'status' => $message);
-				$status = twitter_process($request, $post_data);
-
-				//Back to the timeline
-				twitter_refresh("twitpic/confirm/$id");
-			}
-			else {
-				$content = "<p>Twitpic upload failed. No idea why!</p>";
-				$content .=  "<pre>";
-				$json = json_decode($result);
-				$content .= "<br / ><b>message</b> " . urlencode($_POST['message']);
-				$content .= "<br / ><b>json</b> " . print_r($json);
-				$content .= "<br / ><b>Response</b> " . print_r($response_info);
-				$content .= "<br / ><b>header</b> " . print_r($header);
-				$content .= "<br / ><b>media_data</b> " . print_r($media_data);
-				$content .= "<br /><b>URL was</b> " . $twitpicURL;
-				$content .= "<br /><b>File uploaded was</b> " . $_FILES['media']['tmp_name'];
-				$content .= "</pre>";
-			}
+			$text = $json->text;
+			
+			$content = "<p>Upload success. Image posted to Twitter.</p>
+							<p><img src=\"" . BASE_URL . "simpleproxy.php?url=" . $image_url . ":thumb\" alt='' /></p>
+							<p>". twitter_parse_tags($text) . "</p>";
+			
+		} else {
+			$content = "Damn! Something went wrong. Sorry :-("  
+				."<br /> code=" . $code
+				."<br /> status=" . $status
+				."<br /> image=" . $image
+				."<br /> response=<pre>"
+				. print_r($tmhOAuth->response['response'], TRUE)
+				. "</pre><br /> info=<pre>"
+				. print_r($tmhOAuth->response['info'], TRUE)
+				. "</pre><br /> code=<pre>"
+				. print_r($tmhOAuth->response['code'], TRUE) . "</pre>";
 		}
-		elseif ($query[1] == 'confirm') {
-			$content = "<p>Upload success. Image posted to Twitter.</p><p><img src='".BASE_URL."simpleproxy.php?url=http://twitpic.com/show/thumb/{$query[2]}' alt='' /></p>";
-		}
-		else {
-			$content = "<form method='post' action='twitpic' enctype='multipart/form-data'>Image <input type='file' name='media' /><br />Message (optional):<br /><textarea name='message' style='width:90%; max-width: 400px;' rows='3' id='message'></textarea><br><input type='submit' value='Send'><span id='remaining'>110</span></form>";
-			$content .= js_counter("message", "110");
-		}
-
-		return theme('page', 'Twitpic Upload', $content);
 	}
+	
+	if($_POST) {
+		if (!$_POST['message']) {
+			$content .= "<p>Please enter a message to go with your image.</p>";
+		}
+
+		if (!$_FILES['image']['tmp_name']) {
+			$content .= "<p>Please select an image to upload.</p>";
+		}
+	}
+	
+	$content .=	"<form method='post' action='picture' enctype='multipart/form-data'>
+						Image <input type='file' name='image' /><br />
+						Message (optional):<br />
+						<textarea name='message' style='width:90%; max-width: 400px;' rows='3' id='message'>" . $status . "</textarea><br>
+						<input type='submit' value='Send'><span id='remaining'>120</span>
+					</form>";
+	$content .= js_counter("message", "120");
+
+	return theme('page', 'Picture Upload', $content);
 }
 
 function twitter_process($url, $post_data = false)
@@ -392,7 +355,7 @@ function twitter_process($url, $post_data = false)
 		$post_data = array();
 	}
 
-	if (user_type() == 'oauth' && ( strpos($url, '/twitter.com') !== false || strpos($url, 'api.twitter.com') !== false))
+	if (user_type() == 'oauth' && ( strpos($url, '/twitter.com') !== false || strpos($url, 'api.twitter.com') !== false || strpos($url, 'upload.twitter.com') !== false))
 	{
 		user_oauth_sign($url, $post_data);
 	}
@@ -414,11 +377,6 @@ function twitter_process($url, $post_data = false)
 	{
 		curl_setopt ($ch, CURLOPT_POST, true);
 		curl_setopt ($ch, CURLOPT_POSTFIELDS, $post_data);
-	}
-
-	if (user_type() != 'oauth' && user_is_authenticated())
-	{
-		curl_setopt($ch, CURLOPT_USERPWD, user_current_username().':'.$GLOBALS['user']['password']);
 	}
 
 	//from  http://github.com/abraham/twitteroauth/blob/master/twitteroauth/twitteroauth.php
@@ -482,31 +440,11 @@ function twitter_process($url, $post_data = false)
 	}
 }
 
-function twitter_url_shorten($text) {
-	return preg_replace_callback('#((\w+://|www)[\w\#$%&~/.\-;:=,?@\[\]+]{33,1950})(?<![.,])#is', 'twitter_url_shorten_callback', $text);
-}
-
-function twitter_url_shorten_callback($match) {
-	if (preg_match('#http://www.flickr.com/photos/[^/]+/(\d+)/#', $match[0], $matches)) {
-		return 'http://flic.kr/p/'.flickr_encode($matches[1]);
-	}
-	if (BITLY_API_KEY == '') return $match[0];
-	// http://code.google.com/p/bitly-api/wiki/ApiDocumentation#/v3/shorten
-	$request = 'https://api-ssl.bitly.com/v3/shorten?login='.BITLY_LOGIN.'&apiKey='.BITLY_API_KEY.'&longUrl='.urlencode($match[0]).'&format=json';
-	$json = json_decode(twitter_fetch($request));
-
-	if ($json->status_code == 200) {
-		return $json->data->url;
-	} else {
-		return $match[0];
-	}
-}
-
 function twitter_fetch($url) {
 	global $services_time;
 	$ch = curl_init();
 	curl_setopt($ch, CURLOPT_URL, $url);
-	//curl_setopt($ch, CURLOPT_TIMEOUT, 10);
+	curl_setopt($ch, CURLOPT_TIMEOUT, 10);
 	$user_agent = "Mozilla/5.0 (compatible; dabr; " . BASE_URL . ")";
 	curl_setopt($ch, CURLOPT_USERAGENT, $user_agent);
 	curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
@@ -521,9 +459,10 @@ function twitter_fetch($url) {
 //	http://dev.twitter.com/pages/tweet_entities
 function twitter_get_media($status) {
 	if($status->entities->media) {
+		$image = $status->entities->media[0]->media_url_https;
 	
-		$media_html = "<a href=\"" . $status->entities->media[0]->media_url_https . "\" target='" . get_target() . "'>";
-		$media_html .= 	"<img src=\"" . $status->entities->media[0]->media_url_https . ":thumb\" width=\"" . $status->entities->media[0]->sizes->thumb->w . 
+		$media_html = "<a href=\"" . $image . "\" target='" . get_target() . "'>";
+		$media_html .= 	"<img src=\"" . BASE_URL . "simpleproxy.php?url=" . $image . ":thumb\" width=\"" . $status->entities->media[0]->sizes->thumb->w . 
 								"\" height=\"" . $status->entities->media[0]->sizes->thumb->h . "\" />";
 		$media_html .= "</a><br />";
 		
@@ -534,13 +473,17 @@ function twitter_get_media($status) {
 
 function twitter_parse_tags($input, $entities = false) {
 
+	$out = $input;
+
+	//Linebreaks.  Some clients insert \n for formatting.
+	$out = nl2br($out);
+	
 	// Use the Entities to replace hyperlink URLs
 	// http://dev.twitter.com/pages/tweet_entities
 	if($entities) {
-		$out = $input;
 		foreach($entities->urls as $urls) {
-			if($urls->display_url != "") {
-				$display_url = $urls->display_url;
+			if($urls->expanded_url != "") {
+				$display_url = $urls->expanded_url;
 			}else {
 				$display_url = $urls->url;
 			}
@@ -561,13 +504,20 @@ function twitter_parse_tags($input, $entities = false) {
 			$pattern = '#((?<!href\=(\'|\"))'.preg_quote($url,'#').')#i';
 			$out = preg_replace($pattern,  $link_html, $out);
 		}
-	} else {  // If Entities haven't been returned, use Autolink
+		foreach($entities->hashtags as $hashtag) {
+			$text = $hashtag->text;
+			
+			$pattern = '/(^|\s)([#＃]+)('. $text .')/iu';
+			
+			$link_html = ' <a href="hash/' . $text . '">#' . $text . '</a> ';
+			
+			$out = preg_replace($pattern,  $link_html, $out, 1);
+		}
+	} else {  // If Entities haven't been returned (usually because of search or a bio) use Autolink
 		// Create an array containing all URLs
 		$urls = Twitter_Extractor::create($input)
 				->extractURLs();
-			
-		$out = $input;	
-		
+
 		// Hyperlink the URLs 
 		if (setting_fetch('gwt') == 'on') // If the user wants links to go via GWT 
 		{
@@ -580,7 +530,12 @@ function twitter_parse_tags($input, $entities = false) {
 		{
 				$out = Twitter_Autolink::create($out)
 							->addLinksToURLs();
-		}
+		}	
+		
+		// Hyperlink the #	
+		$out = Twitter_Autolink::create($out)
+					->setTarget('')
+					->addLinksToHashtags();
 	}
 	
 	// Hyperlink the @ and lists
@@ -588,13 +543,24 @@ function twitter_parse_tags($input, $entities = false) {
 				->setTarget('')
 				->addLinksToUsernamesAndLists();
 
-	// Hyperlink the #	
-	$out = Twitter_Autolink::create($out)
-				->setTarget('')
-				->addLinksToHashtags();
-
-	//Linebreaks.  Some clients insert \n for formatting.
-	$out = nl2br($out);
+	// Emails
+	// You are never supposed to post your email addresses without changing the "@".
+	// So all the followings are disabled.
+	//$tok = strtok($out, " \n\t\n\r\0");	// Tokenise the string by whitespace
+	//
+	//while ($tok !== false) {	// Go through all the tokens
+	//	$at = stripos($tok, "@");	// Does the string contain an "@"?
+	//
+	//	if ($at && $at > 0) { // @ is in the string & isn't the first character
+	//		$tok = trim($tok, "?.,!\"\'");	// Remove any trailing punctuation
+	//		
+	//		if (filter_var($tok, FILTER_VALIDATE_EMAIL)) {	// Use the internal PHP email validator
+	//			$email = $tok;
+	//			$out = str_replace($email, "<a href=\"mailto:{$email}\">{$email}</a>", $out);	// Create the mailto: link
+	//		}
+	//	}
+	//	$tok = strtok(" \n\t\n\r\0");	// Move to the next token
+	//}
 
 	//Return the completed string
 	return $out;
@@ -883,7 +849,7 @@ function twitter_retweeters_page($tweet) {
 
 function twitter_update() {
 	twitter_ensure_post_action();
-	$status = twitter_url_shorten(stripslashes(trim($_POST['status'])));
+	$status = stripslashes(trim($_POST['status']));
 	if ($status) {
 		$request = API_URL.'statuses/update.json';
 		$post_data = array('source' => 'dabr', 'status' => $status);
@@ -1086,21 +1052,14 @@ function twitter_user_page($query)
 	// Build an array of people we're talking to
 	$to_users = array($user->screen_name);
 
+	// Build an array of hashtags being used
+	$hashtags = array();
+
 	// Are we replying to anyone?
 	if (is_numeric($in_reply_to_id)) {
 		$tweet = twitter_find_tweet_in_timeline($in_reply_to_id, $tl);
-
-		// Hyperlink the URLs (target _blank
-		$out = Twitter_Autolink::create($tweet->text)
-						->addLinksToURLs();
-	        // Hyperlink the @ and lists
-	        $out = Twitter_Autolink::create($out)
-        	        	                ->setTarget('')
-                	        	        ->addLinksToUsernamesAndLists();
-	        // Hyperlink the #
-        	$out = Twitter_Autolink::create($out)
-                		                ->setTarget('')
-                                		->addLinksToHashtags();
+		
+		$out = twitter_parse_tags($tweet->text);
 
 		$content .= "<p>In reply to:<br />{$out}</p>";
 
@@ -1109,6 +1068,10 @@ function twitter_user_page($query)
 				->extractMentionedUsernames();
 			$to_users = array_unique(array_merge($to_users, $found));
 		}
+				
+		if ($tweet->entities->hashtags) {
+			$hashtags = $tweet->entities->hashtags;
+		}		
 	}
 
 	// Build a status message to everyone we're talking to
@@ -1117,6 +1080,11 @@ function twitter_user_page($query)
 		if (!user_is_current_user($username)) {
 			$status .= "@{$username} ";
 		}
+	}
+
+	// Add in the hashtags they've used
+	foreach ($hashtags as $hashtag) {
+		$status .= "#{$hashtag->text} ";
 	}
 
 	$content .= theme('status_form', $status, $in_reply_to_id);
@@ -1188,29 +1156,18 @@ function twitter_hashtag_page($query) {
 
 function theme_status_form($text = '', $in_reply_to_id = NULL) {
 	if (user_is_authenticated()) {
-		return "<fieldset><legend><img src='".BASE_URL."twimg/bird_16_blue.png' width='16' height='16' /> What's Happening?</legend><form method='post' action='update'><input name='status' value='{$text}' maxlength='140' /> <input name='in_reply_to_id' value='{$in_reply_to_id}' type='hidden' /><input type='submit' value='Tweet' /></form></fieldset>";
+		return "<fieldset><legend><img src='".BASE_URL."images/bird_16_blue.png' width='16' height='16' /> What's Happening?</legend><form method='post' action='update'><input name='status' value='{$text}' maxlength='140' /> <input name='in_reply_to_id' value='{$in_reply_to_id}' type='hidden' /><input type='submit' value='Tweet' /></form></fieldset>";
 	}
 }
 
 function theme_status($status) {
 	//32bit int / snowflake patch
 	if($status->id_str) $status->id = $status->id_str;
-
-	$time_since = theme('status_time_link', $status);
-	$parsed = twitter_parse_tags($status->text, $status->entities);
-	$avatar = theme('avatar', theme_get_avatar($status->user));
-
-	$out = theme('status_form', "@{$status->user->screen_name} ");
-	$out .= "<div class='timeline'>\n";
-	$out .= " <div class='tweet odd'>\n";
-	$out .= "  <span class='avatar'>$avatar</span>\n";
-	$out .= "  <span class='status shift'><b><a href='user/{$status->user->screen_name}'>{$status->user->screen_name}</a></b> $time_since<br />$parsed</span>\n";
-	$out .= " </div>\n";
-	$out .= "</div>\n";
-	if (user_is_current_user($status->user->screen_name)) {
-		$out .= "<form action='delete/{$status->id_str}' method='post'><input type='submit' value='Delete without confirmation' /></form>";
-	}
-	return $out;
+	
+	$feed[] = $status;
+	$tl = twitter_standard_timeline($feed, 'status');
+	$content = theme('timeline', $tl);
+	return $content;
 }
 
 function theme_retweet($status)
@@ -1267,7 +1224,7 @@ function theme_user_header($user) {
 	$tweets_per_day = twitter_tweets_per_day($user, 1);
 	$bio = twitter_parse_tags($user->description);
 	$out = "<div class='profile'>";
-    $out .= "<span class='avatar'>".theme('external_link', $full_avatar, theme('avatar', theme_get_avatar($user)))."</span>";
+	$out .= "<span class='avatar'>".theme('external_link', $full_avatar, theme('avatar', theme_get_avatar($user)))."</span>";
 	$out .= "<span class='status shift'><b>{$name}</b><br />";
 	$out .= "<span class='about'>";
 	if ($user->verified == true) {
@@ -1336,7 +1293,7 @@ function theme_user_header($user) {
 
 function theme_avatar($url, $force_large = false) {
 	$size = $force_large ? 48 : 24;
-	return "<img src='".BASE_URL."simpleproxy.php?url=".$url."' height='$size' width='$size' />";
+	return "<img src='".$url."' height='$size' width='$size' />";
 }
 
 function theme_status_time_link($status, $is_link = true) {
@@ -1399,6 +1356,7 @@ function twitter_standard_timeline($feed, $source) {
 	}
 	
 	switch ($source) {
+		case 'status':
 		case 'favourites':
 		case 'friends':
 		case 'replies':
@@ -1518,11 +1476,21 @@ function twitter_user_info($username = null) {
 function theme_timeline($feed)
 {
 	if (count($feed) == 0) return theme('no_tweets');
+	if (count($feed) < 2) { 
+		$hide_pagination = true;
+	}
 	$rows = array();
 	$page = menu_current_page();
 	$date_heading = false;
 	$first=0;
-	
+
+	// Add the hyperlinks *BEFORE* adding images
+	foreach ($feed as &$status)
+	{
+		$status->text = twitter_parse_tags($status->text, $status->entities);
+	}
+	unset($status);
+
 	// Only embed images in suitable browsers
 	if (!in_array(setting_fetch('browser'), array('text', 'worksafe')))
 	{
@@ -1561,7 +1529,7 @@ function theme_timeline($feed)
 		{
 			$date = $status->created_at;
 		}
-		$text = twitter_parse_tags($status->text, $status->entities);
+		$text = $status->text;
 		$media = twitter_get_media($status);
 		$link = theme('status_time_link', $status, !$status->is_direct);
 		$actions = theme('action_icons', $status);
@@ -1609,12 +1577,11 @@ function theme_timeline($feed)
 	}
 	$content = theme('table', array(), $rows, array('class' => 'timeline'));
 
-	//$content .= theme('pagination');
-	if ($page != '')
+	if ($page != '' && !$hide_pagination)
 	{
 		$content .= theme('pagination');
 	}
-	else
+	else if (!$hide_pagination)  // Don't show pagination if there's only one item
 	{
 		//Doesn't work. since_id returns the most recent tweets up to since_id, not since. Grrr
 		//$links[] = "<a href='{$_GET['q']}?since_id=$since_id'>Newer</a>";
@@ -1749,20 +1716,7 @@ function theme_full_name($user) {
 
 // http://groups.google.com/group/twitter-development-talk/browse_thread/thread/50fd4d953e5b5229#
 function theme_get_avatar($object) {
-	// Are we calling the HTTPS API?	
-	$pos = strpos(API_URL, "https");
-
-	// Not useing HTTPS? Return the normal one
-	if ($pos === false) {
-		return $object->profile_image_url;
-	}
-
-	// Is there a secure image to return?
-	if ($object->profile_image_url_https) {
-		return $object->profile_image_url_https;
-	}
-
-	return $object->profile_image_url;
+	return BASE_URL . "simpleproxy.php?url=" . $object->profile_image_url_https;
 }
 
 function theme_no_tweets() {
@@ -1856,22 +1810,11 @@ function theme_action_icons($status) {
 		$actions[] = theme('action_icon', "user/{$from}/reply/{$status->id}", BASE_URL.'images/reply.png', '@');
 	}
 	//Reply All functionality.
-	if(substr_count(($status->text), '@') >= 1)
+	if( $status->entities->user_mentions )
 	{
-		$found = Twitter_Extractor::create($status->text)->extractMentionedUsernames();
-		$to_users = array_unique($found);
-			
-		$key = array_search(user_current_username(), $to_users); // Remove the username of the authenticated user
-		if ($key != NULL || $key !== FALSE) // Depending on PHP version
-		{
-			unset($to_users[$key]); // remove the username from array
-		}
-			
-		if (count($to_users) >= 1)
-		{
-			$actions[] = theme('action_icon', "user/{$from}/replyall/{$status->id}", BASE_URL.'images/replyall.png', 'REPLY ALL');
-		}
+		$actions[] = theme('action_icon', "user/{$from}/replyall/{$status->id}", BASE_URL.'images/replyall.png', 'REPLY ALL');
 	}
+
 	if (!user_is_current_user($from)) {
 		$actions[] = theme('action_icon', "directs/create/{$from}", BASE_URL.'images/dm.png', 'DM');
 	}
