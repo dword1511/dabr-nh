@@ -15,7 +15,7 @@ function theme() {
 		$function = $custom_function;
 	} else {
 		if (!function_exists($function))
-		return "<p>Error: theme function <b>$function</b> not found.</p>";
+		return "<p>错误：与视觉主题相关的“ <b>$function</b> ”函数被失踪了。</p>";
 	}
 	return call_user_func_array($function, $args);
 }
@@ -134,10 +134,10 @@ function theme_page($title, $content) {
 	if (DEBUG_MODE == 'ON') {
 		global $dabr_start, $api_time, $services_time;
 		$time = microtime(1) - $dabr_start;
-		$body .= '<p>Processed in '.round($time, 4).' seconds ('.round(($time - $api_time - $services_time) / $time * 100).'% Dabr, '.round($api_time / $time * 100).'% Twitter, '.round($services_time / $time * 100).'% other services)</p>';
+		$body .= '<p>于 '.round($time, 4).' 秒内处理完毕。（'.round(($time - $api_time - $services_time) / $time * 100).'% Dabr, '.round($api_time / $time * 100).'% Twitter, '.round($services_time / $time * 100).'% 其他服务）</p>';
 	}
 	if ($title == 'Login') {
-		$title = 'mobile Twitter Login';
+		$title = '登录到 Twitter';
 		$meta = '<meta name="description" content="Free open source alternative to mobile Twitter, bringing you the complete Twitter experience to your phone." />';
 	}
 	ob_start('ob_gzhandler');
@@ -145,12 +145,14 @@ function theme_page($title, $content) {
 	echo	'<!DOCTYPE html PUBLIC "-//WAPFORUM//DTD XHTML Mobile 1.0//EN" "http://www.wapforum.org/DTD/xhtml-mobile10.dtd">
 			<html xmlns="http://www.w3.org/1999/xhtml">
 			<head>
-				<title>',$_SERVER['SERVER_NAME'],' - ',$title,'</title>
+				<title>Dabr - ',$title,'</title>
 				<base href="',BASE_URL,'" />
 				'.$meta.theme('css').'
 				<meta name="viewport" content="width=device-width; initial-scale=1.0;" />
+				<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 			</head>
 			<body>';
+	// things to add: if title == home: self-refresh meta
 
 	echo 	theme('advert');
 	echo 	$body;

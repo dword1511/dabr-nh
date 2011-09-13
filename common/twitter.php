@@ -309,16 +309,16 @@ function twitter_media_page($query)
 
 			$text = $json->text;
 			
-			$content = "<p>Upload success. Image posted to Twitter.</p>
+			$content = "<p>上传成功，图像已经被张贴到 Twitter 上了。</p>
 							<p><img src=\"" . BASE_URL . "simpleproxy.php?url=" . $image_url . ":thumb\" alt='' /></p>
 							<p>". twitter_parse_tags($text) . "</p>";
 			
 		} else {
-			$content = "Damn! Something went wrong. Sorry :-("  
-				."<br /> code=" . $code
-				."<br /> status=" . $status
-				."<br /> image=" . $image
-				."<br /> response=<pre>"
+			$content = "擦！上传失败鸟！"  
+				."<br /> 代码：" . $code
+				."<br /> 状态：" . $status
+				."<br /> 图像：" . $image
+				."<br /> 回应：<pre>"
 				. print_r($tmhOAuth->response['response'], TRUE)
 				. "</pre><br /> info=<pre>"
 				. print_r($tmhOAuth->response['info'], TRUE)
@@ -329,17 +329,17 @@ function twitter_media_page($query)
 	
 	if($_POST) {
 		if (!$_POST['message']) {
-			$content .= "<p>Please enter a message to go with your image.</p>";
+			$content .= "<p>为这张图添加点说明文字吧。</p>";
 		}
 
 		if (!$_FILES['image']['tmp_name']) {
-			$content .= "<p>Please select an image to upload.</p>";
+			$content .= "<p>请选择一幅图片来上传。</p>";
 		}
 	}
 	
 	$content .=	"<form method='post' action='picture' enctype='multipart/form-data'>
-						Image <input type='file' name='image' /><br />
-						Message (optional):<br />
+						图片：<input type='file' name='image' /><br />
+						消息（可选）：<br />
 						<textarea name='message' style='width:90%; max-width: 400px;' rows='3' id='message'>" . $status . "</textarea><br>
 						<input type='submit' value='Send'><span id='remaining'>120</span>
 					</form>";

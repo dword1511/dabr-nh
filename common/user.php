@@ -202,12 +202,12 @@ function _user_decrypt_cookie($crypt_text) {
 }
 
 function user_login() {
-	return theme('page', 'Login','
-<form method="post" action="'.$_GET['q'].'">
-<p>Username <input name="username" size="15" />
-<br />Password <input name="password" type="password" size="15" />
-<br /><label><input type="checkbox" checked="checked" value="yes" name="stay-logged-in" /> Stay logged in? </label>
-<br /><input type="submit" value="Sign In" /></p>
+	return theme('page', '登录','
+<form method="post" action="'.$_GET['q'].'"><p>
+用户名：<input name="username" size="15" /><br />
+密　码：<input name="password" type="password" size="15" /><br />
+<label><input type="checkbox" checked="checked" value="yes" name="stay-logged-in" /> 记住我 </label><br />
+<input type="submit" value="Sign In" /></p>
 </form>
 
 <p><b>Registration steps:</b></p>
