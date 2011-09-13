@@ -121,17 +121,17 @@ function lists_controller($query) {
 function lists_lists_page($user) {
 	// Show a user's lists
 	$lists = twitter_lists_user_lists($user);
-	$content = "<p><a href='lists/{$user}/memberships'>Lists following {$user}</a> | <strong>Lists {$user} follows</strong></p>";
+	$content = "<p><a href='lists/{$user}/memberships'>包含了 {$user} 的列表</a> | <strong>{$user} 订阅的列表</strong></p>";
 	$content .= theme('lists', $lists);
-	theme('page', "{$user}'s lists", $content);
+	theme('page', "{$user} 创建的列表", $content);
 }
 
 function lists_membership_page($user) {
 	// Show lists a user belongs to
 	$lists = twitter_lists_user_memberships($user);
-	$content = "<p><strong>Lists following {$user}</strong> | <a href='lists/{$user}'>Lists {$user} follows</a></p>";
+	$content = "<p><strong>包含了 {$user} 的列表</strong> | <a href='lists/{$user}'>{$user} 订阅的列表</a></p>";
 	$content .= theme('lists', $lists);
-	theme('page', 'List memberhips', $content);
+	theme('page', '列表与用户', $content);
 }
 
 function lists_list_tweets_page($user, $list) {
@@ -140,7 +140,7 @@ function lists_list_tweets_page($user, $list) {
 	$tl = twitter_standard_timeline($tweets, 'user');
 	$content = theme('status_form');
 	$list_url = "lists/{$user}/{$list}";
-	$content .= "<p>Tweets in <a href='user/{$user}'>@{$user}</a>/<strong>{$list}</strong> | <a href='{$list_url}/members'>View Members</a> | <a href='{$list_url}/subscribers'>View Subscribers</a></p>";
+	$content .= "<p><a href='user/{$user}'>@{$user}</a>/<strong>{$list}</strong> 里的消息 | <a href='{$list_url}/members'>查看成员</a> | <a href='{$list_url}/subscribers'>查看订阅者</a></p>";
 	$content .= theme('timeline', $tl);
 	theme('page', "List {$user}/{$list}", $content);
 }
@@ -153,7 +153,7 @@ function lists_list_members_page($user, $list) {
 	// TODO: use a different theme() function? Add a "delete member" link for each member
 	$content = theme('followers', $p, 1);
 	$content .= theme('list_pagination', $p);
-	theme('page', "Members of {$user}/{$list}", $content);
+	theme('page', "{$user}/{$list} 的成员", $content);
 }
 
 function lists_list_subscribers_page($user, $list) {
@@ -161,7 +161,7 @@ function lists_list_subscribers_page($user, $list) {
 	$p = twitter_lists_list_subscribers($user, $list);
 	$content = theme('followers', $p, 1);
 	$content .= theme('list_pagination', $p);
-	theme('page', "Subscribers of {$user}/{$list}", $content);
+	theme('page', "{$user}/{$list} 的订阅者", $content);
 }
 
 
@@ -170,10 +170,10 @@ function lists_list_subscribers_page($user, $list) {
 
 function theme_lists($json) {
 	if (count($json->lists) == 0) {
-		return "<p>No lists to display</p>";
+		return "<p>木有列表可供显示。</p>";
 	}
 	$rows = array();
-	$headers = array('List ', 'Members ', 'Subscribers');
+	$headers = array('列表 ', '成员数 ', '订阅者数');
 	foreach ($json->lists->list as $list) {
 		$url = "lists/{$list->user->screen_name}/{$list->slug}";
 		$rows[] = array(
@@ -189,10 +189,10 @@ function theme_lists($json) {
 
 function theme_list_pagination($json) {
 	if ($cursor = (string) $json->next_cursor) {
-		$links[] = "<a href='{$_GET['q']}?cursor={$cursor}'>Next</a>";
+		$links[] = "<a href='{$_GET['q']}?cursor={$cursor}'>下一页</a>";
 	}
 	if ($cursor = (string) $json->previous_cursor) {
-		$links[] = "<a href='{$_GET['q']}?cursor={$cursor}'>Previous</a>";
+		$links[] = "<a href='{$_GET['q']}?cursor={$cursor}'>上一页</a>";
 	}
 	if (count($links) > 0) return '<p>'.implode(' | ', $links).'</p>';
 }

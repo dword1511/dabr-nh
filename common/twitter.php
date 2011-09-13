@@ -658,7 +658,7 @@ function twitter_retweet_page($query) {
 		$request = API_URL."statuses/show/{$id}.json?include_entities=true";
 		$tl = twitter_process($request);
 		$content = theme('retweet', $tl);
-		theme('page', '转推', $content);
+		theme('page', '转发', $content);
 	}
 }
 
@@ -1237,7 +1237,7 @@ function theme_user_header($user) {
 	$out .= "简介：{$bio}<br />";
 	$out .= "链接：{$link}<br />";
 	$out .= "地址：<a href=\"http://maps.google.com.hk/m?q={$cleanLocation}\" target=\"" . get_target() . "\">{$user->location}</a><br />";
-	$out .= "加入时间：{$date_joined} (~" . pluralise('tweet', $tweets_per_day, true) . " per day)";
+	$out .= "加入时间：{$date_joined} （~ " . pluralise('tweet', $tweets_per_day, true) . " 每天）";
 	$out .= "</span></span>";
 	$out .= "<div class='features'>";
 	$out .= pluralise('tweet', $user->statuses_count, true);
@@ -1293,7 +1293,7 @@ function theme_user_header($user) {
 
 function theme_avatar($url, $force_large = false) {
 	$size = $force_large ? 48 : 24;
-	return "<img src='".$url."' height='$size' width='$size' />";
+	return "<img src='$url' height='$size' width='$size' />";
 }
 
 function theme_status_time_link($status, $is_link = true) {
@@ -1534,7 +1534,7 @@ function theme_timeline($feed)
 		$link = theme('status_time_link', $status, !$status->is_direct);
 		$actions = theme('action_icons', $status);
 		$avatar = theme('avatar', theme_get_avatar($status->from));
-		$source = $status->source ? " from ".str_replace('rel="nofollow"', 'rel="nofollow" target="' . get_target() . '"', preg_replace('/&(?![a-z][a-z0-9]*;|#[0-9]+;|#x[0-9a-f]+;)/i', '&amp;', $status->source)) : ''; //need to replace & in links with &amps and force new window on links
+		$source = $status->source ? "来自 ".str_replace('rel="nofollow"', 'rel="nofollow" target="' . get_target() . '"', preg_replace('/&(?![a-z][a-z0-9]*;|#[0-9]+;|#x[0-9a-f]+;)/i', '&amp;', $status->source)."部门") : ''; //need to replace & in links with &amps and force new window on links
 		if ($status->place->name) {
 			$source .= " " . $status->place->name . ", " . $status->place->country;
 		}
@@ -1543,9 +1543,7 @@ function theme_timeline($feed)
 		}
 		if ($status->retweet_count)	{
 			$source .= " <a href='retweeted_by/{$status->id}'>被转发了 ";
-			switch($status->retweet_count) {
-				default : $source .= $status->retweet_count . " 次</a>";
-			}
+			$source .= $status->retweet_count . " 次</a>";
 		}
 		if ($status->retweeted_by) {
 			$retweeted_by = $status->retweeted_by->user->screen_name;
@@ -1629,7 +1627,7 @@ function twitter_is_reply($status) {
 
 function theme_followers($feed, $hide_pagination = false) {
 	$rows = array();
-	if (count($feed) == 0 || $feed == '[]') return '<p>兄弟，你混得太惨了吧。</p>';
+	if (count($feed) == 0 || $feed == '[]') return '<p>兄弟，你混得贼惨了吧。</p>';
 
 	foreach ($feed->users->user as $user) {
 
