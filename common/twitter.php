@@ -763,12 +763,12 @@ function twitter_confirmation_page($query)
 			{
 				$action = 'unblock';
 				$content  = "<p>你真的要<strong>解除对 $target 的屏蔽</strong>么？</p>";
-				$content .= '<ul><li>They will see your updates on their home page if they follow you again.</li><li>You <em>can</em> block them again if you want.</li></ul>';
+				$content .= '<ul><li>如果他们又fo了你的话他们就又可以看到你的活动了。</li><li>你<em>可以</em>再次B掉他们，如果需要的话。</li></ul>';
 			}
 			else
 			{
 				$content = "<p>你真的要<strong>B掉 $target </strong>么？</p>";
-				$content .= "<ul><li>You won't show up in their list of friends</li><li>They won't see your updates on their home page</li><li>They won't be able to follow you</li><li>You <em>can</em> unblock them but you will need to follow them again afterwards</li></ul>";
+				$content .= "<ul><li>你不会再出现在他们的朋友名单里了。</li><li>他们在你的主页也看不到你发送的消息了。</li><li>他们会没法fo你。</li><li>你<em>可以</em>以后解封但是会需要重新互fo一下。</li></ul>";
 			}
 			break;
 
@@ -779,7 +779,7 @@ function twitter_confirmation_page($query)
 
 		case 'deleteDM':
 			$content = '<p>你真的要删掉那条私信么？</p>';
-			$content .= "<ul><li>消息号：<strong>$target</strong></li><li>There is no way to undo this action.</li><li>The DM will be deleted from both the sender's outbox <em>and</em> receiver's inbox.</li></ul>";
+			$content .= "<ul><li>消息号：<strong>$target</strong></li><li>世上木有后悔药哦亲！</li><li>而且这条私信会被从<em>接收和发送双方</em>的账户里删掉。</li></ul>";
 			break;
 
 		case 'spam':
@@ -802,16 +802,16 @@ function twitter_confirmed_page($query)
 	
 	switch ($action) {
                 case 'block':
-			$content  = "<p><span class='avatar'><img src='".BASE_URL."images/dabr.png' width='48' height='48' /></span><span class='status shift'>Bye-bye @$target - you are now <strong>blocked</strong>.</span></p>";
+			$content  = "<p><span class='avatar'><img src='".BASE_URL."images/dabr.png' width='48' height='48' /></span><span class='status shift'>再见鸟<strong>被B掉的</strong> @$target 。</span></p>";
                         break;
                 case 'unblock':
-                        $content  = "<p><span class='avatar'><img src='".BASE_URL."images/dabr.png' width='48' height='48' /></span><span class='status shift'>Hello again @$target - you have been <strong>unblocked</strong>.</span></p>";
+                        $content  = "<p><span class='avatar'><img src='".BASE_URL."images/dabr.png' width='48' height='48' /></span><span class='status shift'>欢迎回来，<strong>被解封的</strong> @$target 。</span></p>";
                         break;
                 case 'spam':
-                        $content = "<p><span class='avatar'><img src='".BASE_URL."images/dabr.png' width='48' height='48' /></span><span class='status shift'>Yum! Yum! Yum! Delicious spam! Goodbye @$target.</span></p>";
+                        $content = "<p><span class='avatar'><img src='".BASE_URL."images/dabr.png' width='48' height='48' /></span><span class='status shift'>哼！再见鸟可恶滴 @$target 。</span></p>";
                         break;
 	}
- 	theme ('Page', 'Confirmed', $content);
+ 	theme ('Page', '已确认！', $content);
 }
 
 function twitter_friends_page($query) {
@@ -951,7 +951,7 @@ function twitter_directs_page($query) {
 			$tl = twitter_standard_timeline(twitter_process($request), 'directs_sent');
 			$content = theme_directs_menu();
 			$content .= theme('timeline', $tl);
-			theme('page', '私信已发送！', $content);
+			theme('page', '已送出', $content);
 
 		case 'inbox':
 		default:
@@ -964,7 +964,7 @@ function twitter_directs_page($query) {
 }
 
 function theme_directs_menu() {
-	return '<p><a href="directs/create">Create</a> | <a href="directs/inbox">Inbox</a> | <a href="directs/sent">Sent</a></p>';
+	return '<p><a href="directs/create">写信</a> | <a href="directs/inbox">邮筒</a> | <a href="directs/sent">已送出</a></p>';
 }
 
 function theme_directs_form($to) {
@@ -1061,7 +1061,7 @@ function twitter_user_page($query)
 		
 		$out = twitter_parse_tags($tweet->text);
 
-		$content .= "<p>In reply to:<br />{$out}</p>";
+		$content .= "<p>此回复针对下列用户：<br />{$out}</p>";
 
 		if ($subaction == 'replyall') {
 			$found = Twitter_Extractor::create($tweet->text)
@@ -1234,10 +1234,10 @@ function theme_user_header($user) {
 		$out .= '<strong>保密的消息</strong><br />';
 	}
 
-	$out .= "Bio: {$bio}<br />";
-	$out .= "Link: {$link}<br />";
-	$out .= "Location: <a href=\"http://maps.google.com.hk/m?q={$cleanLocation}\" target=\"" . get_target() . "\">{$user->location}</a><br />";
-	$out .= "Joined: {$date_joined} (~" . pluralise('tweet', $tweets_per_day, true) . " per day)";
+	$out .= "简介：{$bio}<br />";
+	$out .= "链接：{$link}<br />";
+	$out .= "地址：<a href=\"http://maps.google.com.hk/m?q={$cleanLocation}\" target=\"" . get_target() . "\">{$user->location}</a><br />";
+	$out .= "加入时间：{$date_joined} (~" . pluralise('tweet', $tweets_per_day, true) . " per day)";
 	$out .= "</span></span>";
 	$out .= "<div class='features'>";
 	$out .= pluralise('tweet', $user->statuses_count, true);
@@ -1257,21 +1257,21 @@ function theme_user_header($user) {
 	}
 
 	$out .= " | <a href='lists/{$user->screen_name}'>" . pluralise('list', $user->listed_count, true) . "</a>";
-	$out .=	" | <a href='directs/create/{$user->screen_name}'>Direct Message</a>";
+	$out .=	" | <a href='directs/create/{$user->screen_name}'>发私信</a>";
 	//NB we can tell if the user can be sent a DM $following->relationship->target->following;
 	//Would removing this link confuse users?
 
 	//Deprecated http://apiwiki.twitter.com/Twitter-REST-API-Method%3A-users%C2%A0show
 	//if ($user->following !== true)
 	if ($followed_by == false) {
-		$out .= " | <a href='follow/{$user->screen_name}'>Follow</a>";
+		$out .= " | <a href='follow/{$user->screen_name}'>关注</a>";
 	}
 	else {
-		$out .= " | <a href='unfollow/{$user->screen_name}'>Unfollow</a>";
+		$out .= " | <a href='unfollow/{$user->screen_name}'>取消关注</a>";
 	}
 	
 	//We need to pass the User Name and the User ID.  The Name is presented in the UI, the ID is used in checking
-	$out.= " | <a href='confirm/block/{$user->screen_name}/{$user->id}'>(Un)Block</a>";
+	$out.= " | <a href='confirm/block/{$user->screen_name}/{$user->id}'>屏蔽/取消屏蔽</a>";
 	/*
 	//This should work, but it doesn't. Grrr.
 	$blocked = $following->relationship->source->blocking; //The $user is blocked by the authenticating
@@ -1285,8 +1285,8 @@ function theme_user_header($user) {
 	}
 	*/
 
-	$out .= " | <a href='confirm/spam/{$user->screen_name}/{$user->id}'>Report Spam</a>";
-	$out .= " | <a href='search?query=%40{$user->screen_name}'>Search @{$user->screen_name}</a>";
+	$out .= " | <a href='confirm/spam/{$user->screen_name}/{$user->id}'>报告为垃圾信息</a>";
+	$out .= " | <a href='search?query=%40{$user->screen_name}'>搜索 @{$user->screen_name}</a>";
 	$out .= "</div></div>";
 	return $out;
 }
@@ -1539,19 +1539,17 @@ function theme_timeline($feed)
 			$source .= " " . $status->place->name . ", " . $status->place->country;
 		}
 		if ($status->in_reply_to_status_id)	{
-			$source .= " <a href='status/{$status->in_reply_to_status_id_str}'>in reply to {$status->in_reply_to_screen_name}</a>";
+			$source .= " <a href='status/{$status->in_reply_to_status_id_str}'>对 {$status->in_reply_to_screen_name} 的回复</a>";
 		}
 		if ($status->retweet_count)	{
-			$source .= " <a href='retweeted_by/{$status->id}'>retweeted ";
+			$source .= " <a href='retweeted_by/{$status->id}'>被转发了 ";
 			switch($status->retweet_count) {
-				case(1) : $source .= "once</a>"; break;
-				case(2) : $source .= "twice</a>"; break;
-				default : $source .= $status->retweet_count . " times</a>";
+				default : $source .= $status->retweet_count . " 次</a>";
 			}
 		}
 		if ($status->retweeted_by) {
 			$retweeted_by = $status->retweeted_by->user->screen_name;
-			$source .= "<br /><a href='retweeted_by/{$status->id}'>retweeted</a> by <a href='user/{$retweeted_by}'>{$retweeted_by}</a>";
+			$source .= "<br /><a href='retweeted_by/{$status->id}'>被下列用户转发：</a> <a href='user/{$retweeted_by}'>{$retweeted_by}</a>";
 		}
 		$html = "<b><a href='user/{$status->from->screen_name}'>{$status->from->screen_name}</a></b> $actions $link<br />{$text}<br />$media<small>$source</small>";
 
@@ -1631,7 +1629,7 @@ function twitter_is_reply($status) {
 
 function theme_followers($feed, $hide_pagination = false) {
 	$rows = array();
-	if (count($feed) == 0 || $feed == '[]') return '<p>No users to display.</p>';
+	if (count($feed) == 0 || $feed == '[]') return '<p>兄弟，你混得太惨了吧。</p>';
 
 	foreach ($feed->users->user as $user) {
 
@@ -1640,19 +1638,19 @@ function theme_followers($feed, $hide_pagination = false) {
 		$last_tweet = strtotime($user->status->created_at);
 		$content = "{$name}<br /><span class='about'>";
 		if($user->description != "")
-			$content .= "Bio: " . twitter_parse_tags($user->description) . "<br />";
+			$content .= "简介：" . twitter_parse_tags($user->description) . "<br />";
 		if($user->location != "")
-			$content .= "Location: {$user->location}<br />";
+			$content .= "地址：{$user->location}<br />";
 		$content .= "Info: ";
 		$content .= pluralise('tweet', $user->statuses_count, true) . ", ";
 		$content .= pluralise('friend', $user->friends_count, true) . ", ";
 		$content .= pluralise('follower', $user->followers_count, true) . ", ";
-		$content .= "~" . pluralise('tweet', $tweets_per_day, true) . " per day<br />";
-		$content .= "Last tweet: ";
+		$content .= "~" . pluralise('tweet', $tweets_per_day, true) . " 每天<br />";
+		$content .= "上一条推：";
 		if($user->protected == 'true' && $last_tweet == 0)
-			$content .= "Private";
+			$content .= "私密";
 		else if($last_tweet == 0)
-			$content .= "Never tweeted";
+			$content .= "没转发过";
 		else
 			$content .= twitter_date('l jS F Y', $last_tweet);
 		$content .= "</span>";
@@ -1673,7 +1671,7 @@ function theme_followers($feed, $hide_pagination = false) {
 // TODO merge theme_retweeters with theme_followers
 function theme_retweeters($feed, $hide_pagination = false) {
 	$rows = array();
-	if (count($feed) == 0 || $feed == '[]') return '<p>No one has retweeted this status.</p>';
+	if (count($feed) == 0 || $feed == '[]') return '<p>木有人转发过这条消息。</p>';
 
 	foreach ($feed->user as $user) {
 
@@ -1682,14 +1680,14 @@ function theme_retweeters($feed, $hide_pagination = false) {
 		$last_tweet = strtotime($user->status->created_at);
 		$content = "{$name}<br /><span class='about'>";
 		if($user->description != "")
-			$content .= "Bio: " . twitter_parse_tags($user->description) . "<br />";
+			$content .= "简介：" . twitter_parse_tags($user->description) . "<br />";
 		if($user->location != "")
-			$content .= "Location: {$user->location}<br />";
+			$content .= "地址：{$user->location}<br />";
 		$content .= "Info: ";
 		$content .= pluralise('tweet', $user->statuses_count, true) . ", ";
 		$content .= pluralise('friend', $user->friends_count, true) . ", ";
 		$content .= pluralise('follower', $user->followers_count, true) . ", ";
-		$content .= "~" . pluralise('tweet', $tweets_per_day, true) . " per day<br />";
+		$content .= "~" . pluralise('tweet', $tweets_per_day, true) . " 每天<br />";
 		$content .= "</span>";
 
 		$rows[] = array('data' => array(array('data' => theme('avatar', theme_get_avatar($user)), 'class' => 'avatar'),
@@ -1720,7 +1718,7 @@ function theme_get_avatar($object) {
 }
 
 function theme_no_tweets() {
-	return '<p>No tweets to display.</p>';
+	return '<p>木有任何消息可供显示。</p>';
 }
 
 function theme_search_results($feed) {
@@ -1746,7 +1744,7 @@ function theme_search_results($feed) {
 
 function theme_search_form($query) {
 	$query = stripslashes(htmlentities($query,ENT_QUOTES,"UTF-8"));
-	return "<form action='search' method='get'><input name='query' value=\"$query\" /><input type='submit' value='Search' /></form>";
+	return "<form action='search' method='get'><input name='query' value=\"$query\" /><input type='submit' value='给我搜！' /></form>";
 }
 
 function theme_external_link($url, $content = null) {
@@ -1773,8 +1771,8 @@ function theme_pagination()
 		$query = $matches[0];
 	}
 	if ($page == 0) $page = 1;
-	$links[] = "<a href='{$_GET['q']}?page=".($page+1)."$query' accesskey='9'>Older</a> 9";
-	if ($page > 1) $links[] = "<a href='{$_GET['q']}?page=".($page-1)."$query' accesskey='8'>Newer</a> 8";
+	$links[] = "<a href='{$_GET['q']}?page=".($page+1)."$query' accesskey='9'>更早</a> 9";
+	if ($page > 1) $links[] = "<a href='{$_GET['q']}?page=".($page-1)."$query' accesskey='8'>更晚</a> 8";
 	return '<p>'.implode(' | ', $links).'</p>';
 
 	/*
