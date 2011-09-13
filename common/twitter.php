@@ -597,11 +597,11 @@ function flickr_encode($num) {
 
 function format_interval($timestamp, $granularity = 2) {
 	$units = array(
-	'year' => 31536000,
-	'day'  => 86400,
-	'hour' => 3600,
-	'min'  => 60,
-	'sec'  => 1
+	'年' => 31536000,
+	'天'  => 86400,
+	'小时' => 3600,
+	'分钟'  => 60,
+	'秒'  => 1
 	);
 	$output = '';
 	foreach ($units as $key => $value) {
@@ -1237,26 +1237,26 @@ function theme_user_header($user) {
 	$out .= "简介：{$bio}<br />";
 	$out .= "链接：{$link}<br />";
 	$out .= "地址：<a href=\"http://maps.google.com.hk/m?q={$cleanLocation}\" target=\"" . get_target() . "\">{$user->location}</a><br />";
-	$out .= "加入时间：{$date_joined} （~ " . pluralise('tweet', $tweets_per_day, true) . " 每天）";
+	$out .= "加入时间：{$date_joined} （~ " . pluralise(' 条消息', $tweets_per_day, true) . "每天）";
 	$out .= "</span></span>";
 	$out .= "<div class='features'>";
-	$out .= pluralise('tweet', $user->statuses_count, true);
+	$out .= pluralise(' 条消息', $user->statuses_count, true);
 
 	//If the authenticated user is not following the protected used, the API will return a 401 error when trying to view friends, followers and favourites
 	//This is not the case on the Twitter website
 	//To avoid the user being logged out, check to see if she is following the protected user. If not, don't create links to friends, followers and favourites
 	if ($user->protected == true && $followed_by == false) {
-		$out .= " | " . pluralise('follower', $user->followers_count, true);
-		$out .= " | " . pluralise('friend', $user->friends_count, true);
-		$out .= " | " . pluralise('favourite', $user->favourites_count, true);
+		$out .= " | " . pluralise('关注者', $user->followers_count, true);
+		$out .= " | " . pluralise('被关注者', $user->friends_count, true);
+		$out .= " | " . pluralise('收藏条目', $user->favourites_count, true);
 	}
 	else {
-		$out .= " | <a href='followers/{$user->screen_name}'>" . pluralise('follower', $user->followers_count, true) . "</a>";
-		$out .= " | <a href='friends/{$user->screen_name}'>" . pluralise('friend', $user->friends_count, true) . "</a>";
-		$out .= " | <a href='favourites/{$user->screen_name}'>" . pluralise('favourite', $user->favourites_count, true) . "</a>";
+		$out .= " | <a href='followers/{$user->screen_name}'>" . pluralise('关注者', $user->followers_count, true) . "</a>";
+		$out .= " | <a href='friends/{$user->screen_name}'>" . pluralise('被关注者', $user->friends_count, true) . "</a>";
+		$out .= " | <a href='favourites/{$user->screen_name}'>" . pluralise('收藏条目', $user->favourites_count, true) . "</a>";
 	}
 
-	$out .= " | <a href='lists/{$user->screen_name}'>" . pluralise('list', $user->listed_count, true) . "</a>";
+	$out .= " | <a href='lists/{$user->screen_name}'>" . pluralise('列表', $user->listed_count, true) . "</a>";
 	$out .=	" | <a href='directs/create/{$user->screen_name}'>发私信</a>";
 	//NB we can tell if the user can be sent a DM $following->relationship->target->following;
 	//Would removing this link confuse users?
@@ -1639,11 +1639,11 @@ function theme_followers($feed, $hide_pagination = false) {
 			$content .= "简介：" . twitter_parse_tags($user->description) . "<br />";
 		if($user->location != "")
 			$content .= "地址：{$user->location}<br />";
-		$content .= "Info: ";
-		$content .= pluralise('tweet', $user->statuses_count, true) . ", ";
-		$content .= pluralise('friend', $user->friends_count, true) . ", ";
-		$content .= pluralise('follower', $user->followers_count, true) . ", ";
-		$content .= "~" . pluralise('tweet', $tweets_per_day, true) . " 每天<br />";
+		$content .= "信息：";
+		$content .= pluralise(' 条消息', $user->statuses_count, true) . ", ";
+		$content .= pluralise('被关注者', $user->friends_count, true) . ", ";
+		$content .= pluralise('关注者', $user->followers_count, true) . ", ";
+		$content .= "~" . pluralise(' 条消息', $tweets_per_day, true) . "每天<br />";
 		$content .= "上一条推：";
 		if($user->protected == 'true' && $last_tweet == 0)
 			$content .= "私密";
@@ -1681,11 +1681,11 @@ function theme_retweeters($feed, $hide_pagination = false) {
 			$content .= "简介：" . twitter_parse_tags($user->description) . "<br />";
 		if($user->location != "")
 			$content .= "地址：{$user->location}<br />";
-		$content .= "Info: ";
-		$content .= pluralise('tweet', $user->statuses_count, true) . ", ";
-		$content .= pluralise('friend', $user->friends_count, true) . ", ";
-		$content .= pluralise('follower', $user->followers_count, true) . ", ";
-		$content .= "~" . pluralise('tweet', $tweets_per_day, true) . " 每天<br />";
+		$content .= "信息：";
+		$content .= pluralise(' 条消息', $user->statuses_count, true) . ", ";
+		$content .= pluralise('被关注者', $user->friends_count, true) . ", ";
+		$content .= pluralise('关注者', $user->followers_count, true) . ", ";
+		$content .= "~" . pluralise(' 条消息', $tweets_per_day, true) . "每天<br />";
 		$content .= "</span>";
 
 		$rows[] = array('data' => array(array('data' => theme('avatar', theme_get_avatar($user)), 'class' => 'avatar'),
@@ -1727,8 +1727,7 @@ function theme_search_results($feed) {
 		$actions = theme('action_icons', $status);
 
 		$row = array(
-		//theme('avatar', theme_get_avatar($status)),
-		theme('avatar', $status->profile_image_url_https),
+		theme('avatar', theme_get_avatar($status)),
       "<a href='user/{$status->from_user}'>{$status->from_user}</a> $actions - {$link}<br />{$text}",
 		);
 		if (twitter_is_reply($status)) {
@@ -1869,7 +1868,7 @@ function theme_action_icon($url, $image_url, $text) {
 
 function pluralise($word, $count, $show = FALSE) {
 	if($show) $word = "{$count} {$word}";
-	return $word . (($count != 1) ? 's' : '');
+	return $word;
 }
 
 function is_64bit() {
