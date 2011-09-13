@@ -1246,17 +1246,17 @@ function theme_user_header($user) {
 	//This is not the case on the Twitter website
 	//To avoid the user being logged out, check to see if she is following the protected user. If not, don't create links to friends, followers and favourites
 	if ($user->protected == true && $followed_by == false) {
-		$out .= " | " . pluralise('关注者', $user->followers_count, true);
-		$out .= " | " . pluralise('被关注者', $user->friends_count, true);
-		$out .= " | " . pluralise('收藏条目', $user->favourites_count, true);
+		$out .= " | " . pluralise('个粉丝', $user->followers_count, true);
+		$out .= " | " . pluralise('个偶像', $user->friends_count, true);
+		$out .= " | " . pluralise('条收藏', $user->favourites_count, true);
 	}
 	else {
-		$out .= " | <a href='followers/{$user->screen_name}'>" . pluralise('关注者', $user->followers_count, true) . "</a>";
-		$out .= " | <a href='friends/{$user->screen_name}'>" . pluralise('被关注者', $user->friends_count, true) . "</a>";
-		$out .= " | <a href='favourites/{$user->screen_name}'>" . pluralise('收藏条目', $user->favourites_count, true) . "</a>";
+		$out .= " | <a href='followers/{$user->screen_name}'>" . pluralise('个粉丝', $user->followers_count, true) . "</a>";
+		$out .= " | <a href='friends/{$user->screen_name}'>" . pluralise('个偶像', $user->friends_count, true) . "</a>";
+		$out .= " | <a href='favourites/{$user->screen_name}'>" . pluralise('条收藏', $user->favourites_count, true) . "</a>";
 	}
 
-	$out .= " | <a href='lists/{$user->screen_name}'>" . pluralise('列表', $user->listed_count, true) . "</a>";
+	$out .= " | <a href='lists/{$user->screen_name}'>" . pluralise('个列表的成员', $user->listed_count, true) . "</a>";
 	$out .=	" | <a href='directs/create/{$user->screen_name}'>发私信</a>";
 	//NB we can tell if the user can be sent a DM $following->relationship->target->following;
 	//Would removing this link confuse users?
@@ -1641,8 +1641,8 @@ function theme_followers($feed, $hide_pagination = false) {
 			$content .= "地址：{$user->location}<br />";
 		$content .= "信息：";
 		$content .= pluralise(' 条消息', $user->statuses_count, true) . ", ";
-		$content .= pluralise('被关注者', $user->friends_count, true) . ", ";
-		$content .= pluralise('关注者', $user->followers_count, true) . ", ";
+		$content .= pluralise('个粉丝', $user->friends_count, true) . ", ";
+		$content .= pluralise('个偶像', $user->followers_count, true) . ", ";
 		$content .= "~" . pluralise(' 条消息', $tweets_per_day, true) . "每天<br />";
 		$content .= "上一条推：";
 		if($user->protected == 'true' && $last_tweet == 0)
@@ -1683,8 +1683,8 @@ function theme_retweeters($feed, $hide_pagination = false) {
 			$content .= "地址：{$user->location}<br />";
 		$content .= "信息：";
 		$content .= pluralise(' 条消息', $user->statuses_count, true) . ", ";
-		$content .= pluralise('被关注者', $user->friends_count, true) . ", ";
-		$content .= pluralise('关注者', $user->followers_count, true) . ", ";
+		$content .= pluralise('个粉丝', $user->friends_count, true) . ", ";
+		$content .= pluralise('个偶像', $user->followers_count, true) . ", ";
 		$content .= "~" . pluralise(' 条消息', $tweets_per_day, true) . "每天<br />";
 		$content .= "</span>";
 
