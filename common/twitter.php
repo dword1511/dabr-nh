@@ -762,36 +762,36 @@ function twitter_confirmation_page($query)
 			if (twitter_block_exists($target_id)) //Is the target blocked by the user?
 			{
 				$action = 'unblock';
-				$content  = "<p>Are you really sure you want to <strong>Unblock $target</strong>?</p>";
+				$content  = "<p>你真的要<strong>解除对 $target 的屏蔽</strong>么？</p>";
 				$content .= '<ul><li>They will see your updates on their home page if they follow you again.</li><li>You <em>can</em> block them again if you want.</li></ul>';
 			}
 			else
 			{
-				$content = "<p>Are you really sure you want to <strong>$action $target</strong>?</p>";
+				$content = "<p>你真的要<strong>B掉 $target </strong>么？</p>";
 				$content .= "<ul><li>You won't show up in their list of friends</li><li>They won't see your updates on their home page</li><li>They won't be able to follow you</li><li>You <em>can</em> unblock them but you will need to follow them again afterwards</li></ul>";
 			}
 			break;
 
 		case 'delete':
-			$content = '<p>Are you really sure you want to delete your tweet?</p>';
-			$content .= "<ul><li>Tweet ID: <strong>$target</strong></li><li>There is no way to undo this action.</li></ul>";
+			$content = '<p>你真的要把自己的推文删掉么？</p>';
+			$content .= "<ul><li>消息号：<strong>$target</strong></li><li>世上木有后悔药哦亲！</li></ul>";
 			break;
 
 		case 'deleteDM':
-			$content = '<p>Are you really sure you want to delete that DM?</p>';
-			$content .= "<ul><li>Tweet ID: <strong>$target</strong></li><li>There is no way to undo this action.</li><li>The DM will be deleted from both the sender's outbox <em>and</em> receiver's inbox.</li></ul>";
+			$content = '<p>你真的要删掉那条私信么？</p>';
+			$content .= "<ul><li>消息号：<strong>$target</strong></li><li>There is no way to undo this action.</li><li>The DM will be deleted from both the sender's outbox <em>and</em> receiver's inbox.</li></ul>";
 			break;
 
 		case 'spam':
-			$content  = "<p>Are you really sure you want to report <strong>$target</strong> as a spammer?</p>";
-			$content .= "<p>They will also be blocked from following you.</p>";
+			$content  = "<p>你确定要举报 <strong>$target</strong> 发布垃圾信息？</p>";
+			$content .= "<p>他们同时会被B掉所以你会掉fo哦。</p>";
 			break;
 
 	}
 	$content .= "<form action='$action/$target' method='post'>
-						<input type='submit' value='Yes please' />
+						<input type='submit' value='是的，表罗嗦。' />
 					</form>";
-	theme('Page', 'Confirm', $content);
+	theme('Page', '确认', $content);
 }
 
 function twitter_confirmed_page($query)
@@ -823,7 +823,7 @@ function twitter_friends_page($query) {
 	$request = API_URL."statuses/friends/{$user}.xml";
 	$tl = lists_paginated_process($request);
 	$content = theme('followers', $tl);
-	theme('page', 'Friends', $content);
+	theme('page', '您关注的人', $content);
 }
 
 function twitter_followers_page($query) {
@@ -835,7 +835,7 @@ function twitter_followers_page($query) {
 	$request = API_URL."statuses/followers/{$user}.xml";
 	$tl = lists_paginated_process($request);
 	$content = theme('followers', $tl);
-	theme('page', 'Followers', $content);
+	theme('page', '关注您的人', $content);
 }
 
 //  Shows every user who retweeted a specific status
@@ -844,7 +844,7 @@ function twitter_retweeters_page($tweet) {
 	$request = API_URL."statuses/{$id}/retweeted_by.xml";
 	$tl = lists_paginated_process($request);
 	$content = theme('retweeters', $tl);
-	theme('page', "Everyone who retweeted {$id}", $content);
+	theme('page', "所有转发了消息号 {$id} 的家伙", $content);
 }
 
 function twitter_update() {
@@ -918,7 +918,7 @@ function twitter_replies_page() {
 	$tl = twitter_standard_timeline($tl, 'replies');
 	$content = theme('status_form');
 	$content .= theme('timeline', $tl);
-	theme('page', 'Replies', $content);
+	theme('page', '回复', $content);
 }
 
 function twitter_retweets_page() {
@@ -927,7 +927,7 @@ function twitter_retweets_page() {
 	$tl = twitter_standard_timeline($tl, 'retweets');
 	$content = theme('status_form');
 	$content .= theme('timeline',$tl);
-	theme('page', 'Retweets', $content);
+	theme('page', '转发', $content);
 }
 
 function twitter_directs_page($query) {
@@ -936,7 +936,7 @@ function twitter_directs_page($query) {
 		case 'create':
 			$to = $query[2];
 			$content = theme('directs_form', $to);
-			theme('page', 'Create DM', $content);
+			theme('page', '写私信', $content);
 
 		case 'send':
 			twitter_ensure_post_action();
@@ -951,7 +951,7 @@ function twitter_directs_page($query) {
 			$tl = twitter_standard_timeline(twitter_process($request), 'directs_sent');
 			$content = theme_directs_menu();
 			$content .= theme('timeline', $tl);
-			theme('page', 'DM Sent', $content);
+			theme('page', '私信已发送！', $content);
 
 		case 'inbox':
 		default:
@@ -959,7 +959,7 @@ function twitter_directs_page($query) {
 			$tl = twitter_standard_timeline(twitter_process($request), 'directs_inbox');
 			$content = theme_directs_menu();
 			$content .= theme('timeline', $tl);
-			theme('page', 'DM Inbox', $content);
+			theme('page', '邮筒', $content);
 	}
 }
 
@@ -978,7 +978,7 @@ function theme_directs_form($to) {
 	} else {
 		$html_to .= "To: <input name='to'><br />Message:";
 	}
-	$content = "<form action='directs/send' method='post'>$html_to<br><textarea name='message' style='width:90%; max-width: 400px;' rows='3' id='message'></textarea><br><input type='submit' value='Send'><span id='remaining'>140</span></form>";
+	$content = "<form action='directs/send' method='post'>$html_to<br><textarea name='message' style='width:90%; max-width: 400px;' rows='3' id='message'></textarea><br><input type='submit' value='发送'><span id='remaining'>140</span></form>";
 	$content .= js_counter("message");
 	return $content;
 }
@@ -997,11 +997,11 @@ function twitter_search_page() {
 	if ($search_query) {
 		$tl = twitter_search($search_query);
 		if ($search_query !== $_COOKIE['search_favourite']) {
-			$content .= '<form action="search/bookmark" method="post"><input type="hidden" name="query" value="'.$search_query.'" /><input type="submit" value="Save as default search" /></form>';
+			$content .= '<form action="search/bookmark" method="post"><input type="hidden" name="query" value="'.$search_query.'" /><input type="submit" value="存为默认搜索" /></form>';
 		}
 		$content .= theme('timeline', $tl);
 	}
-	theme('page', 'Search', $content);
+	theme('page', '搜索', $content);
 }
 
 function twitter_search($search_query) {
@@ -1036,7 +1036,7 @@ function twitter_user_page($query)
 	$in_reply_to_id = (string) $query[3];
 	$content = '';
 
-	if (!$screen_name) theme('error', 'No username given');
+	if (!$screen_name) theme('error', '木有用户名啊！');
 
 	// Load up user profile information and one tweet
 	$user = twitter_user_info($screen_name);
@@ -1091,7 +1091,7 @@ function twitter_user_page($query)
 	$content .= theme('user_header', $user);
 	$content .= theme('timeline', $tl);
 
-	theme('page', "User {$screen_name}", $content);
+	theme('page', "用户 {$screen_name}", $content);
 }
 
 function twitter_favourites_page($query) {
@@ -1105,7 +1105,7 @@ function twitter_favourites_page($query) {
 	$tl = twitter_standard_timeline($tl, 'favourites');
 	$content = theme('status_form');
 	$content .= theme('timeline', $tl);
-	theme('page', 'Favourites', $content);
+	theme('page', '收藏', $content);
 }
 
 function twitter_mark_favourite_page($query) {
@@ -1139,7 +1139,7 @@ function twitter_home_page() {
 	$tl = twitter_standard_timeline($tl, 'friends');
 	$content = theme('status_form');
 	$content .= theme('timeline', $tl);
-	theme('page', 'Home', $content);
+	theme('page', '主页', $content);
 }
 
 function twitter_hashtag_page($query) {
@@ -1156,7 +1156,7 @@ function twitter_hashtag_page($query) {
 
 function theme_status_form($text = '', $in_reply_to_id = NULL) {
 	if (user_is_authenticated()) {
-		return "<fieldset><legend><img src='".BASE_URL."images/bird_16_blue.png' width='16' height='16' /> What's Happening?</legend><form method='post' action='update'><input name='status' value='{$text}' maxlength='140' /> <input name='in_reply_to_id' value='{$in_reply_to_id}' type='hidden' /><input type='submit' value='Tweet' /></form></fieldset>";
+		return "<fieldset><legend><img src='".BASE_URL."images/bird_16_blue.png' width='16' height='16' />发生了神马？</legend><form method='post' action='update'><input name='status' value='{$text}' maxlength='140' /> <input name='in_reply_to_id' value='{$in_reply_to_id}' type='hidden' /><input type='submit' value='推！' /></form></fieldset>";
 	}
 }
 
@@ -1178,24 +1178,24 @@ function theme_retweet($status)
 
 	if($status->user->protected == 0)
 	{
-		$content.="<p>Twitter's new style retweet:</p>
+		$content.="<p>直接转发：</p>
 					<form action='twitter-retweet/{$status->id_str}' method='post'>
 						<input type='hidden' name='from' value='$from' />
-						<input type='submit' value='Twitter Retweet' />
+						<input type='submit' value='直接转发' />
 					</form>
 					<hr />";
 	}
 	else
 	{
-		$content.="<p>@{$status->user->screen_name} doesn't allow you to retweet them. You will have to use the  use the old style editable retweet</p>";
+		$content.="<p>@{$status->user->screen_name} 不让你转发它。但是你可以假装编辑下再发啊。</p>";
 	}
 
-	$content .= "<p>Old style editable retweet:</p>
+	$content .= "<p>编辑后转发：</p>
 					<form action='update' method='post'>
 						<input type='hidden' name='from' value='$from' />
 						<textarea name='status' style='width:90%; max-width: 400px;' rows='3' id='status'>$text</textarea>
 						<br/>
-						<input type='submit' value='Retweet' />
+						<input type='submit' value='转发' />
 						<span id='remaining'>" . (140 - $length) ."</span>
 					</form>";
 	$content .= js_counter("status");
@@ -1228,10 +1228,10 @@ function theme_user_header($user) {
 	$out .= "<span class='status shift'><b>{$name}</b><br />";
 	$out .= "<span class='about'>";
 	if ($user->verified == true) {
-		$out .= '<strong>Verified Account</strong><br />';
+		$out .= '<strong>已认证账户</strong><br />';
 	}
 	if ($user->protected == true) {
-		$out .= '<strong>Private/Protected Tweets</strong><br />';
+		$out .= '<strong>保密的消息</strong><br />';
 	}
 
 	$out .= "Bio: {$bio}<br />";

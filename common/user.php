@@ -229,7 +229,7 @@ function theme_login() {
 	<th>小贴士：上面的玩意墙内的用户可不要乱点哦亲！被跨省了本人概不负责哦亲！</th>
 </tr></table>
 <p>直接通过用户名和密码登录是邪恶的，参见 <a href="http://blog.dabr.co.uk/">Dabr blog</a></p>';
-	$content .='<hr /><h2>大家好！我是邪恶的 OAuth 代理</h2>
+	$content .='<hr /><h2>大家好！我是桑不起的 OAuth 黑中介</h2>
 <em>（对，你最好表相信我，否则……）</em>
 <form action="'.BASE_URL.'oauth" method="post">
 <table>

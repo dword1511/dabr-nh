@@ -134,11 +134,11 @@ function theme_page($title, $content) {
 	if (DEBUG_MODE == 'ON') {
 		global $dabr_start, $api_time, $services_time;
 		$time = microtime(1) - $dabr_start;
-		$body .= '<p>于 '.round($time, 4).' 秒内处理完毕。（'.round(($time - $api_time - $services_time) / $time * 100).'% Dabr, '.round($api_time / $time * 100).'% Twitter, '.round($services_time / $time * 100).'% 其他服务）</p>';
+		$body .= '<p>总计磨蹭了 '.round($time, 4).' 秒。（ Dabr ：'.round(($time - $api_time - $services_time) / $time * 100).'% ，Twitter ：'.round($api_time / $time * 100).'% ，其他服务：'.round($services_time / $time * 100).'% ）</p>';
 	}
 	if ($title == 'Login') {
 		$title = '登录到 Twitter';
-		$meta = '<meta name="description" content="Free open source alternative to mobile Twitter, bringing you the complete Twitter experience to your phone." />';
+		$meta = '<meta name="description" content="免费而且不太河蟹的移动版 Twitter 替代品，为挪鸡鸭量身打造。" />';
 	}
 	ob_start('ob_gzhandler');
 	header('Content-Type: text/html; charset=utf-8');
