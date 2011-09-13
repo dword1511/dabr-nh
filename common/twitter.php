@@ -1386,7 +1386,7 @@ function twitter_standard_timeline($feed, $source) {
 					'from' => (object) array(
 						'id' => $status->from_user_id,
 						'screen_name' => $status->from_user,
-						'profile_image_url' => theme_get_avatar($status),
+						'profile_image_url' => $status->profile_image_url,
 					),
 					'to' => (object) array(
 						'id' => $status->to_user_id,
@@ -1713,8 +1713,7 @@ function theme_full_name($user) {
 
 // http://groups.google.com/group/twitter-development-talk/browse_thread/thread/50fd4d953e5b5229#
 function theme_get_avatar($object) {
-	//return BASE_URL . "simpleproxy.php?url=" . $object->profile_image_url_https;
-	return BASE_URL . "simpleproxy.php?url=" . $object->profile_image_url;
+	return BASE_URL . "simpleproxy.php?url=" . $object->profile_image_url_https;
 }
 
 function theme_no_tweets() {
