@@ -918,7 +918,7 @@ function twitter_replies_page() {
 	$tl = twitter_standard_timeline($tl, 'replies');
 	$content = theme('status_form');
 	$content .= theme('timeline', $tl);
-	theme('page', '回复', $content);
+	theme('page', '提到我的', $content);
 }
 
 function twitter_retweets_page() {
@@ -1727,7 +1727,8 @@ function theme_search_results($feed) {
 		$actions = theme('action_icons', $status);
 
 		$row = array(
-		theme('avatar', theme_get_avatar($status)),
+		//theme('avatar', theme_get_avatar($status)),
+		theme('avatar', $status->profile_image_url_https),
       "<a href='user/{$status->from_user}'>{$status->from_user}</a> $actions - {$link}<br />{$text}",
 		);
 		if (twitter_is_reply($status)) {
