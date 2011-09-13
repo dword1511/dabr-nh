@@ -54,7 +54,7 @@ function geoSuccess(position) {
 
 function desktop_theme_search_form($query) {
 	$query = stripslashes(htmlentities($query,ENT_QUOTES,"UTF-8"));
-	return "<form action='search' method='get'><input name='query' value=\"$query\" style='width:100%; max-width: 300px' /><input type='submit' value='Search' /></form>";
+	return "<form action='search' method='get'><input name='query' value=\"$query\" style='width:100%; max-width: 300px' /><input type='submit' value='给我搜！' /></form>";
 }
 
 function desktop_theme_avatar($url, $force_large = false) {

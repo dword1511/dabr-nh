@@ -57,7 +57,7 @@ function theme_menu_bottom() {
 function theme_menu_both($menu) {
 	$links = array();
 	foreach (menu_visible_items() as $url => $page) {
-		$title = $url ? $url : 'home';
+		$title = $url ? $url : '主页';
 		if (!$url) $url = BASE_URL; // Shouldn't be required, due to <base> element but some browsers are stupid.
 		if ($menu == 'bottom' && isset($page['accesskey'])) {
 			$links[] = "<a href='$url' accesskey='{$page['accesskey']}'>$title</a> {$page['accesskey']}";
@@ -70,7 +70,7 @@ function theme_menu_both($menu) {
 		array_unshift($links, "<b><a href='user/$user'>$user</a></b>");
 	}
 	if ($menu == 'bottom') {
-		$links[] = "<a href='{$_GET['q']}' accesskey='5'>refresh</a> 5";
+		$links[] = "<a href='{$_GET['q']}' accesskey='5'>刷新</a> 5";
 	}
 	return "<div class='menu menu-$menu'>".implode(' | ', $links).'</div>';
 }
