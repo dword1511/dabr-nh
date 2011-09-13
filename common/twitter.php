@@ -1386,7 +1386,7 @@ function twitter_standard_timeline($feed, $source) {
 					'from' => (object) array(
 						'id' => $status->from_user_id,
 						'screen_name' => $status->from_user,
-						//'profile_image_url' => theme_get_avatar($status),
+						'profile_image_url' => theme_get_avatar($status),
 					),
 					'to' => (object) array(
 						'id' => $status->to_user_id,
@@ -1395,6 +1395,7 @@ function twitter_standard_timeline($feed, $source) {
 					'created_at' => $status->created_at,
 					'geo' => $status->geo,
 				);
+				error_log("Invoked search TL, avatar = ".theme_get_avatar($status));
 			}
 			return $output;
 
