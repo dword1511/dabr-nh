@@ -1387,7 +1387,6 @@ function twitter_standard_timeline($feed, $source) {
 						'id' => $status->from_user_id,
 						'screen_name' => $status->from_user,
 						//'profile_image_url' => theme_get_avatar($status),
-						'profile_image_url' => preg_match_one('#src="([^"]*)"#' , $tweet),
 					),
 					'to' => (object) array(
 						'id' => $status->to_user_id,
