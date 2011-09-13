@@ -34,10 +34,10 @@ function geoError(error) {
 			document.getElementById("lblGeo").innerHTML += "：定位服务超时鸟。问问方校长是肿么回事。";
 		break;
 		case error.PERMISSION_DENIED:
-			document.getElementById("lblGeo").innerHTML += "：定位请求被拒绝鸟。请看看您的浏览器设置。";
+			document.getElementById("lblGeo").innerHTML += "：定位请求被拒鸟。请瞅瞅您的浏览器设置。";
 		break;
 		case error.POSITION_UNAVAILABLE:
-			document.getElementById("lblGeo").innerHTML += "：抱歉，也许您已经被开除球籍。";
+			document.getElementById("lblGeo").innerHTML += "：抱歉，我们已经找不到您在哪了，也许您已经被开除球籍。";
 		break;
 	};
 }

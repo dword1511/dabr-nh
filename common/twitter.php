@@ -237,7 +237,7 @@ function twitter_trends_page($query)
 			$header .= '<option value="' . $l->woeid . '"' . (($l->woeid == $woeid) ? ' selected="selected"' : '') . '>' . $n . '</option>';
 		}
 	}
-	$header .= '</select> <input type="submit" value="Go" /></form>';
+	$header .= '</select> <input type="submit" value="走你啊！" /></form>';
 	
 	$request = API_URL.'trends/' . $woeid . '.json';
 	$trends = twitter_process($request);
@@ -248,7 +248,7 @@ function twitter_trends_page($query)
 	}
 	$headers = array($header);
 	$content = theme('table', $headers, $rows, array('class' => 'timeline'));
-	theme('page', 'Trends', $content);
+	theme('page', '趋势', $content);
 }
 
 function js_counter($name, $length='140')
@@ -309,7 +309,7 @@ function twitter_media_page($query)
 
 			$text = $json->text;
 			
-			$content = "<p>上传成功，图像已经被张贴到 Twitter 上了。</p>
+			$content = "<p>上传成功，撒花！</p>
 							<p><img src=\"" . BASE_URL . "simpleproxy.php?url=" . $image_url . ":thumb\" alt='' /></p>
 							<p>". twitter_parse_tags($text) . "</p>";
 			
@@ -341,11 +341,11 @@ function twitter_media_page($query)
 						图片：<input type='file' name='image' /><br />
 						消息（可选）：<br />
 						<textarea name='message' style='width:90%; max-width: 400px;' rows='3' id='message'>" . $status . "</textarea><br>
-						<input type='submit' value='Send'><span id='remaining'>120</span>
+						<input type='submit' value='发送'><span id='remaining'>120</span>
 					</form>";
 	$content .= js_counter("message", "120");
 
-	return theme('page', 'Picture Upload', $content);
+	return theme('page', '上传图片', $content);
 }
 
 function twitter_process($url, $post_data = false)
@@ -413,7 +413,7 @@ function twitter_process($url, $post_data = false)
 			return $response;
 		case 401:
 			user_logout();
-			theme('error', "<p>Error: Login credentials incorrect.</p><p>{$response_info['http_code']}: {$result}</p><hr><p>$url</p>");
+			theme('error', "<p>错误：您的登录信息有问题。也许您被管理员耍了。</p><p>{$response_info['http_code']}: {$result}</p><hr><p>$url</p>");
 		case 0:
 			$result = $erno . ":" . $er . "<br />" ;
 			/*
@@ -422,13 +422,13 @@ function twitter_process($url, $post_data = false)
 				$result .= "Key: $key; Value: $value<br />";
 				}
 				*/
-			theme('error', '<h2>Twitter timed out</h2><p>Dabr gave up on waiting for Twitter to respond. They\'re probably overloaded right now, try again in a minute. <br />'. $result . ' </p>');
+			theme('error', '<h2>Twitter 它它它……超时了！</h2><p>Dabr 决定不去等待 Twitter 的回应了。也许你现在有机会去围观鲸鱼图。过会再试试吧。<br />'. $result . ' </p>');
 		default:
 			$result = json_decode($response);
 			$result = $result->error ? $result->error : $response;
 			if (strlen($result) > 500)
 			{
-				$result = 'Something broke on Twitter\'s end.' ;
+				$result = 'Twitter 抽风了，甭见怪。' ;
 			/*
 			foreach ($response_info as $key => $value)
 			{
@@ -436,7 +436,7 @@ function twitter_process($url, $post_data = false)
 			}
 			*/	
 			}
-			theme('error', "<h2>An error occured while calling the Twitter API</h2><p>{$response_info['http_code']}: {$result}</p><hr>");
+			theme('error', "<h2>调用 Twitter API 时粗线了一个么力滴错误。</h2><p>{$response_info['http_code']}: {$result}</p><hr>");
 	}
 }
 
@@ -636,13 +636,13 @@ function twitter_status_page($query) {
 				}
 			}
 			$tl = twitter_standard_timeline($tl, 'replies');
-			$content .= '<p>Thread:</p>'.theme('timeline', $tl);
+			$content .= '<p>对话素酱紫滴：</p>'.theme('timeline', $tl);
 		} elseif (!$status->user->protected) {
 			$thread = twitter_thread_timeline($id);
-			$content .= '<p>And the experimental conversation view...</p>'.theme('timeline', $thread);
-			$content .= "<p>Don't like the thread order? Go to <a href='settings'>settings</a> to reverse it. Either way - the dates/times are not always accurate.</p>";
+			$content .= '<p>下面是不太靠谱的对话展示功能：</p>'.theme('timeline', $thread);
+			$content .= "<p>如果您对这种顺序感到厌倦，到<a href='settings'>设置</a>里面去改改吧。不过这不会改变我不靠谱的本质哦。</p>";
 		}
-		theme('page', "Status $id", $content);
+		theme('page', "消息号 $id", $content);
 	}
 }
 
@@ -658,7 +658,7 @@ function twitter_retweet_page($query) {
 		$request = API_URL."statuses/show/{$id}.json?include_entities=true";
 		$tl = twitter_process($request);
 		$content = theme('retweet', $tl);
-		theme('page', 'Retweet', $content);
+		theme('page', '转推', $content);
 	}
 }
 

@@ -207,15 +207,15 @@ function user_login() {
 用户名：<input name="username" size="15" /><br />
 密　码：<input name="password" type="password" size="15" /><br />
 <label><input type="checkbox" checked="checked" value="yes" name="stay-logged-in" /> 记住我 </label><br />
-<input type="submit" value="Sign In" /></p>
+<input type="submit" value="登录" /></p>
 </form>
 
-<p><b>Registration steps:</b></p>
+<p><b>注册步骤：</b></p>
 
 <ol>
-	<li><a href="oauth">Sign in via Twitter.com</a> from any computer</li>
-	<li>Visit the Dabr settings page to choose a password</li>
-	<li>Done! You can now benefit from accessing Twitter through Dabr from anywhere (even from computers that block Twitter.com)</li>
+	<li>在墙外通过 <a href="oauth">Twitter/OAuth</a> 登录</li>
+	<li>访问 Dabr 的“设置”页面来设置一个密码。</li>
+	<li>现在你可以通过 Dabr 从包括兲朝的任何地方访问 Twitter 了。</li>
 </ol>
 ');
 }
@@ -223,30 +223,29 @@ function user_login() {
 function theme_login() {
 	$content = '<div style="margin:1em; font-size: 1.2em">
 <table><tr>
-	<td><a href="oauth"><img src="'.BASE_URL.'images/twitter_button_2_lo.gif" alt="Sign in with Twitter/OAuth" width="165" height="28" /></a></td>
-	<td><a href="oauth">Sign in via Twitter.com</a></td>
+	<td><a href="oauth"><img src="'.BASE_URL.'images/twitter_button_2_lo.gif" alt="通过 Twitter/OAuth 登录" width="165" height="28" /></a></td>
+	<td><a href="oauth">通过 Twitter/OAuth 登录</a></td>
 </tr><tr>
-	<th>WARNING: USERS BEHIND THE GFW SHOULD NEVER CLICK ON ANY OF THOSE ABOVE!</th>
+	<th>小贴士：上面的玩意墙内的用户可不要乱点哦亲！被跨省了本人概不负责哦亲！</th>
 </tr></table>
-<p>Twitter no longer allow you to log in directly with a username and password so we can\'t show the standard login form. There\'s some more information on the <a href="http://blog.dabr.co.uk/">Dabr blog</a>.</p>';
-
-	$content .='<h2>OAuth proxy</h2>
-<em>(Oh plz don\'t trust me :D)</em>
+<p>直接通过用户名和密码登录是邪恶的，参见 <a href="http://blog.dabr.co.uk/">Dabr blog</a></p>';
+	$content .='<hr /><h2>大家好！我是邪恶的 OAuth 代理</h2>
+<em>（对，你最好表相信我，否则……）</em>
 <form action="'.BASE_URL.'oauth" method="post">
 <table>
-	<tr><th>Username:</th><td><input type="text" name="username"/></td></tr>
-	<tr><th>Password:</th><td><input type="password" name="password"/></td></tr>
+	<tr><th>用户名：</th><td><input type="text" name="username"/></td></tr>
+	<tr><th>密　码：</th><td><input type="password" name="password"/></td></tr>
 </table>
-<p><input type="submit" value="Login"/></p>
+<p><input type="submit" value="走你！"/></p>
 </form>';
 
-	if (MYSQL_USERS == 'ON') $content .= '<p>No access to Twitter.com? <a href="login">Sign in with your Dabr account</a></p>';
+	if (MYSQL_USERS == 'ON') $content .= '<p>人在兲朝身不由己？ <a href="login">试试用 Dabr 账户登录！</a></p>';
 	$content .= '</div>';
 	return $content;
 }
 
 function theme_logged_out() {
-	return '<p>Logged out. <a href="">Login again</a></p>';
+	return '<p>已经登出了。<a href="">再登录玩玩？</a></p>';
 }
 
 ?>
