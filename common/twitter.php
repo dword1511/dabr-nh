@@ -1713,7 +1713,8 @@ function theme_full_name($user) {
 
 // http://groups.google.com/group/twitter-development-talk/browse_thread/thread/50fd4d953e5b5229#
 function theme_get_avatar($object) {
-	return BASE_URL . "simpleproxy.php?url=" . $object->profile_image_url_https;
+	//return BASE_URL . "simpleproxy.php?url=" . $object->profile_image_url_https;
+	return BASE_URL . "simpleproxy.php?url=" . $object->profile_image_url;
 }
 
 function theme_no_tweets() {
