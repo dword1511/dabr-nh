@@ -1396,7 +1396,6 @@ function twitter_standard_timeline($feed, $source) {
 					'created_at' => $status->created_at,
 					'geo' => $status->geo,
 				);
-				error_log("Invoked search TL.\navatar_https = ".$status->profile_image_url_https."\navatar_http  = ".$status->profile_image_url);
 			}
 			return $output;
 
