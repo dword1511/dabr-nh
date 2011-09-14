@@ -546,21 +546,21 @@ function twitter_parse_tags($input, $entities = false) {
 	// Emails
 	// You are never supposed to post your email addresses without changing the "@".
 	// So all the followings are disabled.
-	//$tok = strtok($out, " \n\t\n\r\0");	// Tokenise the string by whitespace
-	//
-	//while ($tok !== false) {	// Go through all the tokens
-	//	$at = stripos($tok, "@");	// Does the string contain an "@"?
-	//
-	//	if ($at && $at > 0) { // @ is in the string & isn't the first character
-	//		$tok = trim($tok, "?.,!\"\'");	// Remove any trailing punctuation
-	//		
-	//		if (filter_var($tok, FILTER_VALIDATE_EMAIL)) {	// Use the internal PHP email validator
-	//			$email = $tok;
-	//			$out = str_replace($email, "<a href=\"mailto:{$email}\">{$email}</a>", $out);	// Create the mailto: link
-	//		}
-	//	}
-	//	$tok = strtok(" \n\t\n\r\0");	// Move to the next token
-	//}
+	/*$tok = strtok($out, " \n\t\n\r\0");	// Tokenise the string by whitespace
+	
+	while ($tok !== false) {	// Go through all the tokens
+		$at = stripos($tok, "@");	// Does the string contain an "@"?
+	
+		if ($at && $at > 0) { // @ is in the string & isn't the first character
+			$tok = trim($tok, "?.,!\"\'");	// Remove any trailing punctuation
+			
+			if (filter_var($tok, FILTER_VALIDATE_EMAIL)) {	// Use the internal PHP email validator
+				$email = $tok;
+				$out = str_replace($email, "<a href=\"mailto:{$email}\">{$email}</a>", $out);	// Create the mailto: link
+			}
+		}
+		$tok = strtok(" \n\t\n\r\0");	// Move to the next token
+	}*/
 
 	//Return the completed string
 	return $out;
@@ -1387,6 +1387,7 @@ function twitter_standard_timeline($feed, $source) {
 						'id' => $status->from_user_id,
 						'screen_name' => $status->from_user,
 						'profile_image_url' => $status->profile_image_url,
+						'profile_image_url_https' => $status->profile_image_url,
 					),
 					'to' => (object) array(
 						'id' => $status->to_user_id,
@@ -1430,6 +1431,7 @@ function twitter_standard_timeline($feed, $source) {
 						'id' => preg_match_one('#profile_images/(\d*)#', $tweet),
 						'screen_name' => preg_match_one('#twitter.com/([^"]+)#', $tweet),
 						'profile_image_url' => preg_match_one('#src="([^"]*)"#' , $tweet),
+						'profile_image_url_https' => preg_match_one('#src="([^"]*)"#' , $tweet),
 					),
 					'to' => (object) array(
 						'screen_name' => preg_match_one('#@([^<]+)#', $tweet),
@@ -1720,7 +1722,8 @@ function theme_no_tweets() {
 	return '<p>木有任何消息可供显示。</p>';
 }
 
-function theme_search_results($feed) {
+// No longer refered function.
+/*function theme_search_results($feed) {
 	$rows = array();
 	foreach ($feed->results as $status) {
 		$text = twitter_parse_tags($status->text, $status->entities);
@@ -1739,7 +1742,7 @@ function theme_search_results($feed) {
 	$content = theme('table', array(), $rows, array('class' => 'timeline'));
 	$content .= theme('pagination');
 	return $content;
-}
+}*/
 
 function theme_search_form($query) {
 	$query = stripslashes(htmlentities($query,ENT_QUOTES,"UTF-8"));
