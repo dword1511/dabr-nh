@@ -109,8 +109,8 @@ function settings_page($args) {
 	$content .= theme('options', $gwt, setting_fetch('gwt', $GLOBALS['current_theme'] == 'text' ? 'on' : 'off'));
 	$content .= '</select><small><br />Google Web Transcoder (GWT) 会把网页转换成适合不靠谱的山寨机浏览的格式。</small></p>';
 	$content .= '<p><label><input type="checkbox" name="reverse" value="yes" '. (setting_fetch('reverse') == 'yes' ? ' checked="checked" ' : '') .' /> 尝试反转会话线索。</label></p>';
-	$content .= '<p><label><input type="checkbox" name="timestamp" value="yes" '. (setting_fetch('timestamp') == 'yes' ? ' checked="checked" ' : '') .' /> 使用 ' . twitter_date('H:i') . ' 而不是“ 25 秒之前”来显示时间。</label></p>';
-	$content .= '<p><label><input type="checkbox" name="hide_inline" value="yes" '. (setting_fetch('hide_inline') == 'yes' ? ' checked="checked" ' : '') .' /> 不要显示内嵌的媒体（Twitpic 啊 youtube 啊啥的）。</label></p>';
+	$content .= '<p><label><input type="checkbox" name="timestamp" value="yes" '. (setting_fetch('timestamp') == 'yes' ? ' checked="checked" ' : '') .' /> 使用 ' . twitter_date('H:i') . ' 而不是“25 秒之前”来显示时间。</label></p>';
+	$content .= '<p><label><input type="checkbox" name="hide_inline" value="yes" '. (setting_fetch('hide_inline') == 'yes' ? ' checked="checked" ' : '') .' /> 不要显示内嵌的媒体（Twitpic 啊 Youtube 啊啥的）。</label></p>';
 	$content .= '<p><label>现在的 UTC 时间是 ' . gmdate('H:i') . ' ，考虑到存在 <input type="text" name="utc_offset" value="'. $utc_offset .'" size="3" /> 的时差，我会把时间显示成 ' . twitter_date('H:i') . ' 这样。<br />呐，如果你觉得时间不对就调调时差吧。</label></p>';
 
 	
@@ -121,7 +121,7 @@ function settings_page($args) {
 	
 	$content .= '<p><input type="submit" value="走你！" /></p></form>';
 
-	$content .= '<hr /><p>访问<a href="reset">重置</a>页面，如果事情变得不太对头了…… 你会被登出，所有的设置也会被清空。</p>';
+	$content .= '<hr /><p>访问<a href="reset">重置</a>页面，如果事情变得不太对头的话 —— 你会被登出，所有的设置也会被清空。</p>';
 
 	return theme('page', '设置', $content);
 }

@@ -606,7 +606,7 @@ function format_interval($timestamp, $granularity = 2) {
 	$output = '';
 	foreach ($units as $key => $value) {
 		if ($timestamp >= $value) {
-			$output .= ($output ? ' ' : ''). pluralise($key, floor($timestamp / $value), true);
+			$output .= ($output ? ' ' : ''). floor($timestamp / $value) . $key;
 			$timestamp %= $value;
 			$granularity--;
 		}
@@ -1061,7 +1061,7 @@ function twitter_user_page($query)
 		
 		$out = twitter_parse_tags($tweet->text);
 
-		$content .= "<p>此回复针对下列用户：<br />{$out}</p>";
+		$content .= "<p>此回复针对下列消息：<br />{$out}</p>";
 
 		if ($subaction == 'replyall') {
 			$found = Twitter_Extractor::create($tweet->text)
@@ -1187,7 +1187,7 @@ function theme_retweet($status)
 	}
 	else
 	{
-		$content.="<p>@{$status->user->screen_name} 不让你转发它。但是你可以假装编辑下再发啊。</p>";
+		$content.="<p>@{$status->user->screen_name} 不让你转发这条消息。但是你可以假装编辑下再发啊。</p>";
 	}
 
 	$content .= "<p>编辑后转发：</p>
@@ -1237,26 +1237,26 @@ function theme_user_header($user) {
 	$out .= "简介：{$bio}<br />";
 	$out .= "链接：{$link}<br />";
 	$out .= "地址：<a href=\"http://maps.google.com.hk/m?q={$cleanLocation}\" target=\"" . get_target() . "\">{$user->location}</a><br />";
-	$out .= "加入时间：{$date_joined} （~ " . pluralise(' 条消息', $tweets_per_day, true) . "每天）";
+	$out .= "加入时间：{$date_joined} （每天约 ".$tweets_per_day." 条消息）";
 	$out .= "</span></span>";
 	$out .= "<div class='features'>";
-	$out .= pluralise(' 条消息', $user->statuses_count, true);
+	$out .= $user->statuses_count.' 条消息';
 
 	//If the authenticated user is not following the protected used, the API will return a 401 error when trying to view friends, followers and favourites
 	//This is not the case on the Twitter website
 	//To avoid the user being logged out, check to see if she is following the protected user. If not, don't create links to friends, followers and favourites
 	if ($user->protected == true && $followed_by == false) {
-		$out .= " | " . pluralise('个粉丝', $user->followers_count, true);
-		$out .= " | " . pluralise('个偶像', $user->friends_count, true);
-		$out .= " | " . pluralise('条收藏', $user->favourites_count, true);
+		$out .= " | " . $user->followers_count . ' 个粉丝';
+		$out .= " | " . $user->friends_count . ' 个偶像';
+		$out .= " | " . $user->favourites_count . ' 条收藏';
 	}
 	else {
-		$out .= " | <a href='followers/{$user->screen_name}'>" . pluralise('个粉丝', $user->followers_count, true) . "</a>";
-		$out .= " | <a href='friends/{$user->screen_name}'>" . pluralise('个偶像', $user->friends_count, true) . "</a>";
-		$out .= " | <a href='favourites/{$user->screen_name}'>" . pluralise('条收藏', $user->favourites_count, true) . "</a>";
+		$out .= " | <a href='followers/{$user->screen_name}'>" . $user->followers_count . " 个粉丝</a>";
+		$out .= " | <a href='friends/{$user->screen_name}'>" . $user->friends_count . " 个偶像</a>";
+		$out .= " | <a href='favourites/{$user->screen_name}'>" . $user->favourites_count . " 条收藏</a>";
 	}
 
-	$out .= " | <a href='lists/{$user->screen_name}'>" . pluralise('个列表的成员', $user->listed_count, true) . "</a>";
+	$out .= " | <a href='lists/{$user->screen_name}'>" . "在" . $user->listed_count . "个列表中</a>";
 	$out .=	" | <a href='directs/create/{$user->screen_name}'>发私信</a>";
 	//NB we can tell if the user can be sent a DM $following->relationship->target->following;
 	//Would removing this link confuse users?
@@ -1641,12 +1641,12 @@ function theme_followers($feed, $hide_pagination = false) {
 			$content .= "简介：" . twitter_parse_tags($user->description) . "<br />";
 		if($user->location != "")
 			$content .= "地址：{$user->location}<br />";
-		$content .= "信息：";
-		$content .= pluralise(' 条消息', $user->statuses_count, true) . ", ";
-		$content .= pluralise('个粉丝', $user->friends_count, true) . ", ";
-		$content .= pluralise('个偶像', $user->followers_count, true) . ", ";
-		$content .= "~" . pluralise(' 条消息', $tweets_per_day, true) . "每天<br />";
-		$content .= "上一条推：";
+		$content .= "统计：";
+		$content .= $user->statuses_count." 条消息，";
+		$content .= $user->friends_count." 个粉丝，";
+		$content .= $user->followers_count." 个偶像，";
+		$content .= "每天约 ".$tweets_per_day." 条消息<br />";
+		$content .= "上一条消息：";
 		if($user->protected == 'true' && $last_tweet == 0)
 			$content .= "私密";
 		else if($last_tweet == 0)
@@ -1683,11 +1683,11 @@ function theme_retweeters($feed, $hide_pagination = false) {
 			$content .= "简介：" . twitter_parse_tags($user->description) . "<br />";
 		if($user->location != "")
 			$content .= "地址：{$user->location}<br />";
-		$content .= "信息：";
-		$content .= pluralise(' 条消息', $user->statuses_count, true) . ", ";
-		$content .= pluralise('个粉丝', $user->friends_count, true) . ", ";
-		$content .= pluralise('个偶像', $user->followers_count, true) . ", ";
-		$content .= "~" . pluralise(' 条消息', $tweets_per_day, true) . "每天<br />";
+		$content .= "统计：";
+		$content .= $user->statuses_count." 条消息，";
+		$content .= $user->friends_count." 个粉丝，";
+		$content .= $user->followers_count." 个偶像，";
+		$content .= "每天约 ".$tweets_per_day." 条消息<br />";
 		$content .= "</span>";
 
 		$rows[] = array('data' => array(array('data' => theme('avatar', theme_get_avatar($user)), 'class' => 'avatar'),
@@ -1869,10 +1869,11 @@ function theme_action_icon($url, $image_url, $text) {
 	return "<a href='$url'><img src='$image_url' alt='$text' /></a>";
 }
 
-function pluralise($word, $count, $show = FALSE) {
+// No pluralisation in Chinese
+/*function pluralise($word, $count, $show = FALSE) {
 	if($show) $word = "{$count} {$word}";
 	return $word;
-}
+}*/
 
 function is_64bit() {
 	$int = "9223372036854775807";
