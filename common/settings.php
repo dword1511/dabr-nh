@@ -31,7 +31,7 @@ function cookie_monster() {
 		setcookie($cookie, NULL, $duration, '/');
 		setcookie($cookie, NULL, $duration);
 	}
-	return theme('page', 'Cookie Monster', '<p>The cookie monster has logged you out and cleared all settings. Try logging in again now.</p>');
+	return theme('page', 'Cookie 已经被处理掉了', '<p>储存在您机器上有关 dabr 的 Cookie 已经被清除，所有设置已复位，请重新登陆。</p>');
 }
 
 function setting_fetch($setting, $default = NULL) {
@@ -71,17 +71,17 @@ function settings_page($args) {
 	}
 
 	$modes = array(
-		'mobile' => 'Normal phone',
-		'touch' => 'Touch phone',
-		'desktop' => 'PC/Laptop',
-		'text' => 'Text only',
-		'worksafe' => 'Work Safe',
-		'bigtouch' => 'Big Touch',
+		'mobile' => '普通手机',
+		'touch' => '触控手机',
+		'desktop' => '电脑',
+		'text' => '仅文本',
+		'worksafe' => '防老板模式',
+		'bigtouch' => '大屏触控',
 	);
 
 	$gwt = array(
-		'off' => 'direct',
-		'on' => 'via GWT',
+		'off' => '直接',
+		'on' => '通过 GWT',
 	);
 
 	$colour_schemes = array();
@@ -101,27 +101,27 @@ function settings_page($args) {
 		$utc_offset = '+' . $utc_offset;
 	}
 
-	$content .= '<form action="settings/save" method="post"><p>Colour scheme:<br /><select name="colours">';
+	$content .= '<form action="settings/save" method="post"><p>配色方案：<br /><select name="colours">';
 	$content .= theme('options', $colour_schemes, setting_fetch('colours', 5));
-	$content .= '</select></p><p>Mode:<br /><select name="browser">';
+	$content .= '</select></p><p>情景模式：<br /><select name="browser">';
 	$content .= theme('options', $modes, $GLOBALS['current_theme']);
-	$content .= '</select></p><p>External links go:<br /><select name="gwt">';
+	$content .= '</select></p><p>外链方式：<br /><select name="gwt">';
 	$content .= theme('options', $gwt, setting_fetch('gwt', $GLOBALS['current_theme'] == 'text' ? 'on' : 'off'));
-	$content .= '</select><small><br />Google Web Transcoder (GWT) converts third-party sites into small, speedy pages suitable for older phones and people with less bandwidth.</small></p>';
-	$content .= '<p><label><input type="checkbox" name="reverse" value="yes" '. (setting_fetch('reverse') == 'yes' ? ' checked="checked" ' : '') .' /> Attempt to reverse the conversation thread view.</label></p>';
-	$content .= '<p><label><input type="checkbox" name="timestamp" value="yes" '. (setting_fetch('timestamp') == 'yes' ? ' checked="checked" ' : '') .' /> Show the timestamp ' . twitter_date('H:i') . ' instead of 25 sec ago</label></p>';
-	$content .= '<p><label><input type="checkbox" name="hide_inline" value="yes" '. (setting_fetch('hide_inline') == 'yes' ? ' checked="checked" ' : '') .' /> Hide inline media (eg TwitPic thumbnails)</label></p>';
-	$content .= '<p><label>The time in UTC is currently ' . gmdate('H:i') . ', by using an offset of <input type="text" name="utc_offset" value="'. $utc_offset .'" size="3" /> we display the time as ' . twitter_date('H:i') . '.<br />It is worth adjusting this value if the time appears to be wrong.</label></p>';
+	$content .= '</select><small><br />Google Web Transcoder (GWT) 会把网页转换成适合不靠谱的山寨机浏览的格式。</small></p>';
+	$content .= '<p><label><input type="checkbox" name="reverse" value="yes" '. (setting_fetch('reverse') == 'yes' ? ' checked="checked" ' : '') .' /> 尝试反转会话线索。</label></p>';
+	$content .= '<p><label><input type="checkbox" name="timestamp" value="yes" '. (setting_fetch('timestamp') == 'yes' ? ' checked="checked" ' : '') .' /> 使用 ' . twitter_date('H:i') . ' 而不是“ 25 秒之前”来显示时间。</label></p>';
+	$content .= '<p><label><input type="checkbox" name="hide_inline" value="yes" '. (setting_fetch('hide_inline') == 'yes' ? ' checked="checked" ' : '') .' /> 不要显示内嵌的媒体（Twitpic 啊 youtube 啊啥的）。</label></p>';
+	$content .= '<p><label>现在的 UTC 时间是 ' . gmdate('H:i') . ' ，考虑到存在 <input type="text" name="utc_offset" value="'. $utc_offset .'" size="3" /> 的时差，我会把时间显示成 ' . twitter_date('H:i') . ' 这样。<br />呐，如果你觉得时间不对就调调时差吧。</label></p>';
 
 	
 	// Allow users to choose a Dabr password if accounts are enabled
 	if (MYSQL_USERS == 'ON' && user_is_authenticated()) {
-		$content .= '<fieldset><legend>Dabr account</legend><small>If you want to sign in to Dabr without going via Twitter.com in the future, create a password and we\'ll remember you.</small></p><p>Change Dabr password<br /><input type="password" name="newpassword" /><br /><small>Leave blank if you don\'t want to change it</small></fieldset>';
+		$content .= '<fieldset><legend>Dabr 账户</legend><small>如果你被墙了，你可以通过 Dabr 帐号和密码登录（当然 OAuth 还得翻墙的）。</small></p><p>修改 Dabr 密码<br /><input type="password" name="newpassword" /><br /><small>不想改的话就甭填好了。</small></fieldset>';
 	}
 	
-	$content .= '<p><input type="submit" value="Save" /></p></form>';
+	$content .= '<p><input type="submit" value="走你！" /></p></form>';
 
-	$content .= '<hr /><p>Visit <a href="reset">Reset</a> if things go horribly wrong - it will log you out and clear all settings.</p>';
+	$content .= '<hr /><p>访问<a href="reset">重置</a>页面，如果事情变得不太对头了…… 你会被登出，所有的设置也会被清空。</p>';
 
-	return theme('page', 'Settings', $content);
+	return theme('page', '设置', $content);
 }
