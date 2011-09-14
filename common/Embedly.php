@@ -35,7 +35,8 @@ function embedly_embed_thumbnails(&$feed) {
 		'#yfrog\.com\/([\d\w]+)#'						=> 'http://yfrog.com/%s:small',
 		'#instagr\.am\/p\/([_-\d\w]+)#i'				=> 'http://instagr.am/p/%s/media/?size=t',
 		'#instagram\.com\/p\/([_-\d\w]+)#i'			=> 'http://instagr.am/p/%s/media/?size=t',
-		'#twitrpix.com/([\d\w]+)#i' 				=> 'http://img.twitrpix.com/thumb/%s',
+		'#twitrpix\.com\/([\d\w]+)#i' 				=> 'http://img.twitrpix.com/thumb/%s',
+		'#sinaimg\.cn\/large\/([\d\w]+)#i\.jpg'				=> 'http://ww4.sinaimg.cn/small/%s.jpg'
 		);
 
 
