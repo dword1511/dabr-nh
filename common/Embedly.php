@@ -36,7 +36,6 @@ function embedly_embed_thumbnails(&$feed) {
 		'#instagr\.am\/p\/([_-\d\w]+)#i'				=> 'http://instagr.am/p/%s/media/?size=t',
 		'#instagram\.com\/p\/([_-\d\w]+)#i'			=> 'http://instagr.am/p/%s/media/?size=t',
 		'#twitrpix\.com\/([\d\w]+)#i' 				=> 'http://img.twitrpix.com/thumb/%s',
-		'#sinaimg\.cn\/large\/([\d\w]+)#i\.jpg'				=> 'http://ww4.sinaimg.cn/small/%s.jpg'
 		);
 
 
