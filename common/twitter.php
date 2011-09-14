@@ -1256,7 +1256,7 @@ function theme_user_header($user) {
 		$out .= " | <a href='favourites/{$user->screen_name}'>" . $user->favourites_count . " 条收藏</a>";
 	}
 
-	$out .= " | <a href='lists/{$user->screen_name}'>" . "在" . $user->listed_count . "个列表中</a>";
+	$out .= " | <a href='lists/{$user->screen_name}'>" . "在 " . $user->listed_count . " 个列表中</a>";
 	$out .=	" | <a href='directs/create/{$user->screen_name}'>发私信</a>";
 	//NB we can tell if the user can be sent a DM $following->relationship->target->following;
 	//Would removing this link confuse users?
@@ -1646,14 +1646,14 @@ function theme_followers($feed, $hide_pagination = false) {
 		$content .= $user->friends_count." 个粉丝，";
 		$content .= $user->followers_count." 个偶像，";
 		$content .= "每天约 ".$tweets_per_day." 条消息<br />";
-		$content .= "上一条消息：";
+		$content .= "上一条消息于 ";
 		if($user->protected == 'true' && $last_tweet == 0)
 			$content .= "私密";
 		else if($last_tweet == 0)
 			$content .= "没转发过";
 		else
 			$content .= twitter_date('l jS F Y', $last_tweet);
-		$content .= "</span>";
+		$content .= " 发出</span>";
 
 		$rows[] = array('data' => array(array('data' => theme('avatar', theme_get_avatar($user)), 'class' => 'avatar'),
 		                                array('data' => $content, 'class' => 'status shift')),
