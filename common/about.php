@@ -34,7 +34,7 @@ function theme_about() {
 	$content .= link_user('davidcarrington');
 	$content .= '带着';
 	$content .= link_user('whatleydude');
-	$content .= '的灵感，在牛x的'
+	$content .= '的灵感，在牛x的';
 	$content .= link_site('http://shkspr.mobi/blog/index.php/tag/dabr/','Terence Eden');
 	$content .= '的帮助下完成的。</li><li>比较安全，因为所有登录信息都作为一个加密的 cookie 存在你的机器上。（服务器从来就不屑于存储这些玩意儿嘛！）</li></ul>
 <p>如果有啥建议或者意见就直说吧 =。=</p><p><strong>这个站点使用的是一个修改版的 Dabr 。<br /> 修改版的项目主页在伟大的';
