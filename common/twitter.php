@@ -4,6 +4,7 @@ require 'Autolink.php';
 require 'Extractor.php';
 require 'Embedly.php';
 require 'Emoticons.php';
+require 'geoloc.php';
 
 menu_register(array(
 	'' => array(
@@ -354,7 +355,7 @@ function twitter_media_page($query)
 						消息（可选）：<br />
 						<textarea name='message' style='width:90%; max-width: 400px;' rows='3' id='message'>" . $status . "</textarea><br>
 						<input type='submit' value='发送'><span id='remaining'>120</span>";
-	$content .= file_get_contents('geoloc.html');
+	$content .= $geocode;
 	$content .= '</form>';
 	$content .= js_counter("message", "120");
 
