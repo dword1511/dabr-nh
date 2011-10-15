@@ -1215,7 +1215,7 @@ function theme_retweet($status)
 						<textarea name='status' style='width:90%; max-width: 400px;' rows='3' id='status'>$text</textarea>
 						<br/>
 						<input type='submit' value='转发' />
-						<span id='remaining'>" . (140 - $length) ."</span>"
+						<span id='remaining'>" . (140 - $length) ."</span>";
 	$content .= geoloc($_COOKIE['geo']);
 	$content .= "</form>";
 	$content .= js_counter("status");
