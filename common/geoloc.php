@@ -1,27 +1,32 @@
 <?php
-function geoloc() {
-	return '
+// Usage: $out .= geoloc($_COOKIE['geo']);
+function geoloc($checked) {
+	$content = '
 <span id="geo" style="display: none;"><input onclick="goGeo()" type="checkbox" id="geoloc" name="location"/><label for="geoloc" id="lblGeo"/></span>
 <script type="text/javascript">
 started = false;
 chkbox = document.getElementById("geoloc");
 if (navigator.geolocation) {
- geoStatus("包含地理位置信息");
- if ("'.$_COOKIE['geo'].'"=="Y") {
-  chkbox.checked = true;
-  goGeo();
- }
-}
+ geoStatus("包含地理位置信息");';
+
+	if($checked == "Y") $content .= '
+ chkbox.checked = true;
+ goGeo();';
+
+	$content .= '}
+
 function goGeo(node) {
  if(started) return;
  started = true;
  geoStatus("正在定位…");
  navigator.geolocation.getCurrentPosition(geoSuccess, geoError);
 }
+
 function geoStatus(msg) {
  document.getElementById("geo").style.display = "inline";
  document.getElementById("lblGeo").innerHTML = msg;
 }
+
 function geoError(error) {
  switch(error.code) {
   case error.TIMEOUT:
@@ -37,11 +42,13 @@ function geoError(error) {
    geoStatus(error + "未知错误。");
  };
 }
+
 function geoSuccess(position) {
  geoStatus("包含<a href=\'http://maps.google.com.hk/m?q=" + position.coords.latitude + "," + position.coords.longitude + "\' target=\'blank\'>地理位置信息</a>");
  chkbox.value = position.coords.latitude + "," + position.coords.longitude;
-}</script>';
 }
-
+</script>';
+	return $content;
+}
 ?>
 
