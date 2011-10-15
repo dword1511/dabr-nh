@@ -1,5 +1,6 @@
 <?php
-$geocode = '
+function geoloc() {
+	return '
 <span id="geo" style="display: none;"><input onclick="goGeo()" type="checkbox" id="geoloc" name="location"/><label for="geoloc" id="lblGeo"/></span>
 <script type="text/javascript">
 started = false;
@@ -39,6 +40,8 @@ function geoError(error) {
 function geoSuccess(position) {
  geoStatus("包含<a href=\'http://maps.google.com.hk/m?q=" + position.coords.latitude + "," + position.coords.longitude + "\' target=\'blank\'>地理位置信息</a>");
  chkbox.value = position.coords.latitude + "," + position.coords.longitude;
-}</script>'
+}</script>';
+}
+
 ?>
 
