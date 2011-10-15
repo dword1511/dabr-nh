@@ -41,7 +41,7 @@ function logout_page() {
 }
 
 function about_page() {
-	$content = file_get_contents('about.html');
+	$content = theme('about');
 	theme('page', '关于', $content);
 }
 
