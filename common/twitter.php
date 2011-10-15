@@ -286,10 +286,13 @@ function twitter_media_page($query)
 		
 		// Geolocation parameters
 		list($lat, $long) = explode(',', $_POST['location']);
+		$geo = 'N';
 		if (is_numeric($lat) && is_numeric($long)) {
+			$geo = 'Y';
 			$post_data['lat'] = $lat;
-			$post_data['long'] = $long;	
+			$post_data['long'] = $long;
 		}
+		setcookie_year('geo', $geo);
 		
 		list($oauth_token, $oauth_token_secret) = explode('|', $GLOBALS['user']['password']);
 		
