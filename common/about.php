@@ -1,11 +1,10 @@
 <?php
 menu_register(array (
-	'aboutdabr' => array (
+	'about' => array (
 		'callback' => 'about_page',
 		'display' => '关于',
 	),
 ));
-
 
 function about_page() {
 	$content = theme('about');

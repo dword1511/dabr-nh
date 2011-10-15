@@ -6,7 +6,6 @@ if($_SERVER['HTTPS']!="on") {
     header("Location:$redirect");
 }
 
-
 header('Expires: Sat, 26 Jul 1997 05:00:00 GMT');
 header('Last-Modified: ' . date('r'));
 header('Cache-Control: no-store, no-cache, must-revalidate');
