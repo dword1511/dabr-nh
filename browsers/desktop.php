@@ -4,7 +4,7 @@ function desktop_theme_status_form($text = '', $in_reply_to_id = NULL) {
 		$output = '<form method="post" action="update">
   <fieldset><legend><img src="'.BASE_URL.'images/bird_16_blue.png" width="16" height="16" /> 发生了神马？</legend>
   <textarea id="status" name="status" rows="3" style="width:95%;max-width:400px;">'.$text.'</textarea>
-  <div><input name="in_reply_to_id" value="'.$in_reply_to_id.'" type="hidden" /><input type="submit" value="推！" /> <span id="remaining">140</span>'
+  <div><input name="in_reply_to_id" value="'.$in_reply_to_id.'" type="hidden" /><input type="submit" value="推！" /> <span id="remaining">140</span>';
 		$output .= file_get_contents('../geoloc.html');
 		$output .= '</div></fieldset></form>';
 		$output .= js_counter('status');
