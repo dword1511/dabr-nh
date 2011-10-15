@@ -438,13 +438,20 @@ function twitter_process($url, $post_data = false)
 				$result .= "Key: $key; Value: $value<br />";
 				}
 				*/
-			theme('error', '<h2>Twitter 它它它……超时了！</h2><p>Dabr 决定不去等待 Twitter 的回应了。也许你现在有机会去围观鲸鱼图。过会再试试吧。<br />'. $result . ' </p>');
+			theme('error', '<h2>Twitter 它它它……超时了！</h2><p>Dabr 决定不再等待 Twitter 的回应了。管理员会找 ISP 扯皮的。过会再试试吧。<br />'. $result . ' </p>');
 		default:
 			$result = json_decode($response);
 			$result = $result->error ? $result->error : $response;
 			if (strlen($result) > 500)
 			{
-				$result = 'Twitter 抽风了，甭见怪。' ;
+				$result = 'Twitter 抽风了，甭见怪。也许你现在有机会去围观鲸鱼图。过会再试试吧。';
+				$result .=
+'<pre>┈┈╭━━━━━━╮┏╮╭┓┈┈
+┈┈┃╰╯┈┈┈┈┃╰╮╭╯┈┈
+┈┈┣━╯┈┈┈┈╰━╯┃┈┈┈
+┈┈╰━━━━━━━━━╯┈┈┈
+╭┳╭┳╭┳╭┳╭┳╭┳╭┳╭┳
+╯╰╯╰╯╰╯╰╯╰╯╰╯╰╯╰</pre>';
 			/*
 			foreach ($response_info as $key => $value)
 			{
