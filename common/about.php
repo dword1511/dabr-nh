@@ -1,4 +1,17 @@
 <?php
+menu_register(array (
+	'aboutdabr' => array (
+		'callback' => 'about_page',
+		'display' => '关于',
+	),
+));
+
+
+function about_page() {
+	$content = theme('about');
+	theme('page', '关于', $content);
+}
+
 function link_user($name) {
 	if(user_is_authenticated()) return ' <a href="user/'.$name.'">@'.$name.'</a> ';
 	else return ' <a href="https://twitter.com/'.$name.'">@'.$name.'</a> ';

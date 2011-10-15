@@ -21,12 +21,9 @@ require 'common/theme.php';
 require 'common/twitter.php';
 require 'common/lists.php';
 require 'common/settings.php';
+require 'common/about.php';
 
 menu_register(array (
-	'aboutdabr' => array (
-		'callback' => 'about_page',
-		'display' => '关于',
-	),
 	'logout' => array (
 		'security' => true,
 		'callback' => 'logout_page',
@@ -38,11 +35,6 @@ function logout_page() {
 	user_logout();
 	$content = theme('logged_out');
 	theme('page', '已登出', $content);
-}
-
-function about_page() {
-	$content = theme('about');
-	theme('page', '关于', $content);
 }
 
 browser_detect();
