@@ -23,7 +23,7 @@ require 'common/lists.php';
 require 'common/settings.php';
 
 menu_register(array (
-	'about' => array (
+	'aboutdabr' => array (
 		'callback' => 'about_page',
 		'display' => '关于',
 	),
@@ -37,16 +37,12 @@ menu_register(array (
 function logout_page() {
 	user_logout();
 	$content = theme('logged_out');
-	theme('page', 'Logged out', $content);
+	theme('page', '已登出', $content);
 }
 
 function about_page() {
-	$content = '<!DOCTYPE html PUBLIC "-//WAPFORUM//DTD XHTML Mobile 1.0//EN" "http://www.wapforum.org/DTD/xhtml-mobile10.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml">
-<head><title>Dabr - 关于</title><meta http-equiv="Content-Type" content="text/html; charset=utf-8"/></head><body>';
-	$content .= file_get_contents('about.html');
-	$content .= "</body></html>";
-	theme('page', 'About', $content);
+	$content = file_get_contents('about.html');
+	theme('page', '关于', $content);
 }
 
 browser_detect();
