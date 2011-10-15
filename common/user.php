@@ -236,7 +236,7 @@ function theme_login() {
 	<tr><th>用户名：</th><td><input type="text" name="username"/></td></tr>
 	<tr><th>密　码：</th><td><input type="password" name="password"/></td></tr>
 </table>
-<p><input type="submit" value="走你！"/></p>
+<p><input type="submit" value="无节操登录"/></p>
 </form>';
 
 	if (MYSQL_USERS == 'ON') $content .= '<p>人在兲朝身不由己？ <a href="login">试试用 Dabr 账户登录！</a></p>';

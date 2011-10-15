@@ -4,49 +4,9 @@ function desktop_theme_status_form($text = '', $in_reply_to_id = NULL) {
 		$output = '<form method="post" action="update">
   <fieldset><legend><img src="'.BASE_URL.'images/bird_16_blue.png" width="16" height="16" /> 发生了神马？</legend>
   <textarea id="status" name="status" rows="3" style="width:95%;max-width:400px;">'.$text.'</textarea>
-  <div><input name="in_reply_to_id" value="'.$in_reply_to_id.'" type="hidden" /><input type="submit" value="推！" /> <span id="remaining">140</span> 
-  <span id="geo" style="display: none;"><input onclick="goGeo()" type="checkbox" id="geoloc" name="location" /> <label for="geoloc" id="lblGeo"></label></span></div>
-  </fieldset>
-  <script type="text/javascript">
-started = false;
-chkbox = document.getElementById("geoloc");
-if (navigator.geolocation) {
-	geoStatus("包含地理位置信息");
-	if ("'.$_COOKIE['geo'].'"=="Y") {
-		chkbox.checked = true;
-		goGeo();
-	}
-}
-function goGeo(node) {
-	if (started) return;
-	started = true;
-	geoStatus("正在定位……");
-	navigator.geolocation.getCurrentPosition(geoSuccess, geoError);
-}
-function geoStatus(msg) {
-	document.getElementById("geo").style.display = "inline";
-	document.getElementById("lblGeo").innerHTML = msg;
-}
-function geoError(error) {
-	geoStatus(error);
-	switch(error.code) {
-		case error.TIMEOUT:
-			document.getElementById("lblGeo").innerHTML += "：定位服务超时鸟。问问方校长是肿么回事。";
-		break;
-		case error.PERMISSION_DENIED:
-			document.getElementById("lblGeo").innerHTML += "：定位请求被拒鸟。请瞅瞅您的浏览器设置。";
-		break;
-		case error.POSITION_UNAVAILABLE:
-			document.getElementById("lblGeo").innerHTML += "：抱歉，我们已经找不到您在哪了，也许您已经被开除球籍。";
-		break;
-	};
-}
-function geoSuccess(position) {
-	geoStatus("包含<a href=\'http://maps.google.com.hk/m?q=" + position.coords.latitude + "," + position.coords.longitude + "\' target=\'blank\'>地理位置信息</a>");
-	chkbox.value = position.coords.latitude + "," + position.coords.longitude;
-}
-  </script>
-</form>';
+  <div><input name="in_reply_to_id" value="'.$in_reply_to_id.'" type="hidden" /><input type="submit" value="推！" /> <span id="remaining">140</span>'
+		$output .= file_get_contents('../geoloc.html');
+		$output .= '</div></fieldset></form>';
 		$output .= js_counter('status');
 		return $output;
 	}

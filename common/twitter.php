@@ -3,6 +3,7 @@
 require 'Autolink.php';
 require 'Extractor.php';
 require 'Embedly.php';
+require 'Emoticons.php';
 
 menu_register(array(
 	'' => array(
@@ -237,7 +238,7 @@ function twitter_trends_page($query)
 			$header .= '<option value="' . $l->woeid . '"' . (($l->woeid == $woeid) ? ' selected="selected"' : '') . '>' . $n . '</option>';
 		}
 	}
-	$header .= '</select> <input type="submit" value="走你啊！" /></form>';
+	$header .= '</select> <input type="submit" value="应用" /></form>';
 	
 	$request = API_URL.'trends/' . $woeid . '.json';
 	$trends = twitter_process($request);
@@ -282,6 +283,13 @@ function twitter_media_page($query)
 	{
 		require 'tmhOAuth.php';
 		
+		// Geolocation parameters
+		list($lat, $long) = explode(',', $_POST['location']);
+		if (is_numeric($lat) && is_numeric($long)) {
+			$post_data['lat'] = $lat;
+			$post_data['long'] = $long;	
+		}
+		
 		list($oauth_token, $oauth_token_secret) = explode('|', $GLOBALS['user']['password']);
 		
 		$tmhOAuth = new tmhOAuth(array(
@@ -296,7 +304,9 @@ function twitter_media_page($query)
 		$code = $tmhOAuth->request('POST', 'https://upload.twitter.com/1/statuses/update_with_media.json',
 											  array(
 												 'media[]'  => "@{$image}",
-												 'status'   => " " . $status //A space is needed because twitter b0rks if first char is an @
+												 'status'   => " " . $status, //A space is needed because twitter b0rks if first char is an @
+												 'lat'		=> $lat,
+												 'long'		=> $long,
 											  ),
 											  true, // use auth
 											  true  // multipart
@@ -341,8 +351,9 @@ function twitter_media_page($query)
 						图片：<input type='file' name='image' /><br />
 						消息（可选）：<br />
 						<textarea name='message' style='width:90%; max-width: 400px;' rows='3' id='message'>" . $status . "</textarea><br>
-						<input type='submit' value='发送'><span id='remaining'>120</span>
-					</form>";
+						<input type='submit' value='发送'><span id='remaining'>120</span>";
+	$content .= file_get_contents('../geoloc.html');
+	$content .= '</form>';
 	$content .= js_counter("message", "120");
 
 	return theme('page', '上传图片', $content);
@@ -436,7 +447,7 @@ function twitter_process($url, $post_data = false)
 			}
 			*/	
 			}
-			theme('error', "<h2>调用 Twitter API 时粗线了一个么力滴错误。</h2><p>{$response_info['http_code']}: {$result}</p><hr>");
+			theme('error', "<h2>调用 Twitter API 时粗线了一个错误。</h2><p>{$response_info['http_code']}: {$result}</p><hr>");
 	}
 }
 
@@ -461,7 +472,7 @@ function twitter_get_media($status) {
 	if($status->entities->media) {
 		$image = $status->entities->media[0]->media_url_https;
 	
-		$media_html = "<a href=\"" . $image . "\" target='" . get_target() . "'>";
+		$media_html = "<a href=\"" . BASE_URL . "simpleproxy.php?url=" . $image . ":large" . "\" target='" . get_target() . "'>";
 		$media_html .= 	"<img src=\"" . BASE_URL . "simpleproxy.php?url=" . $image . ":thumb\" width=\"" . $status->entities->media[0]->sizes->thumb->w . 
 								"\" height=\"" . $status->entities->media[0]->sizes->thumb->h . "\" />";
 		$media_html .= "</a><br />";
@@ -562,6 +573,11 @@ function twitter_parse_tags($input, $entities = false) {
 		$tok = strtok(" \n\t\n\r\0");	// Move to the next token
 	}*/
 
+	//	Add Emoticons :-)
+	if (setting_fetch('emoticons') != 'off') {
+		$out = emoticons($out);
+	}
+
 	//Return the completed string
 	return $out;
 }
@@ -593,8 +609,6 @@ function flickr_encode($num) {
 	return $encoded;
 }
 
-
-
 function format_interval($timestamp, $granularity = 2) {
 	$units = array(
 	'年' => 31536000,
@@ -614,7 +628,7 @@ function format_interval($timestamp, $granularity = 2) {
 			break;
 		}
 	}
-	return $output ? $output : '0 sec';
+	return $output ? $output : '0 秒';
 }
 
 function twitter_status_page($query) {
@@ -642,7 +656,7 @@ function twitter_status_page($query) {
 			$content .= '<p>下面是不太靠谱的对话展示功能：</p>'.theme('timeline', $thread);
 			$content .= "<p>如果您对这种顺序感到厌倦，到<a href='settings'>设置</a>里面去改改吧。不过这不会改变我不靠谱的本质哦。</p>";
 		}
-		theme('page', "消息号 $id", $content);
+		theme('page', "消息 $id", $content);
 	}
 }
 
@@ -774,12 +788,12 @@ function twitter_confirmation_page($query)
 
 		case 'delete':
 			$content = '<p>你真的要把自己的推文删掉么？</p>';
-			$content .= "<ul><li>消息号：<strong>$target</strong></li><li>世上木有后悔药哦亲！</li></ul>";
+			$content .= "<ul><li>消息：<strong>$target</strong></li><li>世上木有后悔药哦亲！</li></ul>";
 			break;
 
 		case 'deleteDM':
 			$content = '<p>你真的要删掉那条私信么？</p>';
-			$content .= "<ul><li>消息号：<strong>$target</strong></li><li>世上木有后悔药哦亲！</li><li>而且这条私信会被从<em>接收和发送双方</em>的账户里删掉。</li></ul>";
+			$content .= "<ul><li>消息：<strong>$target</strong></li><li>世上木有后悔药哦亲！</li><li>而且这条私信会被从<em>接收和发送双方</em>的账户里删掉。</li></ul>";
 			break;
 
 		case 'spam':
@@ -844,7 +858,7 @@ function twitter_retweeters_page($tweet) {
 	$request = API_URL."statuses/{$id}/retweeted_by.xml";
 	$tl = lists_paginated_process($request);
 	$content = theme('retweeters', $tl);
-	theme('page', "所有转发了消息号 {$id} 的家伙", $content);
+	theme('page', "所有转发了消息 {$id} 的家伙", $content);
 }
 
 function twitter_update() {
@@ -1214,7 +1228,7 @@ function theme_user_header($user) {
 	$followed_by = $following->relationship->target->followed_by; //The $user is followed by the authenticating
 	$following = $following->relationship->target->following;
 	$name = theme('full_name', $user);
-	$full_avatar = str_replace('_normal.', '.', theme_get_avatar($user));
+	$full_avatar = theme_get_full_avatar($user);
 	$link = theme('external_link', $user->url);
 	//Some locations have a prefix which should be removed (UbertTwitter and iPhone)
 	//Sorry if my PC has converted from UTF-8 with the U (artesea)
@@ -1300,7 +1314,7 @@ function theme_status_time_link($status, $is_link = true) {
 	$time = strtotime($status->created_at);
 	if ($time > 0) {
 		if (twitter_date('dmy') == twitter_date('dmy', $time) && !setting_fetch('timestamp')) {
-			$out = format_interval(time() - $time, 1). ' ago';
+			$out = format_interval(time() - $time, 1). '前';
 		} else {
 			$out = twitter_date('H:i', $time);
 		}
@@ -1532,7 +1546,9 @@ function theme_timeline($feed)
 			$date = $status->created_at;
 		}
 		$text = $status->text;
-		$media = twitter_get_media($status);
+		if (!in_array(setting_fetch('browser'), array('text', 'worksafe'))) {
+			$media = twitter_get_media($status);
+		}
 		$link = theme('status_time_link', $status, !$status->is_direct);
 		$actions = theme('action_icons', $status);
 		$avatar = theme('avatar', theme_get_avatar($status->from));
@@ -1643,8 +1659,8 @@ function theme_followers($feed, $hide_pagination = false) {
 			$content .= "地址：{$user->location}<br />";
 		$content .= "统计：";
 		$content .= $user->statuses_count." 条消息，";
-		$content .= $user->friends_count." 个粉丝，";
-		$content .= $user->followers_count." 个偶像，";
+		$content .= $user->friends_count." 个偶像，";
+		$content .= $user->followers_count." 个粉丝，";
 		$content .= "每天约 ".$tweets_per_day." 条消息<br />";
 		$content .= "上一条消息于 ";
 		if($user->protected == 'true' && $last_tweet == 0)
@@ -1685,8 +1701,8 @@ function theme_retweeters($feed, $hide_pagination = false) {
 			$content .= "地址：{$user->location}<br />";
 		$content .= "统计：";
 		$content .= $user->statuses_count." 条消息，";
-		$content .= $user->friends_count." 个粉丝，";
-		$content .= $user->followers_count." 个偶像，";
+		$content .= $user->friends_count." 个偶像，";
+		$content .= $user->followers_count." 个粉丝，";
 		$content .= "每天约 ".$tweets_per_day." 条消息<br />";
 		$content .= "</span>";
 
@@ -1717,31 +1733,13 @@ function theme_get_avatar($object) {
 	return BASE_URL . "simpleproxy.php?url=" . $object->profile_image_url_https;
 }
 
+function theme_get_full_avatar($object) {
+	return BASE_URL . "simpleproxy.php?url=" . str_replace('_normal.', '.', $object->profile_image_url_https);
+}
+
 function theme_no_tweets() {
 	return '<p>木有任何消息可供显示。</p>';
 }
-
-// No longer refered function.
-/*function theme_search_results($feed) {
-	$rows = array();
-	foreach ($feed->results as $status) {
-		$text = twitter_parse_tags($status->text, $status->entities);
-		$link = theme('status_time_link', $status);
-		$actions = theme('action_icons', $status);
-
-		$row = array(
-		theme('avatar', theme_get_avatar($status)),
-      "<a href='user/{$status->from_user}'>{$status->from_user}</a> $actions - {$link}<br />{$text}",
-		);
-		if (twitter_is_reply($status)) {
-			$row = array('class' => 'reply', 'data' => $row);
-		}
-		$rows[] = $row;
-	}
-	$content = theme('table', array(), $rows, array('class' => 'timeline'));
-	$content .= theme('pagination');
-	return $content;
-}*/
 
 function theme_search_form($query) {
 	$query = stripslashes(htmlentities($query,ENT_QUOTES,"UTF-8"));
@@ -1868,12 +1866,6 @@ function theme_action_icon($url, $image_url, $text) {
 
 	return "<a href='$url'><img src='$image_url' alt='$text' /></a>";
 }
-
-// No pluralisation in Chinese
-/*function pluralise($word, $count, $show = FALSE) {
-	if($show) $word = "{$count} {$word}";
-	return $word;
-}*/
 
 function is_64bit() {
 	$int = "9223372036854775807";

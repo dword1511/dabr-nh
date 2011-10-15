@@ -57,6 +57,7 @@ function settings_page($args) {
 		$settings['timestamp']   = $_POST['timestamp'];
 		$settings['hide_inline'] = $_POST['hide_inline'];
 		$settings['utc_offset']  = (float)$_POST['utc_offset'];
+		$settings['emoticons']   = $_POST['emoticons'];
 		
 		// Save a user's oauth details to a MySQL table
 		if (MYSQL_USERS == 'ON' && $newpass = $_POST['newpassword']) {
@@ -84,6 +85,12 @@ function settings_page($args) {
 		'on' => '通过 GWT',
 	);
 
+	
+	$emoticons = array(
+		'on' => '打开',
+		'off' => '关掉',
+	);
+
 	$colour_schemes = array();
 	foreach ($GLOBALS['colour_schemes'] as $id => $info) {
 		list($name, $colours) = explode('|', $info);
@@ -105,6 +112,8 @@ function settings_page($args) {
 	$content .= theme('options', $colour_schemes, setting_fetch('colours', 5));
 	$content .= '</select></p><p>情景模式：<br /><select name="browser">';
 	$content .= theme('options', $modes, $GLOBALS['current_theme']);
+	$content .= '</select><br/></p><p>蛋疼的表情符转换<br /><select name="emoticons">';
+	$content .= theme('options', $emoticons, setting_fetch('emoticons', $GLOBALS['current_theme'] == 'text' ? 'on' : 'off'));
 	$content .= '</select></p><p>外链方式：<br /><select name="gwt">';
 	$content .= theme('options', $gwt, setting_fetch('gwt', $GLOBALS['current_theme'] == 'text' ? 'on' : 'off'));
 	$content .= '</select><small><br />Google Web Transcoder (GWT) 会把网页转换成适合不靠谱的山寨机浏览的格式。</small></p>';
@@ -119,7 +128,7 @@ function settings_page($args) {
 		$content .= '<fieldset><legend>Dabr 账户</legend><small>如果你被墙了，你可以通过 Dabr 帐号和密码登录（当然 OAuth 还得翻墙的）。</small></p><p>修改 Dabr 密码<br /><input type="password" name="newpassword" /><br /><small>不想改的话就甭填好了。</small></fieldset>';
 	}
 	
-	$content .= '<p><input type="submit" value="走你！" /></p></form>';
+	$content .= '<p><input type="submit" value="存起来吧" /></p></form>';
 
 	$content .= '<hr /><p>访问<a href="reset">重置</a>页面，如果事情变得不太对头的话 —— 你会被登出，所有的设置也会被清空。</p>';
 
