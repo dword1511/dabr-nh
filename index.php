@@ -41,7 +41,11 @@ function logout_page() {
 }
 
 function about_page() {
-	$content = file_get_contents('about.html');
+	$content = '<!DOCTYPE html PUBLIC "-//WAPFORUM//DTD XHTML Mobile 1.0//EN" "http://www.wapforum.org/DTD/xhtml-mobile10.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head><title>Dabr - 关于</title><meta http-equiv="Content-Type" content="text/html; charset=utf-8"/></head><body>';
+	$content .= file_get_contents('about.html');
+	$content .= "</body></html>";
 	theme('page', 'About', $content);
 }
 
