@@ -11,6 +11,7 @@ $GLOBALS['colour_schemes'] = array(
 menu_register(array(
 	'settings' => array(
 		'callback' => 'settings_page',
+		'display' => '设置',
 	),
 	'reset' => array(
 		'hidden' => true,

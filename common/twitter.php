@@ -10,6 +10,7 @@ menu_register(array(
 	'' => array(
 		'callback' => 'twitter_home_page',
 		'accesskey' => '0',
+		'display' => '主页',
 	),
 	'status' => array(
 		'hidden' => true,
@@ -30,6 +31,7 @@ menu_register(array(
 		'security' => true,
 		'callback' => 'twitter_replies_page',
 		'accesskey' => '1',
+		'display' => '提及',
 	),
 	'favourite' => array(
 		'hidden' => true,
@@ -45,11 +47,13 @@ menu_register(array(
 		'security' => true,
 		'callback' => 'twitter_directs_page',
 		'accesskey' => '2',
+		'display' => '私信',
 	),
 	'search' => array(
 		'security' => true,
 		'callback' => 'twitter_search_page',
 		'accesskey' => '3',
+		'display' => '搜索',
 	),
 	'user' => array(
 		'hidden' => true,
@@ -94,15 +98,17 @@ menu_register(array(
 	'favourites' => array(
 		'security' => true,
 		'callback' =>  'twitter_favourites_page',
+		'display' => '收藏',
 	),
 	'followers' => array(
 		'security' => true,
 		'callback' => 'twitter_followers_page',
+		'display' => '粉丝',
 	),
 	'friends' => array(
 		'security' => true,
-		'security' => true,
 		'callback' => 'twitter_friends_page',
+		'display' => '偶像',
 	),
 	'delete' => array(
 		'hidden' => true,
@@ -127,14 +133,17 @@ menu_register(array(
 	'picture' => array(
 		'security' => true,
 		'callback' => 'twitter_media_page',
+		'display' => '上图',
 	),
 	'trends' => array(
 		'security' => true,
 		'callback' => 'twitter_trends_page',
+		'display' => '趋势',
 	),
 	'retweets' => array(
 		'security' => true,
 		'callback' => 'twitter_retweets_page',
+		'display' => '被转发的',
 	),
         'retweeted_by' => array(
                 'security' => true,

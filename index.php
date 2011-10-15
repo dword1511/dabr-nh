@@ -24,11 +24,11 @@ require 'common/settings.php';
 
 menu_register(array (
 	'about' => array (
-		'callback' => 'about_page',
+		'callback' => '关于',
 	),
 	'logout' => array (
 		'security' => true,
-		'callback' => 'logout_page',
+		'callback' => '登出',
 	),
 ));
 
