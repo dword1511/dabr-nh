@@ -517,7 +517,7 @@ function twitter_parse_tags($input, $entities = false) {
 				$link = "http://google.com/gwt/n?u={$encoded}";
 			}
 			else {
-				$link = $urls->url;
+				$link = $display_url;
 			}
 			
 			$link_html = '<a href="' . $link . '" target="' . get_target() . '">' . $display_url . '</a>';
