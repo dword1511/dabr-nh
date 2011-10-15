@@ -1,11 +1,11 @@
 <?php
 
 $GLOBALS['colour_schemes'] = array(
-	1 => 'Ugly Orange|b50,ddd,111,555,fff,eee,ffa,dd9,e81,c40,fff',
-	2 => 'Touch Blue|138,ddd,111,555,fff,eee,ffa,dd9,138,fff,fff',
-	3 => 'Sickly Green|293C03,ccc,000,555,fff,eee,CCE691,ACC671,495C23,919C35,fff',
-	4 => 'Kris\' Purple|d5d,000,ddd,999,222,111,202,101,909,222,000,000',
-	5 => '#red|d12,ddd,111,555,fff,eee,ffa,dd9,c12,fff,fff',
+	1 => '扎眼橙|b50,ddd,111,555,fff,eee,ffa,dd9,e81,c40,fff',
+	2 => '清新蓝|138,ddd,111,555,fff,eee,ffa,dd9,138,fff,fff',
+	3 => '鸭屎绿|293C03,ccc,000,555,fff,eee,CCE691,ACC671,495C23,919C35,fff',
+	4 => '阴暗紫|d5d,000,ddd,999,222,111,202,101,909,222,000,000',
+	5 => '猪血红|d12,ddd,111,555,fff,eee,ffa,dd9,c12,fff,fff',
 );
 
 menu_register(array(
@@ -109,13 +109,13 @@ function settings_page($args) {
 		$utc_offset = '+' . $utc_offset;
 	}
 
-	$content .= '<form action="settings/save" method="post"><p>配色方案：<br /><select name="colours">';
+	$content .= '<form action="settings/save" method="post"><p>配色方案：<br /><select name="colours" style="width:60%;max-width:200px;">';
 	$content .= theme('options', $colour_schemes, setting_fetch('colours', 5));
-	$content .= '</select></p><p>情景模式：<br /><select name="browser">';
+	$content .= '</select></p><p>情景模式：<br /><select name="browser" style="width:60%;max-width:200px;">';
 	$content .= theme('options', $modes, $GLOBALS['current_theme']);
-	$content .= '</select><br/></p><p>蛋疼的表情符转换：<br /><select name="emoticons">';
+	$content .= '</select><br/></p><p>蛋疼的表情符转换：<br /><select name="emoticons" style="width:60%;max-width:200px;">';
 	$content .= theme('options', $emoticons, setting_fetch('emoticons', $GLOBALS['current_theme'] == 'text' ? 'on' : 'off'));
-	$content .= '</select></p><p>外链方式：<br /><select name="gwt">';
+	$content .= '</select></p><p>外链方式：<br /><select name="gwt" style="width:60%;max-width:200px;">';
 	$content .= theme('options', $gwt, setting_fetch('gwt', $GLOBALS['current_theme'] == 'text' ? 'on' : 'off'));
 	$content .= '</select><small><br />Google Web Transcoder (GWT) 会把网页转换成适合不靠谱的山寨机浏览的格式。</small></p>';
 	$content .= '<p><label><input type="checkbox" name="reverse" value="yes" '. (setting_fetch('reverse') == 'yes' ? ' checked="checked" ' : '') .' /> 尝试反转会话线索。</label></p>';
@@ -129,7 +129,7 @@ function settings_page($args) {
 		$content .= '<fieldset><legend>Dabr 账户</legend><small>如果你被墙了，你可以通过 Dabr 帐号和密码登录（当然 OAuth 还得翻墙的）。</small></p><p>修改 Dabr 密码<br /><input type="password" name="newpassword" /><br /><small>不想改的话就甭填好了。</small></fieldset>';
 	}
 	
-	$content .= '<p><input type="submit" value="存起来吧" /></p></form>';
+	$content .= '<p><input type="submit" value="存起来吧" style="width:60%;max-width:200px;"/></p></form>';
 
 	$content .= '<hr /><p>访问<a href="reset">重置</a>页面，如果事情变得不太对头的话 —— 你会被登出，所有的设置也会被清空。</p>';
 
