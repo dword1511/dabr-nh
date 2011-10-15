@@ -1,5 +1,5 @@
 <?php
-require '../common/geoloc.php';
+require 'common/geoloc.php';
 function desktop_theme_status_form($text = '', $in_reply_to_id = NULL) {
 	if (user_is_authenticated()) {
 		$output = '<form method="post" action="update">
