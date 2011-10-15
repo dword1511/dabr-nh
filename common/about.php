@@ -14,7 +14,7 @@ function about_page() {
 
 function link_user($name) {
 	if(user_is_authenticated()) return ' <a href="user/'.$name.'">@'.$name.'</a> ';
-	else return ' <a href="https://twitter.com/'.$name.'">@'.$name.'</a> ';
+	else return ' <a href="https://twitter.com/'.$name.'" target="'.get_target().'">@'.$name.'</a> ';
 }
 
 function link_site($url, $title) {
@@ -23,7 +23,7 @@ function link_site($url, $title) {
 		$link = "http://google.com/gwt/n?u={$encoded}";
 	}
 	else $link = $url;
-	return ' <a href="'.$link.'">'.$title.'</a> ';
+	return ' <a href="'.$link.'" target="'.get_target().'">'.$title.'</a> ';
 }
 
 function theme_about() {
