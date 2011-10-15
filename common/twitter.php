@@ -143,7 +143,7 @@ menu_register(array(
 	'retweets' => array(
 		'security' => true,
 		'callback' => 'twitter_retweets_page',
-		'display' => '被转发的',
+		'display' => '转发',
 	),
         'retweeted_by' => array(
                 'security' => true,
