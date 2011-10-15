@@ -320,7 +320,9 @@ function twitter_media_page($query)
 			$text = $json->text;
 			
 			$content = "<p>上传成功，撒花！</p>
-							<p><img src=\"" . BASE_URL . "simpleproxy.php?url=" . $image_url . ":thumb\" alt='' /></p>
+							<p>
+							<a href=\"" . BASE_URL . "simpleproxy.php?url=" . $image_url . ":large" . "\" target='" . get_target() . "'>
+							<img src=\"" . BASE_URL . "simpleproxy.php?url=" . $image_url . ":thumb\" alt='' /></p></a>
 							<p>". twitter_parse_tags($text) . "</p>";
 			
 		} else {
@@ -1752,7 +1754,7 @@ function theme_external_link($url, $content = null) {
 	{
 		//Used to wordwrap long URLs
 		//return "<a href='$url' target='_blank'>". wordwrap(long_url($url), 64, "\n", true) ."</a>";
-		return "<a href='$url' target='" . get_target() . "'>". long_url($url) ."</a>";
+		return "<a href='".long_url($url)."' target='" . get_target() . "'>". long_url($url) ."</a>";
 	}
 	else
 	{

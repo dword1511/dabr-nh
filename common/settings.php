@@ -88,7 +88,7 @@ function settings_page($args) {
 	
 	$emoticons = array(
 		'on' => '打开',
-		'off' => '关掉',
+		'off' => '关掉（推荐）',
 	);
 
 	$colour_schemes = array();
@@ -112,7 +112,7 @@ function settings_page($args) {
 	$content .= theme('options', $colour_schemes, setting_fetch('colours', 5));
 	$content .= '</select></p><p>情景模式：<br /><select name="browser">';
 	$content .= theme('options', $modes, $GLOBALS['current_theme']);
-	$content .= '</select><br/></p><p>蛋疼的表情符转换<br /><select name="emoticons">';
+	$content .= '</select><br/></p><p>蛋疼的表情符转换：<br /><select name="emoticons">';
 	$content .= theme('options', $emoticons, setting_fetch('emoticons', $GLOBALS['current_theme'] == 'text' ? 'on' : 'off'));
 	$content .= '</select></p><p>外链方式：<br /><select name="gwt">';
 	$content .= theme('options', $gwt, setting_fetch('gwt', $GLOBALS['current_theme'] == 'text' ? 'on' : 'off'));
