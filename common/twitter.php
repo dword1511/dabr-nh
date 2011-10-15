@@ -1908,10 +1908,10 @@ function theme_action_icon($url, $image_url, $text) {
 	// alt attribute left off to reduce bandwidth by about 720 bytes per page
 	if ($text == 'MAP')
 	{
-		return "<a href='$url' alt='$text' target='" . get_target() . "' width='16' height='16'><img src='$image_url' /></a>";
+		return "<a href='$url' target='".get_target()."'><img src='$image_url' alt='$text' width='16' height='16'/></a>";
 	}
 
-	return "<a href='$url'><img src='$image_url' alt='$text' /></a>";
+	return "<a href='$url'><img src='$image_url' alt='$text' width='16' height='16'/></a>";
 }
 
 function is_64bit() {
