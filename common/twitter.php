@@ -504,37 +504,52 @@ function twitter_parse_tags($input, $entities = false) {
 	// Use the Entities to replace hyperlink URLs
 	// http://dev.twitter.com/pages/tweet_entities
 	if($entities) {
-		foreach($entities->urls as $urls) {
-			if($urls->expanded_url != "") {
-				$display_url = $urls->expanded_url;
-			}else {
-				$display_url = $urls->url;
-			}
+		if($entities->urls) {
 
-			if (setting_fetch('gwt') == 'on') // If the user wants links to go via GWT 
-			{
-				$encoded = urlencode($urls->url);
-				$link = "http://google.com/gwt/n?u={$encoded}";
-			}
-			else {
-				$link = $display_url;
-			}
+			foreach($entities->urls as $urls) {
+				if($urls->expanded_url != "") {
+					$display_url = $urls->expanded_url;
+				}else {
+					$display_url = $urls->url;
+				}
+				$url = $urls->url;
+				
+				$parsed_url = parse_url($url);
+				
+				if (empty($parsed_url['scheme']))
+				{
+					$url = 'http://' . $url;
+				}
+
+				if (setting_fetch('gwt') == 'on') // If the user wants links to go via GWT 
+				{
+					$encoded = urlencode($urls->url);
+					$link = "http://google.com/gwt/n?u={$encoded}";
+				}
+				else {
+					$link = $display_url;
+				}
 			
-			$link_html = '<a href="' . $link . '" target="' . get_target() . '">' . $display_url . '</a>';
-			$url = $urls->url;
+				$link_html = '<a href="' . $link . '" target="' . get_target() . '">' . $display_url . '</a>';
+				$url = $urls->url;
 			
-			// Replace all URLs *UNLESS* they have already been linked (for example to an image)
-			$pattern = '#((?<!href\=(\'|\"))'.preg_quote($url,'#').')#i';
-			$out = preg_replace($pattern,  $link_html, $out);
+				// Replace all URLs *UNLESS* they have already been linked (for example to an image)
+				$pattern = '#((?<!href\=(\'|\"))'.preg_quote($url,'#').')#i';
+				$out = preg_replace($pattern,  $link_html, $out);
+			}
 		}
-		foreach($entities->hashtags as $hashtag) {
-			$text = $hashtag->text;
-			
-			$pattern = '/(^|\s)([#＃]+)('. $text .')/iu';
-			
-			$link_html = ' <a href="hash/' . $text . '">#' . $text . '</a> ';
-			
-			$out = preg_replace($pattern,  $link_html, $out, 1);
+		
+		if($entities->hashtags) {
+
+			foreach($entities->hashtags as $hashtag) {
+				$text = $hashtag->text;
+				
+				$pattern = '/(^|\s)([#＃]+)('. $text .')/iu';
+				
+				$link_html = ' <a href="hash/' . $text . '">#' . $text . '</a> ';
+				
+				$out = preg_replace($pattern,  $link_html, $out, 1);
+			}
 		}
 	} else {  // If Entities haven't been returned (usually because of search or a bio) use Autolink
 		// Create an array containing all URLs
@@ -1182,6 +1197,12 @@ function twitter_hashtag_page($query) {
 
 function theme_status_form($text = '', $in_reply_to_id = NULL) {
 	if (user_is_authenticated()) {
+		//	adding ?status=foo will automaticall add "foo" to the text area.
+		if ($_GET['status'])
+		{
+			$text = $_GET['status'];
+		}
+
 		return "<fieldset><legend><img src='".BASE_URL."images/bird_16_blue.png' width='16' height='16' />发生了神马？</legend><form method='post' action='update'><input name='status' value='{$text}' maxlength='140' /> <input name='in_reply_to_id' value='{$in_reply_to_id}' type='hidden' /><input type='submit' value='推！' /></form></fieldset>";
 	}
 }
@@ -1632,15 +1653,19 @@ function twitter_is_reply($status) {
 	//	Use Twitter Entities to see if this contains a mention of the user
 	if ($status->entities)	// If there are entities
 	{
-		$entities = $status->entities;
-		foreach($entities->user_mentions as $mentions)
+		if ($status->entities->user_mentions)
 		{
-			if ($mentions->screen_name == $user) 
+			$entities = $status->entities;
+			
+			foreach($entities->user_mentions as $mentions)
 			{
-				return true;
+				if ($mentions->screen_name == $user) 
+				{
+					return true;
+				}
 			}
 		}
-		return false;
+
 	}
 	
 	// If there are no entities (for example on a search) do a simple regex
