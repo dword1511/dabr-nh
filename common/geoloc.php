@@ -51,4 +51,3 @@ function geoSuccess(position) {
 	return $content;
 }
 ?>
-
