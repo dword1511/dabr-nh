@@ -1878,18 +1878,18 @@ function theme_action_icons($status) {
 		}
 		if (user_is_current_user($from))
 		{
-			$actions[] = theme('action_icon', "confirm/delete/{$status->id}", BASE_URL.'images/trash.gif', 'DEL');
+			$actions[] = theme('action_icon', "confirm/delete/{$status->id}", BASE_URL.'images/trash.png', 'DEL');
 		}
 		if ($retweeted_by) //Allow users to delete what they have retweeted
 		{
 			if (user_is_current_user($retweeted_by))
 			{
-				$actions[] = theme('action_icon', "confirm/delete/{$retweeted_id}", BASE_URL.'images/trash.gif', 'DEL');
+				$actions[] = theme('action_icon', "confirm/delete/{$retweeted_id}", BASE_URL.'images/trash.png', 'DEL');
 			}
 		}
 
 	} else {
-		$actions[] = theme('action_icon', "confirm/deleteDM/{$status->id}", BASE_URL.'images/trash.gif', 'DEL');
+		$actions[] = theme('action_icon', "confirm/deleteDM/{$status->id}", BASE_URL.'images/trash.png', 'DEL');
 	}
 	if ($geo !== null)
 	{
@@ -1905,15 +1905,8 @@ function theme_action_icons($status) {
 }
 
 function theme_action_icon($url, $image_url, $text) {
-	if ($text == 'MAP')
-	{
-		return "<a href='$url' target='".get_target()."'><img src='$image_url' alt='$text' width='12' height='12'/></a>";
-	}
-	else if ($text == 'DM')	{
-		return "<a href='$url'><img src='$image_url' alt='$text' width='16' height='11'/></a>";
-	}
-
-	return "<a href='$url'><img src='$image_url' alt='$text' width='12' height='12'/></a>";
+	if ($text == 'MAP') return "<a href='$url' target='".get_target()."'><img src='$image_url' alt='$text' width='16' height='16'/></a>";
+	return "<a href='$url'><img src='$image_url' alt='$text' width='16' height='16'/></a>";
 }
 
 function is_64bit() {
