@@ -60,9 +60,9 @@ function theme_menu_both($menu) {
 		//$title = $url ? $page['display'] : '主页';
 		if (!$url) $url = BASE_URL; // Shouldn't be required, due to <base> element but some browsers are stupid.
 		if ($menu == 'bottom' && isset($page['accesskey'])) {
-			$links[] = "<a href='$url' accesskey='{$page['accesskey']}'>$page['display']</a> {$page['accesskey']}";
+			$links[] = "<a href='$url' accesskey='{$page['accesskey']}'>".$page['display']."</a> {$page['accesskey']}";
 		} else {
-			$links[] = "<a href='$url'>$page['display']</a>";
+			$links[] = "<a href='$url'>".$page['display']."</a>";
 		}
 	}
 	if (user_is_authenticated()) {
