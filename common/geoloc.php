@@ -1,7 +1,7 @@
 <?php
 
 // Usage: $out .= geoloc($_COOKIE['geo']);
-function geoloc($checked, $raden=0) {
+function geoloc($checked, $raden = 0) {
 	$msga = '包含';
 	$msgb = '地理位置信息';
 	$msgc = '';
@@ -14,14 +14,14 @@ function geoloc($checked, $raden=0) {
 <span id="geo" style="display: none;">
  <input onclick="goGeo()" type="checkbox" id="geoloc" name="location"/>
  <label for="geoloc" id="lblGeo"/>';
-	if($raden) $content .='
+	if($raden) $content .= '
  <select name="radius">
   <option value="1km"> 1 公里</option>
   <option value="5km"> 5 公里</option>
   <option value="10km">10 公里</option>
   <option value="50km">50 公里</option>
  </select>';
-	$content .='
+	$content .= '
 </span>
 <script type="text/javascript">
 started = false;
@@ -64,7 +64,7 @@ function geoSuccess(position) {
  geoStatus("'.$msga.'<a href=\'http://maps.google.com.hk/m?q=" + position.coords.latitude + "," + position.coords.longitude + "\' target=\'blank\'>'.$msgb.'</a>'.$msgc.'");
  chkbox.value = position.coords.latitude + "," + position.coords.longitude;
 }
-</script>';
+</script></form>';
 	return $content;
 }
 ?>
