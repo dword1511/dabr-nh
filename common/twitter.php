@@ -1034,6 +1034,12 @@ function theme_directs_form($to) {
 
 function twitter_search_page() {
 	$search_query = $_GET['query'];
+	
+	// Geolocation parameters
+	list($lat, $long) = explode(',', $_GET['location']);
+	$loc = $_GET['location'];
+	$radius = $_GET['radius'];
+	//echo "the lat = $lat, and long = $long, and $loc";
 	$content = theme('search_form', $search_query);
 	if (isset($_POST['query'])) {
 		$duration = time() + (3600 * 24 * 365);
@@ -1044,23 +1050,33 @@ function twitter_search_page() {
 		$search_query = $_COOKIE['search_favourite'];
 		}
 	if ($search_query) {
-		$tl = twitter_search($search_query);
+		$tl = twitter_search($search_query, $lat, $long, $radius);
 		if ($search_query !== $_COOKIE['search_favourite']) {
 			$content .= '<form action="search/bookmark" method="post"><input type="hidden" name="query" value="'.$search_query.'" /><input type="submit" value="存为默认搜索" /></form>';
 		}
 		$content .= theme('timeline', $tl);
 	}
+
 	theme('page', '搜索', $content);
 }
 
-function twitter_search($search_query) {
+function twitter_search($search_query, $lat = NULL, $long = NULL, $radius = NULL) {
 	$page = (int) $_GET['page'];
 	if ($page == 0) $page = 1;
 	$request = 'https://search.twitter.com/search.json?result_type=recent&q=' . urlencode($search_query).'&page='.$page.'&include_entities=true';
+	
+	if ($lat && $long) {
+		$request .= "&geocode=$lat,$long,";
+		if ($radius) $request .="$radius";
+		else $request .="1km";
+	}
+
 	$tl = twitter_process($request);
+	//var_dump($tl->results);
 	$tl = twitter_standard_timeline($tl->results, 'search');
 	return $tl;
 }
+
 
 function twitter_find_tweet_in_timeline($tweet_id, $tl) {
 	// Parameter checks
@@ -1789,7 +1805,7 @@ function theme_no_tweets() {
 
 function theme_search_form($query) {
 	$query = stripslashes(htmlentities($query,ENT_QUOTES,"UTF-8"));
-	return "<form action='search' method='get'><input name='query' value=\"$query\" /><input type='submit' value='给我搜！' /></form>";
+	return '<form action="search" method="get"><input name="query" value="'. $query .'"/><input type="submit" value="给我搜"/></form>';
 }
 
 function theme_external_link($url, $content = null) {

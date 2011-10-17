@@ -23,7 +23,7 @@ function bigtouch_theme_avatar($url, $force_large = false) {
 }
 
 function bigtouch_theme_page($title, $content) {
-	return touch_theme_page($title, $content);
+	return theme_page($title, $content);
 }
 
 function bigtouch_theme_menu_top() {

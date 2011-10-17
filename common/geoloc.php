@@ -1,20 +1,37 @@
 <?php
+
 // Usage: $out .= geoloc($_COOKIE['geo']);
-function geoloc($checked) {
+function geoloc($checked, $raden=0) {
+	$msga = '包含';
+	$msgb = '地理位置信息';
+	$msgc = '';
+	if($raden) {
+		$msga = '搜索';
+		$msgb = '附近';
+		$msgc = '的内容';
+	}
 	$content = '
-<span id="geo" style="display: none;"><input onclick="goGeo()" type="checkbox" id="geoloc" name="location"/><label for="geoloc" id="lblGeo"/></span>
+<span id="geo" style="display: none;">
+ <input onclick="goGeo()" type="checkbox" id="geoloc" name="location"/>
+ <label for="geoloc" id="lblGeo"/>';
+	if($raden) $contens .='
+ <select name="radius">
+  <option value="1km"> 1 公里</option>
+  <option value="5km"> 5 公里</option>
+  <option value="10km">10 公里</option>
+  <option value="50km">50 公里</option>
+ </select>';
+	$contens .='
+</span>
 <script type="text/javascript">
 started = false;
 chkbox = document.getElementById("geoloc");
 if (navigator.geolocation) {
- geoStatus("包含地理位置信息");';
-
+ geoStatus("'.$msga.$msgb.$msgc.'");';
 	if($checked == "Y") $content .= '
  chkbox.checked = true;
  goGeo();';
-
 	$content .= '}
-
 function goGeo(node) {
  if(started) return;
  started = true;
@@ -44,7 +61,7 @@ function geoError(error) {
 }
 
 function geoSuccess(position) {
- geoStatus("包含<a href=\'http://maps.google.com.hk/m?q=" + position.coords.latitude + "," + position.coords.longitude + "\' target=\'blank\'>地理位置信息</a>");
+ geoStatus("'.$msga.'<a href=\'http://maps.google.com.hk/m?q=" + position.coords.latitude + "," + position.coords.longitude + "\' target=\'blank\'>'.$msgb.'</a>'.$msgc.'");
  chkbox.value = position.coords.latitude + "," + position.coords.longitude;
 }
 </script>';

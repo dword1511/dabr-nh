@@ -1,7 +1,7 @@
 <?php
 /* Example advert code */
 
-function theme_advert() {
+function show_advert() {
 	// This allows for multiple advert providers
 	// If one advert provider isn't installed, or doesn't return an ad, a different provider is used
 
@@ -33,13 +33,16 @@ function theme_advert() {
 	{
 		google_ad();
 	}
+
+	//	No advert found
+	return	'';
 }
 
 function inmobi_ad()	{
 	require_once ("common/MkhojAd.php");
 	// Create an object of mkhoj_class
 	// Use your own InMobi key here
-	$base = new MkhojAd("");
+	$base = new MkhojAd(INMOBI_API_KEY);
 	// Set Number of ads required.
 	$base->set_num_of_ads(1);
 	$base->set_page_keywords("twitter facebook social chat pictures");

@@ -1,6 +1,14 @@
 <?php
 
+/*
+Syntax is 
+'Name|links,bodybg,bodyt,small,odd,even,replyodd,replyeven,menubg,menut,menua',
+
+Assembled in theme_css()
+*/
+
 $GLOBALS['colour_schemes'] = array(
+	0 => '傲娇粉|c06,fcd,623,c8a,fee,fde,ffa,dd9,c06,fee,fee',
 	1 => '扎眼橙|b50,ddd,111,555,fff,eee,ffa,dd9,e81,c40,fff',
 	2 => '清新蓝|138,ddd,111,555,fff,eee,ffa,dd9,138,fff,fff',
 	3 => '鸭屎绿|293C03,ccc,000,555,fff,eee,CCE691,ACC671,495C23,919C35,fff',
@@ -75,10 +83,10 @@ function settings_page($args) {
 	$modes = array(
 		'mobile' => '普通手机',
 		'touch' => '触控手机',
+		'bigtouch' => '大屏触控',
 		'desktop' => '电脑',
 		'text' => '仅文本',
 		'worksafe' => '防老板模式',
-		'bigtouch' => '大屏触控',
 	);
 
 	$gwt = array(
