@@ -21,7 +21,7 @@ function geoloc($checked, $raden=0) {
   <option value="10km">10 公里</option>
   <option value="50km">50 公里</option>
  </select>';
-	$contens .='
+	$content .='
 </span>
 <script type="text/javascript">
 started = false;
