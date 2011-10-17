@@ -1,12 +1,18 @@
+# SVN repo files and stuffs we dont want
 .svn
-config.php
-*~
 *.rej
 *.orig
-*.tar
-*.tar.*
+*.mine
 *.r?
 *.r??
 *.r???
 *.r????
+# User files
+config.php
+*~
+*.tar
+*.tar.*
+# Not used any more
+images/trash.gif
+about.html
 
