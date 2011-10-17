@@ -60,7 +60,7 @@ function geoError(error) {
 }
 
 function geoSuccess(position) {
- geoStatus("'.$msga.'<a href=\'http://maps.google.com.hk/m?q=" + position.coords.latitude + "," + position.coords.longitude + "\' target=\'blank\'>'.$msgb.'</a>'.$msgc.'");
+ geoStatus("'.$msga.'<a href=\'http://maps.google.com.hk/m?q=" + position.coords.latitude + "," + position.coords.longitude + "\' target=\''.get_target().'\'>'.$msgb.'</a>'.$msgc.'");
  chkbox.value = position.coords.latitude + "," + position.coords.longitude;
 }
 </script></form>';
