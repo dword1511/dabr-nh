@@ -14,7 +14,7 @@ function geoloc($checked, $raden=0) {
 <span id="geo" style="display: none;">
  <input onclick="goGeo()" type="checkbox" id="geoloc" name="location"/>
  <label for="geoloc" id="lblGeo"/>';
-	if($raden) $contens .='
+	if($raden) $content .='
  <select name="radius">
   <option value="1km"> 1 公里</option>
   <option value="5km"> 5 公里</option>
