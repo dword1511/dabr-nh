@@ -1019,14 +1019,13 @@ function theme_directs_menu() {
 
 function theme_directs_form($to) {
 	if ($to) {
-
 		if (friendship_exists($to) != 1)
 		{
-			$html_to = "<em>Warning</em> <b>" . $to . "</b> is not following you. You cannot send them a Direct Message :-(<br/>";
+			$html_to = "<h3>注意！</h3> <b>".$to."</b> 并没有关注你。你没办法发私信给这个帐号。-____-||<br/>";
 		}
-		$html_to .= "Sending direct message to <b>$to</b><input name='to' value='$to' type='hidden'>";
+		$html_to .= "发私信给 <b>$to</b><input name='to' value='$to' type='hidden'>";
 	} else {
-		$html_to .= "To: <input name='to'><br />Message:";
+		$html_to .= "发送给：<br/><input name='to'><br/>消息：<br/>";
 	}
 	$content = "<form action='directs/send' method='post'>$html_to<br><textarea name='message' style='width:90%; max-width: 400px;' rows='3' id='message'></textarea><br><input type='submit' value='发送'><span id='remaining'>140</span></form>";
 	$content .= js_counter("message");
