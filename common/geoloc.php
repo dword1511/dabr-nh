@@ -13,16 +13,15 @@ function geoloc($checked, $raden = 0) {
 	$content = '
 <span id="geo" style="display: none;">
  <input onclick="goGeo()" type="checkbox" id="geoloc" name="location"/>
- <label for="geoloc" id="lblGeo"/>';
+ <label for="geoloc" id="lblGeo"/></span>';
 	if($raden) $content .= '
- <select name="radius">
-  <option value="1km"> 1 公里</option>
-  <option value="5km"> 5 公里</option>
-  <option value="10km">10 公里</option>
-  <option value="50km">50 公里</option>
- </select>';
+<select name="radius">
+ <option value="1km"> 1 公里</option>
+ <option value="5km"> 5 公里</option>
+ <option value="10km">10 公里</option>
+ <option value="50km">50 公里</option>
+</select>';
 	$content .= '
-</span>
 <script type="text/javascript">
 started = false;
 chkbox = document.getElementById("geoloc");
