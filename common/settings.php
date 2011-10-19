@@ -118,7 +118,7 @@ function settings_page($args) {
 	}
 
 	$content .= '<form action="settings/save" method="post"><p>配色方案：<br /><select name="colours" style="width:60%;max-width:200px;">';
-	$content .= theme('options', $colour_schemes, setting_fetch('colours', 5));
+	$content .= theme('options', $colour_schemes, setting_fetch('colours', 2)); // should be the same default value as used in theme.php
 	$content .= '</select></p><p>情景模式：<br /><select name="browser" style="width:60%;max-width:200px;">';
 	$content .= theme('options', $modes, $GLOBALS['current_theme']);
 	$content .= '</select><br/></p><p>蛋疼的表情符转换：<br /><select name="emoticons" style="width:60%;max-width:200px;">';
