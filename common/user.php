@@ -101,7 +101,7 @@ function user_oauth_sign(&$url, &$args = false) {
 }
 
 function user_ensure_authenticated() {
-	require_once 'about.php'
+	require_once 'about.php';
 	if (!user_is_authenticated()) {
 		$content = theme('login');
 		$content .= theme('about');
