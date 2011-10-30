@@ -494,8 +494,7 @@ function twitter_get_media($status) {
 		$image = $status->entities->media[0]->media_url_https;
 	
 		$media_html = "<a href=\"" . BASE_URL . "simpleproxy.php?url=" . $image . ":large" . "\" target='" . get_target() . "'>";
-		$media_html .= 	"<img src=\"" . BASE_URL . "simpleproxy.php?url=" . $image . ":thumb\" width=\"" . $status->entities->media[0]->sizes->thumb->w . 
-								"\" height=\"" . $status->entities->media[0]->sizes->thumb->h . "\" />";
+		$media_html .= 	"<img src=\"" . BASE_URL . "simpleproxy.php?url=" . $image . ":thumb\"/>";
 		$media_html .= "</a><br />";
 		
 		return $media_html;
