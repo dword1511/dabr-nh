@@ -27,7 +27,8 @@ started = false;
 chkbox = document.getElementById("geoloc");
 if (navigator.geolocation) {
  geoStatus("'.$msga.$msgb.$msgc.'");';
-	if($checked == "Y") $content .= '
+	// Do not automatically enable geoloc in searches.
+	if($checked == "Y" && $raden == 0) $content .= '
  chkbox.checked = true;
  goGeo();';
 	$content .= '}

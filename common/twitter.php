@@ -893,7 +893,7 @@ function twitter_retweeters_page($tweet) {
 	$request = API_URL."statuses/{$id}/retweeted_by.xml";
 	$tl = lists_paginated_process($request);
 	$content = theme('retweeters', $tl);
-	theme('page', "所有转发了消息 {$id} 的家伙", $content);
+	theme('page', "目力所及范围内转发了消息 {$id} 的家伙", $content);
 }
 
 function twitter_update() {
