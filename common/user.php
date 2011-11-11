@@ -233,8 +233,10 @@ function theme_login() {
 <em>（对，你最好表相信我，否则……）</em>
 <form action="'.BASE_URL.'oauth" method="post">
 <table>
-	<tr><th>用户名：</th><td><input type="text" name="username"/></td></tr>
-	<tr><th>密　码：</th><td><input type="password" name="password"/></td></tr>
+	<tr><th>用户名：</th></tr>
+	<tr><td><input type="text" name="username"/></td></tr>
+	<tr><th>密　码：</th></tr>
+	<tr><td><input type="password" name="password"/></td></tr>
 </table>
 <p><input type="submit" value="无节操登录"/></p>
 </form>';
