@@ -1,6 +1,7 @@
 <?php
 
 require 'touch.php';
+require 'desktop.php';
 
 function bigtouch_theme_action_icon($url, $image_url, $text) {
 	$image_url = str_replace('.png', 'L.png', $image_url);
@@ -14,16 +15,13 @@ function bigtouch_theme_action_icon($url, $image_url, $text) {
 function bigtouch_theme_status_form($text = '', $in_reply_to_id = NULL) {
 	return desktop_theme_status_form($text, $in_reply_to_id);
 }
+
 function bigtouch_theme_search_form($query) {
 	return desktop_theme_search_form($query);
 }
 
 function bigtouch_theme_avatar($url, $force_large = false) {
 	return "<img src='".$url."' height='48' width='48' />";
-}
-
-function bigtouch_theme_page($title, $content) {
-	return theme_page($title, $content);
 }
 
 function bigtouch_theme_menu_top() {

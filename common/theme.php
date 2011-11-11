@@ -151,12 +151,12 @@ function theme_page($title, $content) {
 				<meta name="viewport" content="width=device-width; initial-scale=1.0;" />
 				'.$meta.theme('css').'
 			</head>
-			<body id="thepage">';
+			<body id="thepage"><a name="top"/>';
 	echo "<div id=\"advert\">" . show_advert() . "</div>"; //theme('advert');
 	echo $body;
 	// If the cookies haven't been set, remind the user that they can set how Dabr looks
 	if (setting_fetch('colours') == null) echo '<p>觉得 Dabr 很难看？（其实就是嘛！） <a href="settings">更改配色方案吧！</a>（有毛线用。。。）</p>';
-	echo '</body></html>';
+	echo '<p><a href="#top">回页首</a></p></body></html>';
 	exit();
 }
 
