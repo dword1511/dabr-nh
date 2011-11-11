@@ -233,9 +233,9 @@ function theme_login() {
 <em>（对，你最好表相信我，否则……）</em>
 <form action="'.BASE_URL.'oauth" method="post">
 <strong>用户名：</strong><br/>
-<input type="text" name="username" style="width:60%;max-width:200px;"/>
+<input type="text" name="username" style="width:60%;max-width:200px;"/><br/>
 <strong>密码：</strong><br/>
-<input type="password" name="password" style="width:60%;max-width:200px;"/>
+<input type="password" name="password" style="width:60%;max-width:200px;"/><br/>
 <input type="submit" value="无节操登录" style="width:60%;max-width:200px;"/>
 </form>';
 
