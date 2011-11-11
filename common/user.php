@@ -225,7 +225,6 @@ function theme_login() {
 	$content = '<div style="margin:1em; font-size: 1.2em">
 <table><tr>
 	<td><a href="oauth"><img src="'.BASE_URL.'images/twitter_button_2_lo.gif" alt="通过 Twitter/OAuth 登录" width="165" height="28" /></a></td>
-	<td><a href="oauth">通过 Twitter/OAuth 登录</a></td>
 </tr><tr>
 	<th>小贴士：上面的玩意墙内的用户可不要乱点哦亲！被跨省了本人概不负责哦亲！</th>
 </tr></table>

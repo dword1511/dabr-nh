@@ -490,7 +490,7 @@ function twitter_fetch($url) {
 
 //	http://dev.twitter.com/pages/tweet_entities
 function twitter_get_media($status) {
-	if($status->entities->media) {
+	if($status->entities->media && setting_fetch('hide_inline') != 'yes') {
 		$image = $status->entities->media[0]->media_url_https;
 	
 		$media_html = "<a href=\"" . BASE_URL . "simpleproxy.php?url=" . $image . ":large" . "\" target='" . get_target() . "'>";
