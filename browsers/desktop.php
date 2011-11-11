@@ -2,15 +2,21 @@
 function desktop_theme_status_form($text = '', $in_reply_to_id = NULL) {
 	if (user_is_authenticated()) {
 		//	adding ?status=foo will automaticall add "foo" to the text area.
-		if ($_GET['status'])
-		{
+		if ($_GET['status']){
 			$text = $_GET['status'];
 		}
 
-		$output = '<form method="post" action="update">
-  <fieldset><legend><img src="'.BASE_URL.'images/bird_16_blue.png" width="16" height="16" /> 发生了神马？</legend>
-  <textarea id="status" name="status" rows="4" style="width:95%;max-width:400px;">'.$text.'</textarea>
-  <div><input name="in_reply_to_id" value="'.$in_reply_to_id.'" type="hidden" /><input type="submit" value="推！" /> <span id="remaining">140</span>';
+		$output = '
+<script type="text/javascript">
+document.onkeydown = function (){
+if(event.ctrlKey && window.event.keyCode == 13) document.user_tweet.submit();
+}</script>
+<form method="post" action="update" name="user_tweet"><fieldset>
+<legend><img src="'.BASE_URL.'images/bird_16_blue.png" width="16" height="16" /> 发生了神马？</legend>
+<textarea id="status" name="status" rows="4" style="width:95%;max-width:400px;">'.$text.'</textarea>
+<div><input name="in_reply_to_id" value="'.$in_reply_to_id.'" type="hidden" />
+<input type="submit" value="推！" />
+<span id="remaining">140</span>';
 		$output .= geoloc($_COOKIE['geo']);
 		$output .= '</div></fieldset></form>';
 		$output .= js_counter('status');
