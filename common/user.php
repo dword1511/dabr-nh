@@ -223,13 +223,10 @@ function user_login() {
 
 function theme_login() {
 	$content = '<div style="margin:1em; font-size: 1.2em">
-<table><tr>
-	<td><a href="oauth"><img src="'.BASE_URL.'images/twitter_button_2_lo.gif" alt="通过 Twitter/OAuth 登录" width="165" height="28" /></a></td>
-</tr><tr>
-	<th>小贴士：上面的玩意墙内的用户可不要乱点哦亲！被跨省了本人概不负责哦亲！</th>
-</tr></table>
-<p>直接通过用户名和密码登录是邪恶的，参见 <a href="http://blog.dabr.co.uk/">Dabr blog</a></p>';
-	$content .='<hr /><h2>大家好！我是桑不起的 OAuth 黑中介</h2>
+<a href="oauth"><img src="'.BASE_URL.'images/twitter_button_2_lo.gif" alt="通过 Twitter/OAuth 登录" width="165" height="28" /></a><br/>
+<strong>小贴士：上面的玩意墙内的用户可不要乱点哦亲！被跨省了本人概不负责哦亲！</strong><br/>
+<p>直接通过用户名和密码登录是邪恶的，参见 <a href="http://blog.dabr.co.uk/">Dabr blog</a></p>
+<hr /><h2>大家好！我是桑不起的 OAuth 黑中介</h2>
 <em>（对，你最好表相信我，否则……）</em>
 <form action="'.BASE_URL.'oauth" method="post">
 <strong>用户名：</strong><br/>
@@ -238,7 +235,6 @@ function theme_login() {
 <input type="password" name="password" style="width:60%;max-width:200px;"/><br/>
 <input type="submit" value="无节操登录" style="width:60%;max-width:200px;"/>
 </form>';
-
 	if (MYSQL_USERS == 'ON') $content .= '<p>人在兲朝身不由己？ <a href="login">试试用 Dabr 账户登录！</a></p>';
 	$content .= '</div>';
 	return $content;
