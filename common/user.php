@@ -232,13 +232,11 @@ function theme_login() {
 	$content .='<hr /><h2>大家好！我是桑不起的 OAuth 黑中介</h2>
 <em>（对，你最好表相信我，否则……）</em>
 <form action="'.BASE_URL.'oauth" method="post">
-<table>
-	<tr><th>用户名：</th></tr>
-	<tr><td><input type="text" name="username"/></td></tr>
-	<tr><th>密　码：</th></tr>
-	<tr><td><input type="password" name="password"/></td></tr>
-</table>
-<p><input type="submit" value="无节操登录"/></p>
+<strong>用户名：</strong><br/>
+<input type="text" name="username" style="width:60%;max-width:200px;"/>
+<strong>密码：</strong><br/>
+<input type="password" name="password" style="width:60%;max-width:200px;"/>
+<input type="submit" value="无节操登录" style="width:60%;max-width:200px;"/>
 </form>';
 
 	if (MYSQL_USERS == 'ON') $content .= '<p>人在兲朝身不由己？ <a href="login">试试用 Dabr 账户登录！</a></p>';
