@@ -8,8 +8,6 @@ menu_register(array(
 	),
 ));
 
-
-
 /*
  API Calls
 
@@ -21,9 +19,7 @@ menu_register(array(
 function lists_paginated_process($url) {
 	// Adds cursor/pagination parameters to a query
 	$cursor = $_GET['cursor'];
-	if (!is_numeric($cursor)) {
-		$cursor = -1;
-	}
+	if (!is_numeric($cursor)) $cursor = -1;
 	$url .= '?cursor='.$cursor;
 	$xml = twitter_process($url);
 	return simplexml_load_string($xml);
@@ -56,8 +52,6 @@ function twitter_lists_list_subscribers($user, $list) {
 	// Subscribers of a list
 	return lists_paginated_process(API_URL."{$user}/{$list}/subscribers.xml");
 }
-
-
 
 /* Front controller for the new pages
 
@@ -115,8 +109,6 @@ function lists_controller($query) {
 	return theme('error', 'List page not found');
 }
 
-
-
 /* Pages */
 
 function lists_lists_page($user) {
@@ -164,8 +156,6 @@ function lists_list_subscribers_page($user, $list) {
 	$content .= theme('list_pagination', $p);
 	theme('page', "{$user}/{$list} 的订阅者", $content);
 }
-
-
 
 /* Theme functions */
 

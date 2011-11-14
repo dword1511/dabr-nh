@@ -145,6 +145,7 @@ function theme_page($title, $content) {
 	echo '<!DOCTYPE html PUBLIC "-//WAPFORUM//DTD XHTML Mobile 1.0//EN" "http://www.wapforum.org/DTD/xhtml-mobile10.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml"><head>
 <title>Dabr - ',$title,'</title>
+<base href="',BASE_URL,'" />
 <meta name="viewport" content="width=device-width; initial-scale=1.0;" />
 '.$meta.theme('css').'
 </head><body id="thepage"><a name="top">';
@@ -152,9 +153,8 @@ function theme_page($title, $content) {
 	echo $body;
 	// If the cookies haven't been set, remind the user that they can set how Dabr looks
 	if (setting_fetch('colours') == null) echo '<p>觉得 Dabr 很难看？（其实就是嘛！） <a href="settings">更改配色方案吧！</a>（有毛线用。。。）</p>';
-	echo '<p><a href="#top">回页首</a></p></body></html>';
+	echo '<p><a href="'.$_SERVER['REQUEST_URI'].'#top">回页首</a></p></body></html>';
 	exit();
-// <base href="',BASE_URL,'" />
 // <meta http-equiv="Content-Type" content="text/html; charset=utf-8" /> Already set in header, not needed.
 }
 
