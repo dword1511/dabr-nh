@@ -884,7 +884,7 @@ function twitter_followers_page($query) {
 	$request = API_URL."statuses/followers/{$user}.xml";
 	$tl = lists_paginated_process($request);
 	$content = theme('followers', $tl);
-	theme('page', '关注'.$user.'的人', $content);
+	theme('page', '关注 '.$user.' 的人', $content);
 }
 
 //  Shows every user who retweeted a specific status
