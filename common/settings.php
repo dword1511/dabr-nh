@@ -37,10 +37,10 @@ function cookie_monster() {
 	);
 	$duration = time() - 3600;
 	foreach ($cookies as $cookie) {
-		setcookie($cookie, NULL, $duration, '/');
+		setcookie($cookie, NULL, $duration, COOKIE_PREFIX);
 		setcookie($cookie, NULL, $duration);
 	}
-	return theme('page', 'Cookie 已经被处理掉了', '<p>储存在您机器上有关 dabr 的 Cookie 已经被清除，所有设置已复位，请重新登陆。</p>');
+	return theme('page', 'Cookies 已经被处理掉了', '<p>储存在您机器上有关 dabr 的 Cookie 已经被清除，所有设置已复位，请重新登陆。</p>');
 }
 
 function setting_fetch($setting, $default = NULL) {
@@ -54,7 +54,7 @@ function setting_fetch($setting, $default = NULL) {
 
 function setcookie_year($name, $value) {
 	$duration = time() + (3600 * 24 * 365);
-	setcookie($name, $value, $duration, '/');
+	setcookie($name, $value, $duration, COOKIE_PREFIX);
 }
 
 function settings_page($args) {

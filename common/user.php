@@ -111,7 +111,7 @@ function user_ensure_authenticated() {
 
 function user_logout() {
 	unset($GLOBALS['user']);
-	setcookie('USER_AUTH', '', time() - 3600, '/');
+	setcookie('USER_AUTH', '', time() - 3600, COOKIE_PREFIX);
 }
 
 function user_is_authenticated() {
@@ -171,7 +171,7 @@ function _user_save_cookie($stay_logged_in = 0) {
 	if ($stay_logged_in) {
 		$duration = time() + (3600 * 24 * 365);
 	}
-	setcookie('USER_AUTH', $cookie, $duration, '/');
+	setcookie('USER_AUTH', $cookie, $duration, COOKIE_PREFIX);
 }
 
 function _user_encryption_key() {

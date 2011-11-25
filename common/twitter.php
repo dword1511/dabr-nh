@@ -1042,7 +1042,7 @@ function twitter_search_page() {
 	$content = theme('search_form', $search_query);
 	if (isset($_POST['query'])) {
 		$duration = time() + (3600 * 24 * 365);
-		setcookie('search_favourite', $_POST['query'], $duration, '/');
+		setcookie('search_favourite', $_POST['query'], $duration, COOKIE_PREFIX);
 		twitter_refresh('search');
 	}
 	if (!isset($search_query) && array_key_exists('search_favourite', $_COOKIE)) {
@@ -1393,7 +1393,7 @@ function twitter_date($format, $timestamp = null) {
 			} else {
 				$user = twitter_user_info();
 				$offset = $user->utc_offset;
-				setcookie('utc_offset', $offset, time() + 3000000, '/');
+				setcookie('utc_offset', $offset, time() + 3000000, COOKIE_PREFIX);
 			}
 		} else {
 			$offset = 0;

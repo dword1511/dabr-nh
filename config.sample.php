@@ -14,6 +14,9 @@ define('API_URL','http://api.twitter.com/1/');
 // Cookie encryption key. Max 52 characters
 define('ENCRYPTION_KEY', 'Example Key - Change Me!');
 
+// Cookie prefix, point it to the path of dabr if you are not using entire domain
+define('COOKIE_PREFIX', '/');
+
 // OAuth consumer and secret keys. Available from http://twitter.com/oauth_clients
 define('OAUTH_CONSUMER_KEY', '');
 define('OAUTH_CONSUMER_SECRET', '');
