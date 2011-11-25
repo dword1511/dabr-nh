@@ -3,6 +3,7 @@
  * @author tifan
  */
 
+error_reporting(E_ALL ^ E_NOTICE);
 include('simple_html_dom.php');
 
 /* Credit: */

@@ -1,7 +1,7 @@
 <?php
 // This is a simple and dirty HTTP proxy for handling images that has simple URL.
 // by dword1511 <zhangchi866@gmail.com>
-
+error_reporting(E_ALL ^ E_NOTICE);
 $url = !empty($_REQUEST['url']) ? $_GET['url'] : null;
 
 if($url == null) {

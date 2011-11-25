@@ -12,6 +12,8 @@ Licensed under The MIT License
 Redistributions of files must retain the above copyright notice.
 *******************************************************************************/
 
+error_reporting(E_ALL ^ E_NOTICE);
+
 define('HDOM_TYPE_ELEMENT', 1);
 define('HDOM_TYPE_COMMENT', 2);
 define('HDOM_TYPE_TEXT',    3);
