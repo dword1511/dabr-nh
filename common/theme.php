@@ -224,7 +224,7 @@ function googleAnalyticsGetImageUrl() {
 function theme_google_analytics() {
 	global $GA_ACCOUNT;
 	if (!$GA_ACCOUNT) return '';
-	echo '<img src="' . googleAnalyticsGetImageUrl() . '" />';?>
+	echo '<img src="' . googleAnalyticsGetImageUrl() . '" />';
 }
 
 ?>
