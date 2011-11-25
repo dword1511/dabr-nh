@@ -130,7 +130,6 @@ function theme_page($title, $content) {
 	$body = theme('menu_top');
 	$body .= $content;
 	$body .= theme('menu_bottom');
-	$body .= theme('google_analytics');
 	if (DEBUG_MODE == 'ON') {
 		global $dabr_start, $api_time, $services_time, $rate_limit;
 		$time = microtime(1) - $dabr_start;
@@ -153,7 +152,7 @@ function theme_page($title, $content) {
 	echo $body;
 	// If the cookies haven't been set, remind the user that they can set how Dabr looks
 	if (setting_fetch('colours') == null) echo '<p>觉得 Dabr 很难看？（其实就是嘛！） <a href="settings">更改配色方案吧！</a>（有毛线用。。。）</p>';
-	echo '<p><a href="'.$_SERVER['REQUEST_URI'].'#top">回页首</a></p></body></html>';
+	echo '<p><a href="'.$_SERVER['REQUEST_URI'].'#top">回页首</a>'.theme('google_analytics').'</p></body></html>';
 	exit();
 // <meta http-equiv="Content-Type" content="text/html; charset=utf-8" /> Already set in header, not needed.
 }
@@ -205,11 +204,27 @@ function theme_css() {
 </style>";
 }
 
+function googleAnalyticsGetImageUrl() {
+	// Copyright 2009 Google Inc. All Rights Reserved.
+	global $GA_ACCOUNT, $GA_PIXEL;
+	$url = "";
+	$url .= $GA_PIXEL . "?";
+	$url .= "utmac=" . $GA_ACCOUNT;
+	$url .= "&utmn=" . rand(0, 0x7fffffff);
+	$referer = $_SERVER["HTTP_REFERER"];
+	$query = $_SERVER["QUERY_STRING"];
+	$path = $_SERVER["REQUEST_URI"];
+	if(empty($referer)) $referer = "-";
+	$url .= "&utmr=" . urlencode($referer);
+	if(!empty($path)) $url .= "&utmp=" . urlencode($path);
+	$url .= "&guid=ON";
+	return str_replace("&", "&amp;", $url);
+}
+
 function theme_google_analytics() {
 	global $GA_ACCOUNT;
 	if (!$GA_ACCOUNT) return '';
-	$googleAnalyticsImageUrl = googleAnalyticsGetImageUrl();
-	return "<img src='{$googleAnalyticsImageUrl}' />";
+	echo '<img src="' . googleAnalyticsGetImageUrl() . '" />';?>
 }
 
 ?>
