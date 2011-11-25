@@ -4,17 +4,9 @@ require 'desktop.php';
 require_once ("common/advert.php");
 
 function touch_theme_action_icon($url, $image_url, $text) {
-	if ($text == 'MAP')	{
-		return "<a href='$url' alt='$text' target='" . get_target() . "'><img src='$image_url' width='12' height='12' /></a>";
-	}
-	else if ($text == 'DM')	{
-		return "<a href='$url'><img src='$image_url' alt='$text' width='16' height='11' /></a>";
-	}
-	else	{
-		return "<a href='$url'><img src='$image_url' alt='$text' width='12' height='12' /></a>";
-	}
+	if ($text == 'MAP') return "<a href='$url' alt='$text' target='" . get_target() . "'><img src='$image_url' width='16' height='16' /></a>";
+	return "<a href='$url'><img src='$image_url' alt='$text' width='16' height='16' /></a>";
 }
-
 
 function touch_theme_status_form($text = '', $in_reply_to_id = NULL) {
 	return desktop_theme_status_form($text, $in_reply_to_id);

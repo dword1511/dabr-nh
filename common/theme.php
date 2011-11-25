@@ -152,10 +152,10 @@ function theme_page($title, $content) {
 	echo $body;
 	// If the cookies haven't been set, remind the user that they can set how Dabr looks
 	if (setting_fetch('colours') == null) echo '<p>觉得 Dabr 很难看？（其实就是嘛！） <a href="settings">更改配色方案吧！</a>（有毛线用。。。）</p>';
-	echo '<p><a href="'.$_SERVER['REQUEST_URI'].'#top">回页首</a></p>';
+	echo '<p><a href="'.$_SERVER['REQUEST_URI'].'#top">回页首</a>';
 	global $GA_ACCOUNT;
-	if ($GA_ACCOUNT) echo '<img src="' . googleAnalyticsGetImageUrl() . '" />';
-	echo '</body></html>';
+	if ($GA_ACCOUNT) echo '<img src="' . googleAnalyticsGetImageUrl() . '"/>';
+	echo '</p></body></html>';
 	exit();
 // <meta http-equiv="Content-Type" content="text/html; charset=utf-8" /> Already set in header, not needed.
 }

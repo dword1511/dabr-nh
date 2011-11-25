@@ -1914,6 +1914,8 @@ function theme_action_icons($status) {
 	}
 	//Search for @ to a user
 	$actions[] = theme('action_icon',"search?query=%40{$from}",BASE_URL.'images/q.png','?');
+	//Status link on twitter.com
+	$actions[] = theme('action_icon',"http://twitter.com/{$from}/statuses/{$status->id}",BASE_URL.'images/lnk.png','?');
 
 	return implode(' ', $actions);
 }

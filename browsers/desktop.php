@@ -40,4 +40,10 @@ function desktop_theme_css() {
 	return $out;
 }
 
+function desktop_theme_action_icon($url, $image_url, $text) {
+	$image_url = str_replace('.png', 'L.png', $image_url);
+	if ($text == 'MAP') return "<a href='$url' alt='$text' target='" . get_target() . "'><img src='$image_url' width='24' height='24' /></a>";
+	return "<a href='$url'><img src='$image_url' alt='$text' width='24' height='24' /></a>";
+}
+
 ?>
