@@ -4,7 +4,7 @@ require 'desktop.php';
 require_once ("common/advert.php");
 
 function touch_theme_action_icon($url, $image_url, $text) {
-	if ($text == 'MAP') return "<a href='$url' alt='$text' target='" . get_target() . "'><img src='$image_url' width='16' height='16' /></a>";
+	if ($text == 'MAP' || $text == 'LINK') return "<a href='$url' alt='$text' target='" . get_target() . "'><img src='$image_url' width='16' height='16' /></a>";
 	return "<a href='$url'><img src='$image_url' alt='$text' width='16' height='16' /></a>";
 }
 
