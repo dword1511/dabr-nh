@@ -4,11 +4,8 @@
 
 警告：
     请您只在自己或熟识的朋友搭建的 dabr 上输入您的 twitter 帐号与密码，因为被修改过的代码可能会被用于窃取您的账户信息。
-实例：
-    http://dword1511.4pu.com/t/
 
 Thanks:
     @dabr @davidcarrington @whatleydude : The original dabr version
     @yegle @tifan : OAuth proxy that bypasses the GFW
     @shellexy : Better thread lookup method
-

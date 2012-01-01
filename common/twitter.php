@@ -1658,7 +1658,7 @@ function theme_timeline($feed)
 		//$links[] = "<a href='{$_GET['q']}?since_id=$since_id'>Newer</a>";
 
 		if(is_64bit()) $max_id = intval($max_id) - 1; //stops last tweet appearing as first tweet on next page
-		$links[] = "<a href='{$_GET['q']}?max_id=$max_id' accesskey='9'>Older</a> 9";
+		$links[] = "<a href='{$_GET['q']}?max_id=$max_id' accesskey='9'>更早</a> 9";
 		$content .= '<p>'.implode(' | ', $links).'</p>';
 	}
 
