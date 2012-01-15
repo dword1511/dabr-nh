@@ -202,11 +202,11 @@ function twitter_profile_page() {
 function theme_profile_form($user){
 	// Profile form
 	$out .= "<form name='profile' action='Edit Profile' method='post'>
-<hr />名字：<input name='name' maxlength='20' value='". htmlspecialchars($user->name, ENT_QUOTES) ."' />
+<hr />名字：<input name='name' size=40 maxlength='20' value='". htmlspecialchars($user->name, ENT_QUOTES) ."' />
 <br />简介：<input name='description' size=40 maxlength='160' value='". htmlspecialchars($user->description, ENT_QUOTES) ."' />
 <br />链接：<input name='url' maxlength='100' size=40 value='". htmlspecialchars($user->url, ENT_QUOTES) ."' />
-<br />地址：<input name='location' maxlength='30' value='". htmlspecialchars($user->location, ENT_QUOTES) ."' />
-<br /><input type='submit' value='更新个人资料' />
+<br />地址：<input name='location' maxlength='30' size=40 value='". htmlspecialchars($user->location, ENT_QUOTES) ."' />
+<br />　　　<input type='submit' value='更新个人资料' />
 </form>";
 	return $out;
 }
