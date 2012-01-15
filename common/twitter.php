@@ -145,11 +145,16 @@ menu_register(array(
 		'callback' => 'twitter_retweets_page',
 		'display' => '转发',
 	),
-        'retweeted_by' => array(
-                'security' => true,
+	'retweeted_by' => array(
+		'security' => true,
 		'hidden' => true,
-                'callback' => 'twitter_retweeters_page',
-        )
+		'callback' => 'twitter_retweeters_page',
+	),
+	'Edit Profile' => array(
+		'security' => true,
+		'callback' => 'twitter_profile_page',
+		'display' => '自传',
+	)
 ));
 
 // How should external links be opened?
@@ -164,6 +169,46 @@ function get_target()
 	{
 		return "_blank";
 	}
+}
+
+//	Edit User Profile
+function twitter_profile_page() {
+	// process form data
+	if ($_POST['name']){
+		// post profile update
+		$post_data = array(
+			"name"	=> stripslashes($_POST['name']),
+			"url"	=> stripslashes($_POST['url']),
+			"location"	=> stripslashes($_POST['location']),
+			"description"	=> stripslashes($_POST['description']),
+		);
+
+		$url = "https://twitter.com/account/update_profile.json";
+		$user = twitter_process($url, $post_data);
+		$content = "<h2>Profile Updated</h2>";
+	}
+
+	// Twitter API is really slow!  If there's no delay, the old profile is returned.
+	//	Wait for 3 seconds before getting the user's information, which seems to be sufficient
+	sleep(3);
+	// retrieve profile information
+	$user = twitter_user_info(user_current_username());
+
+	$content .= theme('user_header', $user);
+	$content .= theme('profile_form', $user);
+	theme('page', "Profile Edit", $content);
+}
+
+function theme_profile_form($user){
+	// Profile form
+	$out .= "<form name='profile' action='Edit Profile' method='post'>
+<hr />名字：<input name='name' maxlength='20' value='". htmlspecialchars($user->name, ENT_QUOTES) ."' />
+<br />简介：<input name='description' size=40 maxlength='160' value='". htmlspecialchars($user->description, ENT_QUOTES) ."' />
+<br />链接：<input name='url' maxlength='100' size=40 value='". htmlspecialchars($user->url, ENT_QUOTES) ."' />
+<br />地址：<input name='location' maxlength='30' value='". htmlspecialchars($user->location, ENT_QUOTES) ."' />
+<br /><input type='submit' value='更新个人资料' />
+</form>";
+	return $out;
 }
 
 function long_url($shortURL)
@@ -962,7 +1007,8 @@ function twitter_retweet($query) {
 }
 
 function twitter_replies_page() {
-	$request = API_URL.'statuses/mentions.json?page='.intval($_GET['page']).'&include_entities=true';
+	$perPage = setting_fetch('perPage', 20);
+	$request = API_URL.'statuses/mentions.json?page='.intval($_GET['page']).'&include_entities=true&count='.$perPage;
 	$tl = twitter_process($request);
 	$tl = twitter_standard_timeline($tl, 'replies');
 	$content = theme('status_form');
@@ -971,7 +1017,8 @@ function twitter_replies_page() {
 }
 
 function twitter_retweets_page() {
-	$request = API_URL.'statuses/retweets_of_me.json?page='.intval($_GET['page']).'&include_entities=true';
+	$perPage = setting_fetch('perPage', 20);
+	$request = API_URL.'statuses/retweets_of_me.json?page='.intval($_GET['page']).'&include_entities=true&count='.$perPage;
 	$tl = twitter_process($request);
 	$tl = twitter_standard_timeline($tl, 'retweets');
 	$content = theme('status_form');
@@ -980,6 +1027,8 @@ function twitter_retweets_page() {
 }
 
 function twitter_directs_page($query) {
+	$perPage = setting_fetch('perPage', 20);
+
 	$action = strtolower(trim($query[1]));
 	switch ($action) {
 		case 'create':
@@ -996,7 +1045,7 @@ function twitter_directs_page($query) {
 			twitter_refresh('directs/sent');
 
 		case 'sent':
-			$request = API_URL.'direct_messages/sent.json?page='.intval($_GET['page']).'&include_entities=true';
+			$request = API_URL.'direct_messages/sent.json?page='.intval($_GET['page']).'&include_entities=true&count='.$perPage;
 			$tl = twitter_standard_timeline(twitter_process($request), 'directs_sent');
 			$content = theme_directs_menu();
 			$content .= theme('timeline', $tl);
@@ -1004,7 +1053,7 @@ function twitter_directs_page($query) {
 
 		case 'inbox':
 		default:
-			$request = API_URL.'direct_messages.json?page='.intval($_GET['page']).'&include_entities=true';
+			$request = API_URL.'direct_messages.json?page='.intval($_GET['page']).'&include_entities=true&count='.$perPage;
 			$tl = twitter_standard_timeline(twitter_process($request), 'directs_inbox');
 			$content = theme_directs_menu();
 			$content .= theme('timeline', $tl);
@@ -1060,9 +1109,11 @@ function twitter_search_page() {
 }
 
 function twitter_search($search_query, $lat = NULL, $long = NULL, $radius = NULL) {
+	$perPage = setting_fetch('perPage', 20);
+
 	$page = (int) $_GET['page'];
 	if ($page == 0) $page = 1;
-	$request = 'https://search.twitter.com/search.json?result_type=recent&q=' . urlencode($search_query).'&page='.$page.'&include_entities=true';
+	$request = 'https://search.twitter.com/search.json?rpp='.$perPage.'&result_type=recent&q=' . urlencode($search_query).'&page='.$page.'&include_entities=true';
 	
 	if ($lat && $long) {
 		$request .= "&geocode=$lat,$long,";
@@ -1186,8 +1237,8 @@ function twitter_mark_favourite_page($query) {
 
 function twitter_home_page() {
 	user_ensure_authenticated();
-	//$request = API_URL.'statuses/home_timeline.json?count=20&include_rts=true&page='.intval($_GET['page']);
-	$request = API_URL.'statuses/home_timeline.json?count=20&include_rts=true&include_entities=true';
+	$perPage = setting_fetch('perPage', 20);
+	$request = API_URL.'statuses/home_timeline.json?include_rts=true&include_entities=true&count='.$perPage;
 
 	if ($_GET['max_id'])
 	{
@@ -1332,31 +1383,14 @@ function theme_user_header($user) {
 	//NB we can tell if the user can be sent a DM $following->relationship->target->following;
 	//Would removing this link confuse users?
 
-	//Deprecated http://apiwiki.twitter.com/Twitter-REST-API-Method%3A-users%C2%A0show
-	//if ($user->following !== true)
-	if ($followed_by == false) {
-		$out .= " | <a href='follow/{$user->screen_name}'>关注</a>";
+	//	One cannot follow, block, nor report spam oneself.
+	if (strtolower($user->screen_name) !== strtolower(user_current_username())) {
+		if ($followed_by == false) $out .= " | <a href='follow/{$user->screen_name}'>关注</a>";
+		else $out .= " | <a href='unfollow/{$user->screen_name}'>取消关注</a>";
+		//We need to pass the User Name and the User ID.  The Name is presented in the UI, the ID is used in checking
+		$out.= " | <a href='confirm/block/{$user->screen_name}/{$user->id}'>屏蔽/取消屏蔽</a>";
+		$out .= " | <a href='confirm/spam/{$user->screen_name}/{$user->id}'>报告为垃圾信息</a>";
 	}
-	else {
-		$out .= " | <a href='unfollow/{$user->screen_name}'>取消关注</a>";
-	}
-	
-	//We need to pass the User Name and the User ID.  The Name is presented in the UI, the ID is used in checking
-	$out.= " | <a href='confirm/block/{$user->screen_name}/{$user->id}'>屏蔽/取消屏蔽</a>";
-	/*
-	//This should work, but it doesn't. Grrr.
-	$blocked = $following->relationship->source->blocking; //The $user is blocked by the authenticating
-	if ($blocked == true)
-	{
-		$out.= " | <a href='confirm/block/{$user->screen_name}/{$user->id}'>Unblock</a>";
-	}
-	else
-	{
-		$out.= " | <a href='confirm/block/{$user->screen_name}/{$user->id}'>Block</a>";
-	}
-	*/
-
-	$out .= " | <a href='confirm/spam/{$user->screen_name}/{$user->id}'>报告为垃圾信息</a>";
 	$out .= " | <a href='search?query=%40{$user->screen_name}'>搜索 @{$user->screen_name}</a>";
 	$out .= "</div></div>";
 	return $out;
@@ -1384,22 +1418,6 @@ function theme_status_time_link($status, $is_link = true) {
 }
 
 function twitter_date($format, $timestamp = null) {
-/*
-	static $offset;
-	if (!isset($offset)) {
-		if (user_is_authenticated()) {
-			if (array_key_exists('utc_offset', $_COOKIE)) {
-				$offset = $_COOKIE['utc_offset'];
-			} else {
-				$user = twitter_user_info();
-				$offset = $user->utc_offset;
-				setcookie('utc_offset', $offset, time() + 3000000, COOKIE_PREFIX);
-			}
-		} else {
-			$offset = 0;
-		}
-	}
-*/
 	$offset = setting_fetch('utc_offset', 0) * 3600;
 	if (!isset($timestamp)) {
 		$timestamp = time();

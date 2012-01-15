@@ -33,6 +33,7 @@ function cookie_monster() {
 		'settings',
 		'utc_offset',
 		'search_favourite',
+		'perPage',
 		'USER_AUTH',
 	);
 	$duration = time() - 3600;
@@ -61,6 +62,7 @@ function settings_page($args) {
 	if ($args[1] == 'save') {
 		$settings['browser']     = $_POST['browser'];
 		$settings['gwt']         = $_POST['gwt'];
+		$settings['perPage']     = $_POST['perPage'];
 		$settings['colours']     = $_POST['colours'];
 		$settings['reverse']     = $_POST['reverse'];
 		$settings['timestamp']   = $_POST['timestamp'];
@@ -87,6 +89,18 @@ function settings_page($args) {
 		'desktop' => '电脑',
 		'text' => '仅文本',
 		'worksafe' => '防老板模式',
+	);
+
+	$perPage = array(
+		'5' => '每页显示 5 推',
+		'10' => '每页显示 10 推',
+		'20' => '每页显示 20 推',
+		'30' => '每页显示 30 推',
+		'40' => '每页显示 40 推',
+		'50' => '每页显示 50 推',
+		'100' => '每页显示 100 推',
+		'150' => '每页显示 150 推',
+		'200' => '每页显示 200 推',
 	);
 
 	$gwt = array(
@@ -117,13 +131,16 @@ function settings_page($args) {
 		$utc_offset = '+' . $utc_offset;
 	}
 
-	$content .= '<form action="settings/save" method="post"><p>配色方案：<br /><select name="colours" style="width:60%;max-width:200px;">';
-	$content .= theme('options', $colour_schemes, setting_fetch('colours', 2)); // should be the same default value as used in theme.php
-	$content .= '</select></p><p>情景模式：<br /><select name="browser" style="width:60%;max-width:200px;">';
-	$content .= theme('options', $modes, $GLOBALS['current_theme']);
-	$content .= '</select><br/></p><p>蛋疼的表情符转换：<br /><select name="emoticons" style="width:60%;max-width:200px;">';
-	$content .= theme('options', $emoticons, setting_fetch('emoticons', $GLOBALS['current_theme'] == 'text' ? 'on' : 'off'));
-	$content .= '</select></p><p>外链方式：<br /><select name="gwt" style="width:60%;max-width:200px;">';
+	$content .= '<form action="settings/save" method="post">';
+	$content .= '<p>配色方案：<br /><select name="colours" style="width:60%;max-width:200px;">';
+	$content .= theme('options', $colour_schemes, setting_fetch('colours', 2)).'</select></p>'; // should be the same default value as used in theme.php
+	$content .= '<p>情景模式：<br /><select name="browser" style="width:60%;max-width:200px;">';
+	$content .= theme('options', $modes, $GLOBALS['current_theme']).'</select></p>';
+	$content .= '<p>每页推数:<br /><select name="perPage" style="width:60%;max-width:200px;">';
+	$content .= theme('options', $perPage, setting_fetch('perPage', 20)).'</select></p>';
+	$content .= '<p>蛋疼的表情符转换：<br /><select name="emoticons" style="width:60%;max-width:200px;">';
+	$content .= theme('options', $emoticons, setting_fetch('emoticons', $GLOBALS['current_theme'] == 'text' ? 'on' : 'off')).'</select></p>';
+	$content .= '<p>外链方式：<br /><select name="gwt" style="width:60%;max-width:200px;">';
 	$content .= theme('options', $gwt, setting_fetch('gwt', $GLOBALS['current_theme'] == 'text' ? 'on' : 'off'));
 	$content .= '</select><small><br />Google Web Transcoder (GWT) 会把网页转换成适合不靠谱的山寨机浏览的格式。</small></p>';
 	$content .= '<p><label><input type="checkbox" name="reverse" value="yes" '. (setting_fetch('reverse') == 'yes' ? ' checked="checked" ' : '') .' /> 尝试反转会话线索。</label></p>';

@@ -32,8 +32,8 @@ menu_register(array (
 
 function logout_page() {
 	user_logout();
-	$content = theme('logged_out');
-	theme('page', '已登出', $content);
+	header("Location: " . BASE_URL); /* Redirect browser */
+	exit;
 }
 
 browser_detect();
