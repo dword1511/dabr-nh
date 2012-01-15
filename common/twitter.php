@@ -185,18 +185,19 @@ function twitter_profile_page() {
 
 		$url = "https://twitter.com/account/update_profile.json";
 		$user = twitter_process($url, $post_data);
-		$content = "<h2>Profile Updated</h2>";
+		$content = "<h2>个人资料已更新。新的资料会在一分钟内生效。</h2>";
 	}
 
 	// Twitter API is really slow!  If there's no delay, the old profile is returned.
 	//	Wait for 3 seconds before getting the user's information, which seems to be sufficient
-	sleep(3);
+	// update: no waiting here! you are always getting old ones as twitter api is f***ing slow
+	//sleep(3);
 	// retrieve profile information
 	$user = twitter_user_info(user_current_username());
 
 	$content .= theme('user_header', $user);
 	$content .= theme('profile_form', $user);
-	theme('page', "Profile Edit", $content);
+	theme('page', "编辑个人资料", $content);
 }
 
 function theme_profile_form($user){
