@@ -377,8 +377,8 @@ function twitter_media_page($query)
 图片：<input type='file' name='image' /><br />
 消息（可选）：<br />
 <textarea name='message' style='width:90%; max-width: 400px;' rows='3' id='message'>" . $status . "</textarea><br>
-<input type='submit' value='发送'><span id='remaining'>120</span>
-<script type='text/javascript'>
+<input type='submit' value='发送'><span id='remaining'>120</span>";
+	if(setting_fetch('browser') == 'desktop') $content .= "<script type='text/javascript'>
 document.onkeydown = function (){
 if(event.ctrlKey && window.event.keyCode == 13) document.upload_pict.submit();
 }</script>";
@@ -1290,8 +1290,8 @@ function theme_retweet($status)
 						<input type='submit' value='转发' />
 						<span id='remaining'>" . (140 - $length) ."</span>";
 	if(setting_fetch('browser') == 'desktop') $content .= geoloc($_COOKIE['geo']);
-	$content .= "</form>
-<script type='text/javascript'>
+	$content .= "</form>";
+	if(setting_fetch('browser') == 'desktop') $content .= "<script type='text/javascript'>
 document.onkeydown = function (){
 if(event.ctrlKey && window.event.keyCode == 13) document.rt_edited.submit();
 }</script>";
