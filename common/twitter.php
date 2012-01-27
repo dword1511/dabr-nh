@@ -1604,10 +1604,10 @@ function theme_timeline($feed)
 		if ($status->place->name) {
 			$source .= " " . $status->place->name . ", " . $status->place->country;
 		}
-		if ($status->in_reply_to_status_id)	{
+		if ($status->in_reply_to_status_id) {
 			$source .= " <a href='status/{$status->in_reply_to_status_id_str}'>对 {$status->in_reply_to_screen_name} 的回复</a>";
 		}
-		if ($status->retweet_count)	{
+		if ($status->retweet_count) {
 			$source .= " <a href='retweeted_by/{$status->id}'>被转发了 ";
 			$source .= $status->retweet_count . " 次</a>";
 		}
