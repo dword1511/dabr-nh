@@ -1772,11 +1772,7 @@ function theme_retweeters($feed, $hide_pagination = false) {
 
 function theme_full_name($user) {
 	$name = "<a href='user/{$user->screen_name}'>{$user->screen_name}</a>";
-	//THIS IF STATEMENT IS RETURNING FALSE EVERYTIME ?!?
-	//if ($user->name && $user->name != $user->screen_name) {
-	if($user->name != "") {
-		$name .= " ({$user->name})";
-	}
+	if($user->name != "") $name .= " ({$user->name})";
 	return $name;
 }
 
@@ -1799,54 +1795,18 @@ function theme_search_form($query) {
 }
 
 function theme_external_link($url, $content = null) {
-	//Long URL functionality.  Also uncomment function long_url($shortURL)
-	if (!$content)
-	{
-		//Used to wordwrap long URLs
-		//return "<a href='$url' target='_blank'>". wordwrap(long_url($url), 64, "\n", true) ."</a>";
-		return "<a href='".long_url($url)."' target='" . get_target() . "'>". long_url($url) ."</a>";
-	}
-	else
-	{
-		return "<a href='$url' target='" . get_target() . "'>$content</a>";
-	}
-
+	if (!$content) return "<a href='".long_url($url)."' target='" . get_target() . "'>". long_url($url) ."</a>";
+	else return "<a href='$url' target='" . get_target() . "'>$content</a>";
 }
 
-function theme_pagination()
-{
-
+function theme_pagination() {
 	$page = intval($_GET['page']);
-	if (preg_match('#&q(.*)#', $_SERVER['QUERY_STRING'], $matches))
-	{
-		$query = $matches[0];
-	}
+	if (preg_match('#&q(.*)#', $_SERVER['QUERY_STRING'], $matches)) $query = $matches[0];
 	if ($page == 0) $page = 1;
 	$links[] = "<a href='{$_GET['q']}?page=".($page+1)."$query' accesskey='9'>更早</a> 9";
 	if ($page > 1) $links[] = "<a href='{$_GET['q']}?page=".($page-1)."$query' accesskey='8'>更晚</a> 8";
 	return '<p>'.implode(' | ', $links).'</p>';
-
-	/*
-	 if ($_GET['max_id'])
-	 {
-		$id = intval($_GET['max_id']);
-		}
-		elseif ($_GET['since_id'])
-		{
-		$id = intval($_GET['since_id']);
-		}
-		else
-		{
-		$id = 17090863233;
-		}
-
-		$links[] = "<a href='{$_GET['q']}?max_id=$id' accesskey='9'>Older</a> 9";
-		$links[] = "<a href='{$_GET['q']}?since_id=$id' accesskey='8'>Newer</a> 8";
-
-		return '<p>'.implode(' | ', $links).'</p>';
-		*/
 }
-
 
 function theme_action_icons($status) {
 	$from = $status->from->screen_name;
@@ -1857,7 +1817,6 @@ function theme_action_icons($status) {
 
 	if (!$status->is_direct) $actions[] = theme('action_icon', "user/{$from}/reply/{$status->id}", BASE_URL.'images/reply.png', '@');
 	if( $status->entities->user_mentions ) $actions[] = theme('action_icon', "user/{$from}/replyall/{$status->id}", BASE_URL.'images/replyall.png', 'REPLY ALL');
-	if (!user_is_current_user($from)) $actions[] = theme('action_icon', "directs/create/{$from}", BASE_URL.'images/dm.png', 'DM');
 	if (!$status->is_direct) {
 		if ($status->favorited == '1') $actions[] = theme('action_icon', "unfavourite/{$status->id}", BASE_URL.'images/star.png', 'UNFAV');
 		else $actions[] = theme('action_icon', "favourite/{$status->id}", BASE_URL.'images/star_grey.png', 'FAV');
@@ -1875,9 +1834,8 @@ function theme_action_icons($status) {
 	}
 	// Less used fuctions should only appear on pc
 	if(setting_fetch('browser') == 'desktop') {
-		//Search for @ to a user
+		if (!user_is_current_user($from)) $actions[] = theme('action_icon', "directs/create/{$from}", BASE_URL.'images/dm.png', 'DM');
 		$actions[] = theme('action_icon',"search?query=%40{$from}",BASE_URL.'images/q.png','?');
-		//Status link on twitter.com
 		$actions[] = theme('action_icon',"http://twitter.com/{$from}/statuses/{$status->id}",BASE_URL.'images/lnk.png','LINK');
 		//TODO: add embed tweet links.
 	}
