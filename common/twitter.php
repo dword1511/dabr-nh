@@ -158,20 +158,13 @@ menu_register(array(
 ));
 
 // How should external links be opened?
-function get_target()
-{
+function get_target() {
 	// Kindle doesn't support opening in a new window
-	if (stristr($_SERVER['HTTP_USER_AGENT'], "Kindle/"))
-	{
-		return "_self";
-	}
-	else 
-	{
-		return "_blank";
-	}
+	if (stristr($_SERVER['HTTP_USER_AGENT'], "Kindle/")) return "_self";
+	else return "_blank";
 }
 
-//	Edit User Profile
+// Edit User Profile
 function twitter_profile_page() {
 	// process form data
 	if ($_POST['name']){
@@ -182,25 +175,18 @@ function twitter_profile_page() {
 			"location"	=> stripslashes($_POST['location']),
 			"description"	=> stripslashes($_POST['description']),
 		);
-
 		$url = "https://twitter.com/account/update_profile.json";
 		$user = twitter_process($url, $post_data);
 		$content = "<h2>个人资料已更新。新的资料会在一分钟内生效。</h2>";
 	}
-
-	// Twitter API is really slow!  If there's no delay, the old profile is returned.
-	//	Wait for 3 seconds before getting the user's information, which seems to be sufficient
-	// update: no waiting here! you are always getting old ones as twitter api is f***ing slow
-	//sleep(3);
 	// retrieve profile information
 	$user = twitter_user_info(user_current_username());
-
 	$content .= theme('user_header', $user);
 	$content .= theme('profile_form', $user);
 	theme('page', "编辑个人资料", $content);
 }
 
-function theme_profile_form($user){
+function theme_profile_form($user) {
 	// Profile form
 	$out .= "<form name='profile' action='editbio' method='post'>
 <hr />名字：<input name='name' size=40 maxlength='20' value='". htmlspecialchars($user->name, ENT_QUOTES) ."' />
@@ -212,63 +198,43 @@ function theme_profile_form($user){
 	return $out;
 }
 
-function long_url($shortURL)
-{
-	if (!defined('LONGURL_KEY'))
-	{
-		return $shortURL;
-	}
+function long_url($shortURL) {
+	if (!defined('LONGURL_KEY')) return $shortURL;
 	$url = "http://www.longurlplease.com/api/v1.1?q=" . $shortURL;
 	$curl_handle=curl_init();
 	curl_setopt($curl_handle,CURLOPT_RETURNTRANSFER,1);
 	curl_setopt($curl_handle,CURLOPT_URL,$url);
 	$url_json = curl_exec($curl_handle);
 	curl_close($curl_handle);
-
 	$url_array = json_decode($url_json,true);
-
 	$url_long = $url_array["$shortURL"];
-
-	if ($url_long == null)
-	{
-		return $shortURL;
-	}
-
+	if ($url_long == null) return $shortURL;
 	return $url_long;
 }
-
 
 function friendship_exists($user_a) {
 	$request = API_URL.'friendships/show.json?target_screen_name=' . $user_a;
 	$following = twitter_process($request);
-
-	if ($following->relationship->target->following == 1) {
-		return true;
-	} else {
-		return false;
-	}
+	if ($following->relationship->target->following == 1) return true;
+	else return false;
 }
 
-function friendship($user_a)
-{
+function friendship($user_a) {
 	$request = API_URL.'friendships/show.json?target_screen_name=' . $user_a;
 	return twitter_process($request);
 }
 
-function twitter_block_exists($query)
-{
+function twitter_block_exists($query) {
 	//http://apiwiki.twitter.com/Twitter-REST-API-Method%3A-blocks-blocking-ids
 	//Get an array of all ids the authenticated user is blocking
 	$request = API_URL.'blocks/blocking/ids.json';
 	$blocked = (array) twitter_process($request);
-
 	//bool in_array  ( mixed $needle  , array $haystack  [, bool $strict  ] )
 	//If the authenticate user has blocked $query it will appear in the array
 	return in_array($query,$blocked);
 }
 
-function twitter_trends_page($query)
-{
+function twitter_trends_page($query) {
 	$woeid = $_GET['woeid'];
 	if($woeid == '') $woeid = '1'; //worldwide
 	
@@ -307,8 +273,8 @@ function twitter_trends_page($query)
 	theme('page', '趋势', $content);
 }
 
-function js_counter($name, $length='140')
-{
+function js_counter($name, $length='140') {
+	if(setting_fetch('browser') == 'mobile') return '';
 	$script = '<script type="text/javascript">
 function updateCount() {
 var remaining = ' . $length . ' - document.getElementById("' . $name . '").value.length;
@@ -407,11 +373,15 @@ function twitter_media_page($query)
 		}
 	}
 	
-	$content .=	"<form method='post' action='picture' enctype='multipart/form-data'>
-						图片：<input type='file' name='image' /><br />
-						消息（可选）：<br />
-						<textarea name='message' style='width:90%; max-width: 400px;' rows='3' id='message'>" . $status . "</textarea><br>
-						<input type='submit' value='发送'><span id='remaining'>120</span>";
+	$content .=	"<form method='post' action='picture' enctype='multipart/form-data' name='upload_pict'>
+图片：<input type='file' name='image' /><br />
+消息（可选）：<br />
+<textarea name='message' style='width:90%; max-width: 400px;' rows='3' id='message'>" . $status . "</textarea><br>
+<input type='submit' value='发送'><span id='remaining'>120</span>
+<script type='text/javascript'>
+document.onkeydown = function (){
+if(event.ctrlKey && window.event.keyCode == 13) document.upload_pict.submit();
+}</script>";
 	if(setting_fetch('browser') == 'desktop') $content .= geoloc($_COOKIE['geo']);
 	$content .= '</form>';
 	$content .= js_counter("message", "120");
@@ -1313,14 +1283,18 @@ function theme_retweet($status)
 	}
 
 	$content .= "<p>编辑后转发：</p>
-					<form action='update' method='post'>
+					<form action='update' method='post' name='rt-edited'>
 						<input type='hidden' name='from' value='$from' />
 						<textarea name='status' style='width:90%; max-width: 400px;' rows='3' id='status'>$text</textarea>
 						<br/>
 						<input type='submit' value='转发' />
 						<span id='remaining'>" . (140 - $length) ."</span>";
 	if(setting_fetch('browser') == 'desktop') $content .= geoloc($_COOKIE['geo']);
-	$content .= "</form>";
+	$content .= "</form>
+<script type='text/javascript'>
+document.onkeydown = function (){
+if(event.ctrlKey && window.event.keyCode == 13) document.rt-edited.submit();
+}</script>";
 	$content .= js_counter("status");
 
 	return $content;
@@ -1420,9 +1394,7 @@ function theme_status_time_link($status, $is_link = true) {
 
 function twitter_date($format, $timestamp = null) {
 	$offset = setting_fetch('utc_offset', 0) * 3600;
-	if (!isset($timestamp)) {
-		$timestamp = time();
-	}
+	if (!isset($timestamp)) $timestamp = time();
 	return gmdate($format, $timestamp + $offset);
 }
 
@@ -1883,59 +1855,32 @@ function theme_action_icons($status) {
 	$geo = $status->geo;
 	$actions = array();
 
+	if (!$status->is_direct) $actions[] = theme('action_icon', "user/{$from}/reply/{$status->id}", BASE_URL.'images/reply.png', '@');
+	if( $status->entities->user_mentions ) $actions[] = theme('action_icon', "user/{$from}/replyall/{$status->id}", BASE_URL.'images/replyall.png', 'REPLY ALL');
+	if (!user_is_current_user($from)) $actions[] = theme('action_icon', "directs/create/{$from}", BASE_URL.'images/dm.png', 'DM');
 	if (!$status->is_direct) {
-		$actions[] = theme('action_icon', "user/{$from}/reply/{$status->id}", BASE_URL.'images/reply.png', '@');
+		if ($status->favorited == '1') $actions[] = theme('action_icon', "unfavourite/{$status->id}", BASE_URL.'images/star.png', 'UNFAV');
+		else $actions[] = theme('action_icon', "favourite/{$status->id}", BASE_URL.'images/star_grey.png', 'FAV');
+		if ($retweeted_by) $actions[] = theme('action_icon', "retweet/{$status->id}", BASE_URL.'images/retweeted.png', 'RT');
+		else $actions[] = theme('action_icon', "retweet/{$status->id}", BASE_URL.'images/retweet.png', 'RT');
+		if (user_is_current_user($from)) $actions[] = theme('action_icon', "confirm/delete/{$status->id}", BASE_URL.'images/trash.png', 'DEL');
+		if ($retweeted_by && user_is_current_user($retweeted_by)) $actions[] = theme('action_icon', "confirm/delete/{$retweeted_id}", BASE_URL.'images/trash.png', 'DEL');
 	}
-	//Reply All functionality.
-	if( $status->entities->user_mentions )
-	{
-		$actions[] = theme('action_icon', "user/{$from}/replyall/{$status->id}", BASE_URL.'images/replyall.png', 'REPLY ALL');
-	}
-
-	if (!user_is_current_user($from)) {
-		$actions[] = theme('action_icon', "directs/create/{$from}", BASE_URL.'images/dm.png', 'DM');
-	}
-	if (!$status->is_direct) {
-		if ($status->favorited == '1') {
-			$actions[] = theme('action_icon', "unfavourite/{$status->id}", BASE_URL.'images/star.png', 'UNFAV');
-		} else {
-			$actions[] = theme('action_icon', "favourite/{$status->id}", BASE_URL.'images/star_grey.png', 'FAV');
-		}
-		if ($retweeted_by) // Show a diffrent retweet icon to indicate to the user this is an RT
-		{
-			$actions[] = theme('action_icon', "retweet/{$status->id}", BASE_URL.'images/retweeted.png', 'RT');
-		}
-		else
-		{
-			$actions[] = theme('action_icon', "retweet/{$status->id}", BASE_URL.'images/retweet.png', 'RT');
-		}
-		if (user_is_current_user($from))
-		{
-			$actions[] = theme('action_icon', "confirm/delete/{$status->id}", BASE_URL.'images/trash.png', 'DEL');
-		}
-		if ($retweeted_by) //Allow users to delete what they have retweeted
-		{
-			if (user_is_current_user($retweeted_by))
-			{
-				$actions[] = theme('action_icon', "confirm/delete/{$retweeted_id}", BASE_URL.'images/trash.png', 'DEL');
-			}
-		}
-
-	} else {
-		$actions[] = theme('action_icon', "confirm/deleteDM/{$status->id}", BASE_URL.'images/trash.png', 'DEL');
-	}
-	if ($geo !== null)
-	{
+	else $actions[] = theme('action_icon', "confirm/deleteDM/{$status->id}", BASE_URL.'images/trash.png', 'DEL');
+	if ($geo !== null) {
 		$latlong = $geo->coordinates;
 		$lat = $latlong[0];
 		$long = $latlong[1];
 		$actions[] = theme('action_icon', "http://maps.google.com.hk/m?q={$lat},{$long}", BASE_URL.'images/map.png', 'MAP');
 	}
-	//Search for @ to a user
-	$actions[] = theme('action_icon',"search?query=%40{$from}",BASE_URL.'images/q.png','?');
-	//Status link on twitter.com
-	$actions[] = theme('action_icon',"http://twitter.com/{$from}/statuses/{$status->id}",BASE_URL.'images/lnk.png','LINK');
-
+	// Less used fuctions should only appear on pc
+	if(setting_fetch('browser') == 'desktop') {
+		//Search for @ to a user
+		$actions[] = theme('action_icon',"search?query=%40{$from}",BASE_URL.'images/q.png','?');
+		//Status link on twitter.com
+		$actions[] = theme('action_icon',"http://twitter.com/{$from}/statuses/{$status->id}",BASE_URL.'images/lnk.png','LINK');
+		//TODO: add embed tweet links.
+	}
 	return implode(' ', $actions);
 }
 
