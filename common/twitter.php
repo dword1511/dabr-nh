@@ -1283,7 +1283,7 @@ function theme_retweet($status)
 	}
 
 	$content .= "<p>编辑后转发：</p>
-					<form action='update' method='post' name='rt-edited'>
+					<form action='update' method='post' name='rt_edited'>
 						<input type='hidden' name='from' value='$from' />
 						<textarea name='status' style='width:90%; max-width: 400px;' rows='3' id='status'>$text</textarea>
 						<br/>
@@ -1293,7 +1293,7 @@ function theme_retweet($status)
 	$content .= "</form>
 <script type='text/javascript'>
 document.onkeydown = function (){
-if(event.ctrlKey && window.event.keyCode == 13) document.rt-edited.submit();
+if(event.ctrlKey && window.event.keyCode == 13) document.rt_edited.submit();
 }</script>";
 	$content .= js_counter("status");
 
