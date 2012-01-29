@@ -64,7 +64,7 @@ function settings_page($args) {
 		$settings['gwt']         = $_POST['gwt'];
 		$settings['perPage']     = $_POST['perPage'];
 		$settings['colours']     = $_POST['colours'];
-		$settings['reverse']     = $_POST['reverse'];
+//		$settings['reverse']     = $_POST['reverse'];
 		$settings['timestamp']   = $_POST['timestamp'];
 		$settings['hide_inline'] = $_POST['hide_inline'];
 		$settings['utc_offset']  = (float)$_POST['utc_offset'];
@@ -143,7 +143,7 @@ function settings_page($args) {
 	$content .= '<p>外链方式：<br /><select name="gwt" style="width:60%;max-width:200px;">';
 	$content .= theme('options', $gwt, setting_fetch('gwt', $GLOBALS['current_theme'] == 'text' ? 'on' : 'off'));
 	$content .= '</select><small><br />Google Web Transcoder (GWT) 会把网页转换成适合不靠谱的山寨机浏览的格式。</small></p>';
-	$content .= '<p><label><input type="checkbox" name="reverse" value="yes" '. (setting_fetch('reverse') == 'yes' ? ' checked="checked" ' : '') .' /> 尝试反转会话线索。</label></p>';
+//	$content .= '<p><label><input type="checkbox" name="reverse" value="yes" '. (setting_fetch('reverse') == 'yes' ? ' checked="checked" ' : '') .' /> 尝试反转会话线索。</label></p>';
 	$content .= '<p><label><input type="checkbox" name="timestamp" value="yes" '. (setting_fetch('timestamp') == 'yes' ? ' checked="checked" ' : '') .' /> 使用 ' . twitter_date('H:i') . ' 而不是“25 秒之前”来显示时间。</label></p>';
 	$content .= '<p><label><input type="checkbox" name="hide_inline" value="yes" '. (setting_fetch('hide_inline') == 'yes' ? ' checked="checked" ' : '') .' /> 不要显示内嵌的媒体（Twitpic 啊 Youtube 啊啥的）。</label></p>';
 	$content .= '<p><label>现在的 UTC 时间是 ' . gmdate('H:i') . ' ，考虑到存在 <input type="text" name="utc_offset" value="'. $utc_offset .'" size="3" /> 的时差，我会把时间显示成 ' . twitter_date('H:i') . ' 这样。<br />呐，如果你觉得时间不对就调调时差吧。</label></p>';

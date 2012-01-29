@@ -539,7 +539,7 @@ function twitter_status_page($query) {
 		$request = API_URL."statuses/show/{$id}.json?include_entities=true";
 		$status = twitter_process($request);
 		$content = theme('status', $status);
-		$content .= '<a href="http://translate.google.com/m?hl=zh-CN&tl=zh-CN&sl=auto&ie=UTF-8&q=' . urlencode($text) . '" target="'. get_target() . '">请 Google 翻译一下这货</a></p>';
+		$content .= '<a href="http://translate.google.com/m?hl=zh-CN&tl=zh-CN&sl=auto&ie=UTF-8&q='.urlencode($text).'" target="'.get_target().'">请 Google 翻译一下这货</a></p>';
 		$thread_id = $status->id_str;
 		$request = API_URL."related_results/show/{$thread_id}.json";
 		$threadstatus = twitter_process($request);
@@ -550,11 +550,10 @@ function twitter_status_page($query) {
 				array_push($tl, $value->value);
 				if ($value->value->in_reply_to_status_id_str == $thread_id && $array[key]->value->screen_name != "") array_push($tl, $status);
 			}
-			$tl = twitter_standard_timeline($tl, 'thread');
+			$tl = twitter_standard_timeline($tl, 'replies');
 			$content .= '<p>对话素酱紫滴：</p>'.theme('timeline', $tl);
 		}
 		else $content .= '<p>木有对话可供显示。</p>';
-		$content .= "<p>不喜欢这样的对话顺序？到 <a href='settings'>设置</a> 页面去反转它吧。</p>";
 		theme('page', "消息 $id", $content);
 	}
 }
@@ -1117,16 +1116,16 @@ function twitter_date($format, $timestamp = null) {
 
 function twitter_standard_timeline($feed, $source) {
 	$output = array();
-	if (!is_array($feed) && $source != 'thread') return $output;
+	if (!is_array($feed)/* && $source != 'thread'*/) return $output;
 	
 	//32bit int / snowflake patch
-	if (is_array($feed)) {
+//	if (is_array($feed)) {
 		foreach($feed as $key => $status) {
 			if($status->id_str) $feed[$key]->id = $status->id_str;
 			if($status->in_reply_to_status_id_str) $feed[$key]->in_reply_to_status_id = $status->in_reply_to_status_id_str;
 			if($status->retweeted_status->id_str) $feed[$key]->retweeted_status->id = $status->retweeted_status->id_str;
 		}
-	}
+//	}
 	
 	switch ($source) {
 		case 'status':
@@ -1190,7 +1189,7 @@ function twitter_standard_timeline($feed, $source) {
 			}
 			return $output;
 
-		case 'thread':
+/*		case 'thread':
 			// First pass: extract tweet info from the HTML
 			$html_tweets = explode('</li>', $feed);
 			foreach ($html_tweets as $tweet) {
@@ -1228,7 +1227,7 @@ function twitter_standard_timeline($feed, $source) {
 				$output = array_reverse($output);
 			}
 			return $output;
-
+*/
 		default:
 			echo "<h1>$source</h1><pre>";
 			print_r($feed); die();
