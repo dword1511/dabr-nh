@@ -539,7 +539,7 @@ function format_interval($timestamp, $granularity = 2) {
 	return $output ? $output : '0 秒';
 }
 
-/*function twitter_status_page($query) {
+function twitter_status_page($query) {
 	$id = (string) $query[1];
 	if (is_numeric($id)) {
 		$request = API_URL."statuses/show/{$id}.json?include_entities=true";
@@ -551,7 +551,7 @@ function format_interval($timestamp, $granularity = 2) {
 		if ($threadstatus && $threadstatus[0] && $threadstatus[0]->results) {
 			//$array = array_reverse($threadstatus[0]->results);
 			$tl = array();
-			foreach ($array as $value) if ($value->value->id_str != $thread_id){
+			foreach ($array as $key=>$value) if ($array[key]->value->id_str != $thread_id) {
 				array_push($tl, $value->value);
 				if ($value->value->in_reply_to_status_id_str && $value->value->in_reply_to_status_id_str == $status->id_str) array_push($tl, $status);
 			}
@@ -561,37 +561,6 @@ function format_interval($timestamp, $granularity = 2) {
 		else {
 			$thread = twitter_thread_timeline($id);
 			$content .= '<p>木有对话可供显示。</p>';
-		}
-		theme('page', "消息 $id", $content);
-	}
-}
-*/
-
-function twitter_status_page($query) {
-	$id = (string) $query[1];
-	if (is_numeric($id)) {
-		$request = API_URL."statuses/show/{$id}.json?include_entities=true";
-		$status = twitter_process($request);
-		$content = theme('status', $status);
-
-		if (strcmp($query[2],'')==0) {
-			$status = twitter_process($request);
-			$threadrequest = API_URL."related_results/show/{$id}.json?include_entities=true";
-			$threadstatus = twitter_process($threadrequest);
-			if ($threadstatus && $threadstatus[0] && $threadstatus[0]->results) {
-				$array = array_reverse($threadstatus[0]->results);
-				$tl = array();
-				foreach ($array as $key=>$value) {
-					$tl[] = $value->value;
-					if ($value->value->in_reply_to_status_id_str && $value->value->in_reply_to_status_id_str == $id) $tl[] = $status;
-				}
-				$tl = twitter_standard_timeline($tl, 'status');
-				$content .= '<p>对话素酱紫滴：</p>'.theme('timeline', $tl);
-			}
-			else {
-				$thread = twitter_thread_timeline($id);
-				$content .= '<p>木有对话可供显示。</p>';
-			}
 		}
 		theme('page', "消息 $id", $content);
 	}
