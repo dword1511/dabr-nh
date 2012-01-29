@@ -548,8 +548,9 @@ function twitter_status_page($query) {
 		$thread_id = $status->id_str;
 		$request = API_URL."related_results/show/{$thread_id}.json";
 		$threadstatus = twitter_process($request);
-		if ($threadstatus && $threadstatus[0] && $threadstatus[0]->results) {
-			$array = array_reverse($threadstatus[0]->results);
+		if (/*$threadstatus && $threadstatus[0] && */$threadstatus[0]->results) {
+			//$array = array_reverse($threadstatus[0]->results);
+			$array = $threadstatus[0]->results;
 			$tl = array();
 			foreach ($array as $key=>$value) if ($array[key]->value->id_str != $thread_id) {
 				array_push($tl, $value->value);
@@ -558,21 +559,10 @@ function twitter_status_page($query) {
 			$tl = twitter_standard_timeline($tl, 'replies');
 			$content .= '<p>对话素酱紫滴：</p>'.theme('timeline', $tl);
 		}
-		else {
-			//$thread = twitter_thread_timeline($id);
-			$content .= '<p>木有对话可供显示。</p>';
-		}
+		else $content .= '<p>木有对话可供显示。</p>';
 		theme('page', "消息 $id", $content);
 	}
 }
-
-/*
-function twitter_thread_timeline($thread_id) {
-	$request = "https://search.twitter.com/search/thread/{$thread_id}";
-	$tl = twitter_standard_timeline(twitter_fetch($request), 'thread');
-	return $tl;
-}
-*/
 
 function twitter_retweet_page($query) {
 	$id = (string) $query[1];
