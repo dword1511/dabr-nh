@@ -158,15 +158,12 @@ menu_register(array(
 ));
 
 function get_target() {
-	// Kindle doesn't support opening in a new window
 	if (stristr($_SERVER['HTTP_USER_AGENT'], "Kindle/")) return "_self";
 	else return "_blank";
 }
 
 function twitter_profile_page() {
-	// process form data
 	if ($_POST['name']){
-		// post profile update
 		$post_data = array(
 			"name"	=> stripslashes($_POST['name']),
 			"url"	=> stripslashes($_POST['url']),
@@ -177,7 +174,7 @@ function twitter_profile_page() {
 		$user = twitter_process($url, $post_data);
 		$content = "<h2>个人资料已更新。新的资料会在一分钟内生效。</h2>";
 	}
-	// retrieve profile information
+
 	$user = twitter_user_info(user_current_username());
 	$content .= theme('user_header', $user);
 	$content .= theme('profile_form', $user);
@@ -229,22 +226,20 @@ function twitter_block_exists($query) {
 
 function twitter_trends_page($query) {
 	$woeid = $_GET['woeid'];
-	if($woeid == '') $woeid = '1'; //worldwide
-	
-	//fetch "local" names
+	if($woeid == '') $woeid = '1';
+
 	$request = API_URL.'trends/available.json';
 	$local = twitter_process($request);
 	$header = '<form method="get" action="trends"><select name="woeid">';
 	$header .= '<option value="1"' . (($woeid == 1) ? ' selected="selected"' : '') . '>Worldwide</option>';
-	
-	//sort the output, going for Country with Towns as children
+
 	foreach($local as $key => $row) {
 		$c[$key] = $row->country;
 		$t[$key] = $row->placeType->code;
 		$n[$key] = $row->name;
 	}
 	array_multisort($c, SORT_ASC, $t, SORT_DESC, $n, SORT_ASC, $local);
-	
+
 	foreach($local as $l) {
 		if($l->woeid != 1) {
 			$n = $l->name;
@@ -253,7 +248,7 @@ function twitter_trends_page($query) {
 		}
 	}
 	$header .= '</select> <input type="submit" value="应用" /></form>';
-	
+
 	$request = API_URL.'trends/' . $woeid . '.json';
 	$trends = twitter_process($request);
 	$search_url = 'search?query=';
@@ -293,7 +288,6 @@ function twitter_media_page($query) {
 	$status = stripslashes($_POST['message']);
 	if ($_POST['message'] && $_FILES['image']['tmp_name']) {
 		require 'tmhOAuth.php';
-		// Geolocation parameters
 		list($lat, $long) = explode(',', $_POST['location']);
 		$geo = 'N';
 		if (is_numeric($lat) && is_numeric($long)) {
@@ -311,15 +305,12 @@ function twitter_media_page($query) {
 		));
 		$image = "{$_FILES['image']['tmp_name']};type={$_FILES['image']['type']};filename={$_FILES['image']['name']}";
 		$code = $tmhOAuth->request('POST', 'https://upload.twitter.com/1/statuses/update_with_media.json',
-											array(
-												'media[]'  => "@{$image}",
-												'status'   => " " . $status, //A space is needed because twitter b0rks if first char is an @
-												'lat'		=> $lat,
-												'long'		=> $long,
-											),
-											true, // use auth
-											true  // multipart
-										);
+							array(
+								'media[]' => "@{$image}",
+								'status' => " " . $status,
+								'lat' => $lat,
+								'long' => $long,
+							),true,	true);
 		if ($code == 200) {
 			$json = json_decode($tmhOAuth->response['response']);
 			$image_url = $json->entities->media[0]->media_url_https;
@@ -344,7 +335,6 @@ function twitter_process($url, $post_data = false) {
 	if ($post_data === true) $post_data = array();
 	if (user_type() == 'oauth' && ( strpos($url, '/twitter.com') !== false || strpos($url, 'api.twitter.com') !== false || strpos($url, 'upload.twitter.com') !== false)) user_oauth_sign($url, $post_data);
 	elseif (strpos($url, 'api.twitter.com') !== false && is_array($post_data)) {
-		// Passing $post_data as an array to twitter.com (non-oauth) causes an error :(
 		$s = array();
 		foreach ($post_data as $name => $value)
 		$s[] = $name.'='.urlencode($value);
@@ -357,8 +347,6 @@ function twitter_process($url, $post_data = false) {
 		curl_setopt ($ch, CURLOPT_POST, true);
 		curl_setopt ($ch, CURLOPT_POSTFIELDS, $post_data);
 	}
-
-	//from  http://github.com/abraham/twitteroauth/blob/master/twitteroauth/twitteroauth.php
 	curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
 	curl_setopt($ch, CURLOPT_HTTPHEADER, array('Expect:'));
 	curl_setopt($ch, CURLOPT_TIMEOUT, 10);
@@ -373,7 +361,6 @@ function twitter_process($url, $post_data = false) {
 	curl_close($ch);
 	global $api_time;
 	global $rate_limit;
-	//Doesn't bloody work. No idea why!
 	$rate_limit = $response_info['X-RateLimit-Limit'];
 	$api_time += microtime(1) - $api_start;
 	switch( intval( $response_info['http_code'] ) ) {
@@ -391,16 +378,7 @@ function twitter_process($url, $post_data = false) {
 		default:
 			$result = json_decode($response);
 			$result = $result->error ? $result->error : $response;
-			if (strlen($result) > 500) {
-				$result = 'Twitter 抽风了，甭见怪。也许你现在有机会去围观鲸鱼图。过会再试试吧。';
-				$result .=
-'<pre>┈┈╭━━━━━━╮┏╮╭┓┈┈
-┈┈┃╰╯┈┈┈┈┃╰╮╭╯┈┈
-┈┈┣━╯┈┈┈┈╰━╯┃┈┈┈
-┈┈╰━━━━━━━━━╯┈┈┈
-╭┳╭┳╭┳╭┳╭┳╭┳╭┳╭┳
-╯╰╯╰╯╰╯╰╯╰╯╰╯╰╯╰</pre>';
-			}
+			if (strlen($result) > 500) $result = "Twitter 抽风了，甭见怪。也许你现在有机会去围观鲸鱼图。过会再试试吧。<pre>┈┈╭━━━━━━╮┏╮╭┓┈┈\n┈┈┃╰╯┈┈┈┈┃╰╮╭╯┈┈\n┈┈┣━╯┈┈┈┈╰━╯┃┈┈┈\n┈┈╰━━━━━━━━━╯┈┈┈\n╭┳╭┳╭┳╭┳╭┳╭┳╭┳╭┳\n╯╰╯╰╯╰╯╰╯╰╯╰╯╰╯╰</pre>";
 			theme('error', "<h2>调用 Twitter API 时粗线了一个错误。</h2><p>{$response_info['http_code']}: {$result}</p><hr>");
 	}
 }
@@ -448,7 +426,6 @@ function twitter_parse_tags($input, $entities = false) {
 				else $link = $display_url;
 				$link_html = '<a href="' . $link . '" target="' . get_target() . '">' . $display_url . '</a>';
 				$url = $urls->url;
-				// Replace all URLs *UNLESS* they have already been linked (for example to an image)
 				$pattern = '#((?<!href\=(\'|\"))'.preg_quote($url,'#').')#i';
 				$out = preg_replace($pattern,  $link_html, $out);
 			}
@@ -462,10 +439,9 @@ function twitter_parse_tags($input, $entities = false) {
 			}
 		}
 	}
-	else {  // If Entities haven't been returned (usually because of search or a bio) use Autolink
-		// Create an array containing all URLs
+	else {
 		$urls = Twitter_Extractor::create($input)->extractURLs();
-		// Hyperlink the URLs 
+
 		if (setting_fetch('gwt') == 'on') {
 			foreach($urls as $url) {
 				$encoded = urlencode($url);
@@ -473,45 +449,16 @@ function twitter_parse_tags($input, $entities = false) {
 			}	
 		}
 		else $out = Twitter_Autolink::create($out)->addLinksToURLs();	
-		// Hyperlink the #	
+	
 		$out = Twitter_Autolink::create($out)->setTarget('')->addLinksToHashtags();
 	}
-	// Hyperlink the @ and lists
+
 	$out = Twitter_Autolink::create($out)->setTarget('')->addLinksToUsernamesAndLists();
-	// Add Emoticons :-)
+
 	if (setting_fetch('emoticons') != 'off') $out = emoticons($out);
-	//Return the completed string
+
 	return $out;
 }
-
-/*
-function flickr_decode($num) {
-	$alphabet = '123456789abcdefghijkmnopqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ';
-	$decoded = 0;
-	$multi = 1;
-	while (strlen($num) > 0) {
-		$digit = $num[strlen($num)-1];
-		$decoded += $multi * strpos($alphabet, $digit);
-		$multi = $multi * strlen($alphabet);
-		$num = substr($num, 0, -1);
-	}
-	return $decoded;
-}
-
-function flickr_encode($num) {
-	$alphabet = '123456789abcdefghijkmnopqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ';
-	$base_count = strlen($alphabet);
-	$encoded = '';
-	while ($num >= $base_count) {
-		$div = $num/$base_count;
-		$mod = ($num-($base_count*intval($div)));
-		$encoded = $alphabet[$mod] . $encoded;
-		$num = intval($div);
-	}
-	if ($num) $encoded = $alphabet[$num] . $encoded;
-	return $encoded;
-}
-*/
 
 function format_interval($timestamp, $granularity = 2) {
 	$units = array(
@@ -627,22 +574,18 @@ function twitter_block_page($query) {
 }
 
 function twitter_spam_page($query) {
-	//http://apiwiki.twitter.com/Twitter-REST-API-Method%3A-report_spam
-	//We need to post this data
 	twitter_ensure_post_action();
 	$user = $query[1];
-	//The data we need to post
 	$post_data = array("screen_name" => $user);
 	$request = API_URL."report_spam.json";
 	twitter_process($request, $post_data);
-	//Where should we return the user to?  Back to the user
 	twitter_refresh("confirmed/spam/{$user}");
 }
 
 function twitter_confirmation_page($query) {
 	$action = $query[1];
-	$target = $query[2];	//The name of the user we are doing this action on
-	$target_id = $query[3];	//The targets's ID.  Needed to check if they are being blocked.
+	$target = $query[2]; //The name of the user we are doing this action on
+	$target_id = $query[3]; //The targets's ID.  Needed to check if they are being blocked.
 	switch ($action) {
 		case 'block':
 			if (twitter_block_exists($target_id)) {
@@ -673,7 +616,6 @@ function twitter_confirmation_page($query) {
 }
 
 function twitter_confirmed_page($query) {
-        // the URL /confirm can be passed parameters like so /confirm/param1/param2/param3 etc.
         $action = $query[1]; // The action. block, unblock, spam
         $target = $query[2]; // The username of the target
 	
@@ -715,7 +657,6 @@ function twitter_followers_page($query) {
 	theme('page', '关注 '.$user.' 的人', $content);
 }
 
-//  Shows every user who retweeted a specific status
 function twitter_retweeters_page($tweet) {
 	$id = $tweet[1];
 	$request = API_URL."statuses/{$id}/retweeted_by.xml";
@@ -734,7 +675,6 @@ function twitter_update() {
 		if (is_numeric($in_reply_to_id)) {
 			$post_data['in_reply_to_status_id'] = $in_reply_to_id;
 		}
-		// Geolocation parameters
 		list($lat, $long) = explode(',', $_POST['location']);
 		$geo = 'N';
 		if (is_numeric($lat) && is_numeric($long)) {
@@ -749,12 +689,6 @@ function twitter_update() {
 }
 
 function twitter_get_place($lat, $long) {
-	//	http://dev.twitter.com/doc/get/geo/reverse_geocode
-	//	http://api.twitter.com/version/geo/reverse_geocode.format 
-	
-	//	This will look up a place ID based on lat / long.
-	//	Not needed (Twitter include it automagically
-	//	Left in just incase we ever need it...
 	$request = API_URL.'geo/reverse_geocode.json';
 	$request .= '?lat='.$lat.'&long='.$long.'&max_results=1';
 	$locations = twitter_process($request);
@@ -845,11 +779,9 @@ function theme_directs_form($to) {
 function twitter_search_page() {
 	$search_query = $_GET['query'];
 
-	// Geolocation parameters
 	list($lat, $long) = explode(',', $_GET['location']);
 	$loc = $_GET['location'];
 	$radius = $_GET['radius'];
-	//echo "the lat = $lat, and long = $long, and $loc";
 	$content = theme('search_form', $search_query);
 	if (isset($_POST['query'])) {
 		$duration = time() + (3600 * 24 * 365);
@@ -880,20 +812,15 @@ function twitter_search($search_query, $lat = NULL, $long = NULL, $radius = NULL
 	}
 
 	$tl = twitter_process($request);
-	//var_dump($tl->results);
 	$tl = twitter_standard_timeline($tl->results, 'search');
 	return $tl;
 }
 
-
 function twitter_find_tweet_in_timeline($tweet_id, $tl) {
-	// Parameter checks
 	if (!is_numeric($tweet_id) || !$tl) return;
 
-	// Check if the tweet exists in the timeline given
 	if (array_key_exists($tweet_id, $tl)) $tweet = $tl[$tweet_id];
 	else {
-		// Not found, fetch it specifically from the API
 		$request = API_URL."statuses/show/{$tweet_id}.json?include_entities=true";
 		$tweet = twitter_process($request);
 	}
@@ -908,24 +835,17 @@ function twitter_user_page($query) {
 
 	if (!$screen_name) theme('error', '木有用户名啊！');
 
-	// Load up user profile information and one tweet
 	$user = twitter_user_info($screen_name);
 
-	// If the user has at least one tweet
 	if (isset($user->status)) {
-		// Fetch the timeline early, so we can try find the tweet they're replying to
 		$request = API_URL."statuses/user_timeline.json?screen_name={$screen_name}&include_rts=true&include_entities=true&page=".intval($_GET['page']);
 		$tl = twitter_process($request);
 		$tl = twitter_standard_timeline($tl, 'user');
 	}
 
-	// Build an array of people we're talking to
 	$to_users = array($user->screen_name);
-
-	// Build an array of hashtags being used
 	$hashtags = array();
 
-	// Are we replying to anyone?
 	if (is_numeric($in_reply_to_id)) {
 		$tweet = twitter_find_tweet_in_timeline($in_reply_to_id, $tl);
 		$out = twitter_parse_tags($tweet->text);
@@ -937,11 +857,9 @@ function twitter_user_page($query) {
 		if ($tweet->entities->hashtags) $hashtags = $tweet->entities->hashtags;	
 	}
 
-	// Build a status message to everyone we're talking to
 	$status = '';
 	foreach ($to_users as $username) if (!user_is_current_user($username)) $status .= "@{$username} ";
 
-	// Add in the hashtags they've used
 	foreach ($hashtags as $hashtag) $status .= "#{$hashtag->text} ";
 	$content .= theme('status_form', $status, $in_reply_to_id);
 	$content .= theme('user_header', $user);
@@ -978,7 +896,6 @@ function twitter_home_page() {
 	$request = API_URL.'statuses/home_timeline.json?include_rts=true&include_entities=true&count='.$perPage;
 	if ($_GET['max_id']) $request .= '&max_id='.$_GET['max_id'];
 	if ($_GET['since_id']) $request .= '&since_id='.$_GET['since_id'];
-	//echo $request;
 	$tl = twitter_process($request);
 	$tl = twitter_standard_timeline($tl, 'friends');
 	$content = theme('status_form');
@@ -996,14 +913,12 @@ function twitter_hashtag_page($query) {
 
 function theme_status_form($text = '', $in_reply_to_id = NULL) {
 	if (user_is_authenticated()) {
-		//	adding ?status=foo will automaticall add "foo" to the text area.
 		if ($_GET['status']) $text = $_GET['status'];
-		return "<fieldset><legend><img src='".BASE_URL."images/bird_16_blue.png' width='16' height='16' />发生了神马？</legend><form method='post' action='update'><input name='status' value='{$text}' maxlength='140' /> <input name='in_reply_to_id' value='{$in_reply_to_id}' type='hidden' /><input type='submit' value='推！' /></form></fieldset>";
+		return "<fieldset><legend><img src='".BASE_URL."images/bird_16_blue.png' width='16' height='16'/>发生了神马？</legend><form method='post' action='update'><input name='status' value='{$text}' maxlength='140' /><input name='in_reply_to_id' value='{$in_reply_to_id}' type='hidden'/><input type='submit' value='推！'/></form></fieldset>";
 	}
 }
 
 function theme_status($status) {
-	//32bit int / snowflake patch
 	if($status->id_str) $status->id = $status->id_str;
 	$feed[] = $status;
 	$tl = twitter_standard_timeline($feed, 'status');
@@ -1026,7 +941,6 @@ function theme_retweet($status) {
 }
 
 function twitter_tweets_per_day($user, $rounding = 1) {
-	// Helper function to calculate an average count of tweets per day
 	$days_on_twitter = (time() - strtotime($user->created_at)) / 86400;
 	return round($user->statuses_count / $days_on_twitter, $rounding);
 }
@@ -1038,8 +952,6 @@ function theme_user_header($user) {
 	$name = theme('full_name', $user);
 	$full_avatar = theme_get_full_avatar($user);
 	$link = theme('external_link', $user->url);
-	//Some locations have a prefix which should be removed (UbertTwitter and iPhone)
-	//Sorry if my PC has converted from UTF-8 with the U (artesea)
 	$cleanLocation = str_replace(array("iPhone: ","ÜT: "),"",$user->location);
 	$raw_date_joined = strtotime($user->created_at);
 	$date_joined = date('jS M Y', $raw_date_joined);
@@ -1060,9 +972,6 @@ function theme_user_header($user) {
 	$out .= "<div class='features'>";
 	$out .= $user->statuses_count.' 条消息';
 
-	//If the authenticated user is not following the protected used, the API will return a 401 error when trying to view friends, followers and favourites
-	//This is not the case on the Twitter website
-	//To avoid the user being logged out, check to see if she is following the protected user. If not, don't create links to friends, followers and favourites
 	if ($user->protected == true && $followed_by == false) {
 		$out .= " | " . $user->followers_count . ' 个粉丝';
 		$out .= " | " . $user->friends_count . ' 个偶像';
@@ -1076,14 +985,10 @@ function theme_user_header($user) {
 
 	$out .= " | <a href='lists/{$user->screen_name}'>" . "在 " . $user->listed_count . " 个列表中</a>";
 	$out .=	" | <a href='directs/create/{$user->screen_name}'>发私信</a>";
-	//NB we can tell if the user can be sent a DM $following->relationship->target->following;
-	//Would removing this link confuse users?
 
-	//	One cannot follow, block, nor report spam oneself.
 	if (strtolower($user->screen_name) !== strtolower(user_current_username())) {
 		if ($followed_by == false) $out .= " | <a href='follow/{$user->screen_name}'>关注</a>";
 		else $out .= " | <a href='unfollow/{$user->screen_name}'>取消关注</a>";
-		//We need to pass the User Name and the User ID.  The Name is presented in the UI, the ID is used in checking
 		$out.= " | <a href='confirm/block/{$user->screen_name}/{$user->id}'>屏蔽/取消屏蔽</a>";
 		$out .= " | <a href='confirm/spam/{$user->screen_name}/{$user->id}'>报告为垃圾信息</a>";
 	}
@@ -1116,17 +1021,14 @@ function twitter_date($format, $timestamp = null) {
 
 function twitter_standard_timeline($feed, $source) {
 	$output = array();
-	if (!is_array($feed)/* && $source != 'thread'*/) return $output;
-	
-	//32bit int / snowflake patch
-//	if (is_array($feed)) {
-		foreach($feed as $key => $status) {
-			if($status->id_str) $feed[$key]->id = $status->id_str;
-			if($status->in_reply_to_status_id_str) $feed[$key]->in_reply_to_status_id = $status->in_reply_to_status_id_str;
-			if($status->retweeted_status->id_str) $feed[$key]->retweeted_status->id = $status->retweeted_status->id_str;
-		}
-//	}
-	
+	if (!is_array($feed)) return $output;
+
+	foreach($feed as $key => $status) {
+		if($status->id_str) $feed[$key]->id = $status->id_str;
+		if($status->in_reply_to_status_id_str) $feed[$key]->in_reply_to_status_id = $status->in_reply_to_status_id_str;
+		if($status->retweeted_status->id_str) $feed[$key]->retweeted_status->id = $status->retweeted_status->id_str;
+	}
+
 	switch ($source) {
 		case 'status':
 		case 'favourites':
@@ -1148,7 +1050,6 @@ function twitter_standard_timeline($feed, $source) {
 				$output[(string) $new->id] = $new;
 			}
 			return $output;
-
 		case 'search':
 			foreach ($feed as $status) {
 				$output[(string) $status->id] = (object) array(
@@ -1170,7 +1071,6 @@ function twitter_standard_timeline($feed, $source) {
 				);
 			}
 			return $output;
-
 		case 'directs_sent':
 		case 'directs_inbox':
 			foreach ($feed as $status) {
@@ -1188,46 +1088,6 @@ function twitter_standard_timeline($feed, $source) {
 				$output[$new->id_str] = $new;
 			}
 			return $output;
-
-/*		case 'thread':
-			// First pass: extract tweet info from the HTML
-			$html_tweets = explode('</li>', $feed);
-			foreach ($html_tweets as $tweet) {
-				$id = preg_match_one('#msgtxt(\d*)#', $tweet);
-				if (!$id) continue;
-				$output[$id] = (object) array(
-					'id' => $id,
-					'text' => strip_tags(preg_match_one('#</a>: (.*)</span>#', $tweet)),
-					'source' => preg_match_one('#>from (.*)</span>#', $tweet),
-					'from' => (object) array(
-						'id' => preg_match_one('#profile_images/(\d*)#', $tweet),
-						'screen_name' => preg_match_one('#twitter.com/([^"]+)#', $tweet),
-						'profile_image_url' => preg_match_one('#src="([^"]*)"#' , $tweet),
-						'profile_image_url_https' => preg_match_one('#src="([^"]*)"#' , $tweet),
-					),
-					'to' => (object) array(
-						'screen_name' => preg_match_one('#@([^<]+)#', $tweet),
-					),
-					'created_at' => str_replace('about', '', preg_match_one('#info">\s(.*)#', $tweet)),
-				);
-			}
-			// Second pass: OPTIONALLY attempt to reverse the order of tweets
-			if (setting_fetch('reverse') == 'yes') {
-				$first = false;
-				foreach ($output as $id => $tweet) {
-					$date_string = str_replace('later', '', $tweet->created_at);
-					if ($first) {
-						$attempt = strtotime("+$date_string");
-						if ($attempt == 0) $attempt = time();
-						$previous = $current = $attempt - time() + $previous;
-					}
-					else $previous = $current = $first = strtotime($date_string);
-					$output[$id]->created_at = date('r', $current);
-				}
-				$output = array_reverse($output);
-			}
-			return $output;
-*/
 		default:
 			echo "<h1>$source</h1><pre>";
 			print_r($feed); die();
@@ -1249,18 +1109,15 @@ function twitter_user_info($username = null) {
 
 function theme_timeline($feed) {
 	if (count($feed) == 0) return theme('no_tweets');
-	// For single tweet display
 	if (count($feed) == 1) $hide_pagination = true;
 	$rows = array();
 	$page = menu_current_page();
 	$date_heading = false;
 	$first=0;
 
-	// Add the hyperlinks *BEFORE* adding images
 	foreach ($feed as &$status) $status->text = twitter_parse_tags($status->text, $status->entities);
 	unset($status);
 
-	// Only embed images in suitable browsers
 	if (!in_array(setting_fetch('browser'), array('text', 'worksafe'))&&EMBEDLY_KEY != '') embedly_embed_thumbnails($feed);
 	foreach ($feed as $status) {
 		if ($first==0) {
@@ -1329,16 +1186,12 @@ function theme_timeline($feed) {
 function twitter_is_reply($status) {
 	if (!user_is_authenticated()) return false;
 	$user = user_current_username();
-	//	Use Twitter Entities to see if this contains a mention of the user
-	if ($status->entities) {
-		if ($status->entities->user_mentions) {
-			$entities = $status->entities;
-			foreach($entities->user_mentions as $mentions) if ($mentions->screen_name == $user) return true;
-		}
 
+	if ($status->entities) if ($status->entities->user_mentions) {
+		$entities = $status->entities;
+		foreach($entities->user_mentions as $mentions) if ($mentions->screen_name == $user) return true;
 	}
-	
-	// If there are no entities (for example on a search) do a simple regex
+
 	$found = Twitter_Extractor::create($status->text)->extractMentionedUsernames();
 	foreach($found as $mentions) if (strcasecmp($mentions, $user) == 0) return true;
 	return false;
@@ -1390,7 +1243,6 @@ function theme_full_name($user) {
 	return $name;
 }
 
-// http://groups.google.com/group/twitter-development-talk/browse_thread/thread/50fd4d953e5b5229#
 function theme_get_avatar($object) {
 	return BASE_URL . "simpleproxy.php?url=" . $object->profile_image_url_https;
 }
@@ -1445,7 +1297,6 @@ function theme_action_icons($status) {
 		$long = $latlong[1];
 		$actions[] = theme('action_icon', "http://maps.google.com.hk/m?q={$lat},{$long}", BASE_URL.'images/map.png','MAP');
 	}
-	// Less used fuctions should only appear on pc
 	if(setting_fetch('browser') == 'desktop') {
 		if (!user_is_current_user($from)) $actions[] = theme('action_icon', "directs/create/{$from}", BASE_URL.'images/dm.png','DM');
 		$actions[] = theme('action_icon',"search?query=%40{$from}",BASE_URL.'images/q.png','?');
