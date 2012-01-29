@@ -1332,7 +1332,7 @@ function theme_timeline($feed) {
 	$content = theme('table', array(), $rows, array('class' => 'timeline'));
 
 	if ($page != '' && !$hide_pagination) $content .= theme('pagination');
-	else if (!$hide_pagination)
+	else if (!$hide_pagination) {
 		if(is_64bit()) $max_id = intval($max_id) - 1; //stops last tweet appearing as first tweet on next page
 		$links[] = "<a href='{$_GET['q']}?max_id=$max_id' accesskey='9'>更早</a> 9";
 		$content .= '<p>'.implode(' | ', $links).'</p>';
