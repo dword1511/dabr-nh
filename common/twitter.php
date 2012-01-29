@@ -222,12 +222,8 @@ function friendship($user_a) {
 }
 
 function twitter_block_exists($query) {
-	//http://apiwiki.twitter.com/Twitter-REST-API-Method%3A-blocks-blocking-ids
-	//Get an array of all ids the authenticated user is blocking
 	$request = API_URL.'blocks/blocking/ids.json';
 	$blocked = (array) twitter_process($request);
-	//bool in_array  ( mixed $needle  , array $haystack  [, bool $strict  ] )
-	//If the authenticate user has blocked $query it will appear in the array
 	return in_array($query,$blocked);
 }
 
@@ -414,7 +410,7 @@ function twitter_fetch($url) {
 	$ch = curl_init();
 	curl_setopt($ch, CURLOPT_URL, $url);
 	curl_setopt($ch, CURLOPT_TIMEOUT, 10);
-	$user_agent = "Mozilla/5.0 (compatible; dabr; " . BASE_URL . ")";
+	$user_agent = "Mozilla/5.0 (compatible; dabr-nh; " . BASE_URL . ")";
 	curl_setopt($ch, CURLOPT_USERAGENT, $user_agent);
 	curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
 	$fetch_start = microtime(1);
@@ -424,12 +420,11 @@ function twitter_fetch($url) {
 	return $response;
 }
 
-//	http://dev.twitter.com/pages/tweet_entities
 function twitter_get_media($status) {
 	if($status->entities->media && setting_fetch('hide_inline') != 'yes') {
 		$image = $status->entities->media[0]->media_url_https;
 		$media_html = "<a href=\"" . BASE_URL . "simpleproxy.php?url=" . $image . ":large" . "\" target='" . get_target() . "'>";
-		$media_html .= 	"<img src=\"" . BASE_URL . "simpleproxy.php?url=" . $image . ":thumb\"/>";
+		$media_html .= "<img src=\"" . BASE_URL . "simpleproxy.php?url=" . $image . ":thumb\"/>";
 		$media_html .= "</a><br />";
 		return $media_html;
 	}
@@ -437,10 +432,7 @@ function twitter_get_media($status) {
 
 function twitter_parse_tags($input, $entities = false) {
 	$out = $input;
-	//Linebreaks.  Some clients insert \n for formatting.
 	$out = nl2br($out);
-	// Use the Entities to replace hyperlink URLs
-	// http://dev.twitter.com/pages/tweet_entities
 	if($entities) {
 		if($entities->urls) {
 			foreach($entities->urls as $urls) {
@@ -492,6 +484,7 @@ function twitter_parse_tags($input, $entities = false) {
 	return $out;
 }
 
+/*
 function flickr_decode($num) {
 	$alphabet = '123456789abcdefghijkmnopqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ';
 	$decoded = 0;
@@ -518,6 +511,7 @@ function flickr_encode($num) {
 	if ($num) $encoded = $alphabet[$num] . $encoded;
 	return $encoded;
 }
+*/
 
 function format_interval($timestamp, $granularity = 2) {
 	$units = array(
@@ -545,21 +539,22 @@ function twitter_status_page($query) {
 		$request = API_URL."statuses/show/{$id}.json?include_entities=true";
 		$status = twitter_process($request);
 		$content = theme('status', $status);
+		$content .= '<a href="http://translate.google.com/m?hl=zh-CN&tl=zh-CN&sl=auto&ie=UTF-8&q=' . urlencode($text) . '" target="'. get_target() . '">请 Google 翻译一下这货</a></p>';
 		$thread_id = $status->id_str;
 		$request = API_URL."related_results/show/{$thread_id}.json";
 		$threadstatus = twitter_process($request);
-		if (/*$threadstatus && $threadstatus[0] && */$threadstatus[0]->results) {
-			//$array = array_reverse($threadstatus[0]->results);
+		if ($threadstatus[0]->results) {
 			$array = $threadstatus[0]->results;
 			$tl = array();
-			foreach ($array as $key=>$value) /*if () */{
+			foreach ($array as $key=>$value) {
 				array_push($tl, $value->value);
 				if ($value->value->in_reply_to_status_id_str == $thread_id && $array[key]->value->screen_name != "") array_push($tl, $status);
 			}
-			$tl = twitter_standard_timeline($tl, 'replies');
+			$tl = twitter_standard_timeline($tl, 'thread');
 			$content .= '<p>对话素酱紫滴：</p>'.theme('timeline', $tl);
 		}
 		else $content .= '<p>木有对话可供显示。</p>';
+		$content .= "<p>不喜欢这样的对话顺序？到 <a href='settings'>设置</a> 页面去反转它吧。</p>";
 		theme('page', "消息 $id", $content);
 	}
 }
