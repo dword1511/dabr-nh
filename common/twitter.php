@@ -1453,25 +1453,27 @@ function theme_action_icons($status) {
 	if (!$status->is_direct) $actions[] = theme('action_icon', "user/{$from}/reply/{$status->id}", BASE_URL.'images/reply.png', '@');
 	if( $status->entities->user_mentions ) $actions[] = theme('action_icon', "user/{$from}/replyall/{$status->id}", BASE_URL.'images/replyall.png', 'REPLY ALL');
 	if (!$status->is_direct) {
-		if ($status->favorited == '1') $actions[] = theme('action_icon', "unfavourite/{$status->id}", BASE_URL.'images/star.png', 'UNFAV');
-		else $actions[] = theme('action_icon', "favourite/{$status->id}", BASE_URL.'images/star_grey.png', 'FAV');
-		if ($retweeted_by) $actions[] = theme('action_icon', "retweet/{$status->id}", BASE_URL.'images/retweeted.png', 'RT');
-		else $actions[] = theme('action_icon', "retweet/{$status->id}", BASE_URL.'images/retweet.png', 'RT');
-		if (user_is_current_user($from)) $actions[] = theme('action_icon', "confirm/delete/{$status->id}", BASE_URL.'images/trash.png', 'DEL');
-		if ($retweeted_by && user_is_current_user($retweeted_by)) $actions[] = theme('action_icon', "confirm/delete/{$retweeted_id}", BASE_URL.'images/trash.png', 'DEL');
+		if ($status->favorited == '1') $actions[] = theme('action_icon', "unfavourite/{$status->id}", BASE_URL.'images/star.png','UNFAV');
+		else $actions[] = theme('action_icon', "favourite/{$status->id}", BASE_URL.'images/star_grey.png','FAV');
+		if ($retweeted_by) $actions[] = theme('action_icon', "retweet/{$status->id}", BASE_URL.'images/retweeted.png','RT');
+		else $actions[] = theme('action_icon', "retweet/{$status->id}", BASE_URL.'images/retweet.png','RT');
+		if (user_is_current_user($from)) $actions[] = theme('action_icon', "confirm/delete/{$status->id}", BASE_URL.'images/trash.png','DEL');
+		if ($retweeted_by && user_is_current_user($retweeted_by)) $actions[] = theme('action_icon',"confirm/delete/{$retweeted_id}", BASE_URL.'images/trash.png', 'DEL');
 	}
-	else $actions[] = theme('action_icon', "confirm/deleteDM/{$status->id}", BASE_URL.'images/trash.png', 'DEL');
+	else $actions[] = theme('action_icon', "confirm/deleteDM/{$status->id}", BASE_URL.'images/trash.png','DEL');
 	if ($geo !== null) {
 		$latlong = $geo->coordinates;
 		$lat = $latlong[0];
 		$long = $latlong[1];
-		$actions[] = theme('action_icon', "http://maps.google.com.hk/m?q={$lat},{$long}", BASE_URL.'images/map.png', 'MAP');
+		$actions[] = theme('action_icon', "http://maps.google.com.hk/m?q={$lat},{$long}", BASE_URL.'images/map.png','MAP');
 	}
 	// Less used fuctions should only appear on pc
 	if(setting_fetch('browser') == 'desktop') {
-		if (!user_is_current_user($from)) $actions[] = theme('action_icon', "directs/create/{$from}", BASE_URL.'images/dm.png', 'DM');
+		if (!user_is_current_user($from)) $actions[] = theme('action_icon', "directs/create/{$from}", BASE_URL.'images/dm.png','DM');
 		$actions[] = theme('action_icon',"search?query=%40{$from}",BASE_URL.'images/q.png','?');
 		$actions[] = theme('action_icon',"http://twitter.com/{$from}/statuses/{$status->id}",BASE_URL.'images/lnk.png','LINK');
+		$actions[] = theme('action_icon',"http://twitter.com/statuses/user_timeline/{$from}.rss",BASE_URL.'images/rss.png','RSS');
+		$actions[] = theme('action_icon',"http://zh-tw.whotwi.com/user/{$from}",BASE_URL.'images/pie.png','ANAL');
 		//TODO: add embed tweet links.
 	}
 	return implode(' ', $actions);
