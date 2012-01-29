@@ -551,16 +551,16 @@ function twitter_status_page($query) {
 		if ($threadstatus && $threadstatus[0] && $threadstatus[0]->results) {
 			$array = array_reverse($threadstatus[0]->results);
 			$tl = array();
-			foreach ($array as $key=>$value) {
+			foreach ($array as $key=>$value) if ($value->value->in_reply_to_status_id_str && $value->value->in_reply_to_status_id_str == $status->id_str) {
 				array_push($tl, $value->value);
-				if ($value->value->in_reply_to_status_id_str && $value->value->in_reply_to_status_id_str == $status->id_str) array_push($tl, $status);
+				array_push($tl, $status);
 			}
 			$tl = twitter_standard_timeline($tl, 'replies');
 			$content .= '<p>对话素酱紫滴：</p>'.theme('timeline', $tl);
-		} elseif (!$status->user->protected) {
+		}
+		else {
 			$thread = twitter_thread_timeline($id);
-			$content .= '<p>下面是不太靠谱的对话展示功能：</p>'.theme('timeline', $thread);
-			$content .= "<p>如果您对这种顺序感到厌倦，到<a href='settings'>设置</a>里面去改改吧。不过这不会改变我不靠谱的本质哦。</p>";
+			$content .= '<p>木有对话可供显示。</p>';
 		}
 		theme('page', "消息 $id", $content);
 	}
@@ -1119,11 +1119,10 @@ function theme_status_time_link($status, $is_link = true) {
 	$time = strtotime($status->created_at);
 	if ($time > 0) {
 		if (twitter_date('dmy') == twitter_date('dmy', $time) && !setting_fetch('timestamp'))  $out = format_interval(time() - $time, 1). '前';
-		else  $out = twitter_date('H:i', $time);
+		else $out = twitter_date('H:i', $time);
 	}
 	else $out = $status->created_at;
-	if ($is_link)
-		$out = "<a href='status/{$status->id}' class='time'>$out</a>";
+	if ($is_link) $out = "<a href='status/{$status->id}' class='time'>$out</a>";
 	return $out;
 }
 
@@ -1280,7 +1279,7 @@ function theme_timeline($feed) {
 	unset($status);
 
 	// Only embed images in suitable browsers
-	if (!in_array(setting_fetch('browser'), array('text', 'worksafe'))) if (EMBEDLY_KEY !== '') embedly_embed_thumbnails($feed);
+	if (!in_array(setting_fetch('browser'), array('text', 'worksafe'))&&EMBEDLY_KEY != '') embedly_embed_thumbnails($feed);
 	foreach ($feed as $status) {
 		if ($first==0) {
 			$since_id = $status->id;
@@ -1292,10 +1291,10 @@ function theme_timeline($feed) {
 		}
 		$time = strtotime($status->created_at);
 		if ($time > 0) {
-			$date = twitter_date('Y-m-d H:i:s (l)', strtotime($status->created_at));
+			$date = twitter_date('l jS F Y', strtotime($status->created_at));
 			if ($date_heading !== $date) {
 				$date_heading = $date;
-				$rows[] = array('data'  => array($date), 'class' => 'date');
+				$rows[] = array('data' => array(twitter_date('↓↓↓ Y 年 m 月 d 日 ↓↓↓', strtotime($status->created_at))), 'class' => 'date');
 			}
 		}
 		else $date = $status->created_at;
@@ -1377,7 +1376,7 @@ function theme_followers($feed, $hide_pagination = false) {
 		$content .= "统计：".$user->statuses_count." 条消息，".$user->friends_count." 个偶像，".$user->followers_count." 个粉丝，每天约 ".$tweets_per_day." 条消息<br/>";
 		if($user->protected == 'true' && $last_tweet == 0) $content .= "保密的消息";
 		else if($last_tweet == 0) $content .= "该用户从未发过推";
-		else $content .= "上一条消息于 ".twitter_date('Y-m-d H:i:s (l)', $last_tweet)." 发出";
+		else $content .= "上一条消息于 ".twitter_date('Y 年 m 月 d 日 H:i:s', $last_tweet)." 发出";
 		$content .= "</span>";
 		$rows[] = array('data' => array(array('data' => theme('avatar', theme_get_avatar($user)), 'class' => 'avatar'),array('data' => $content, 'class' => 'status shift')),'class' => 'tweet');
 	}
@@ -1480,7 +1479,7 @@ function theme_action_icons($status) {
 }
 
 function theme_action_icon($url, $image_url, $text) {
-	if ($text == 'MAP' || $text == 'LINK') return "<a href='$url' target='".get_target()."'><img src='$image_url' alt='$text' width='16' height='16'/></a>";
+	if ($text == 'MAP' || $text == 'LINK' || $text == 'RSS' || $text == 'ANAL') return "<a href='$url' target='".get_target()."'><img src='$image_url' alt='$text' width='16' height='16'/></a>";
 	return "<a href='$url'><img src='$image_url' alt='$text' width='16' height='16'/></a>";
 }
 
