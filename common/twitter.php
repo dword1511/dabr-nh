@@ -551,9 +551,9 @@ function twitter_status_page($query) {
 		if ($threadstatus && $threadstatus[0] && $threadstatus[0]->results) {
 			$array = array_reverse($threadstatus[0]->results);
 			$tl = array();
-			foreach ($array as $key=>$value) if ($value->value->in_reply_to_status_id_str && $value->value->in_reply_to_status_id_str == $status->id_str) {
+			foreach ($array as $key=>$value) {
 				array_push($tl, $value->value);
-				array_push($tl, $status);
+				if ($value->value->in_reply_to_status_id_str && $value->value->in_reply_to_status_id_str == $status->id_str && $value->value->id_str != $status->id_str) array_push($tl, $status);
 			}
 			$tl = twitter_standard_timeline($tl, 'replies');
 			$content .= '<p>对话素酱紫滴：</p>'.theme('timeline', $tl);
@@ -1001,15 +1001,11 @@ function twitter_home_page() {
 }
 
 function twitter_hashtag_page($query) {
-	// Again, never worked.
-//	if (isset($query[1])) {
-		$hashtag = '#'.$query[1];
-		$content = theme('status_form', $hashtag.' ');
-		$tl = twitter_search($hashtag);
-		$content .= theme('timeline', $tl);
-		theme('page', $hashtag, $content);
-//	}
-//	else theme('page', 'Hashtag', 'Hash hash!');
+	$hashtag = '#'.$query[1];
+	$content = theme('status_form', $hashtag.' ');
+	$tl = twitter_search($hashtag);
+	$content .= theme('timeline', $tl);
+	theme('page', $hashtag, $content);
 }
 
 function theme_status_form($text = '', $in_reply_to_id = NULL) {
@@ -1267,8 +1263,8 @@ function twitter_user_info($username = null) {
 
 function theme_timeline($feed) {
 	if (count($feed) == 0) return theme('no_tweets');
-	// Never worked out right.
-	//if (count($feed) < 2) $hide_pagination = true;
+	// For single tweet display
+	if (count($feed) == 1) $hide_pagination = true;
 	$rows = array();
 	$page = menu_current_page();
 	$date_heading = false;
@@ -1335,9 +1331,8 @@ function theme_timeline($feed) {
 	}
 	$content = theme('table', array(), $rows, array('class' => 'timeline'));
 
-	//if ($page != '' && !$hide_pagination) $content .= theme('pagination');
-	if ($page != '') $content .= theme('pagination');
-	else {
+	if ($page != '' && !$hide_pagination) $content .= theme('pagination');
+	else if (!$hide_pagination)
 		if(is_64bit()) $max_id = intval($max_id) - 1; //stops last tweet appearing as first tweet on next page
 		$links[] = "<a href='{$_GET['q']}?max_id=$max_id' accesskey='9'>更早</a> 9";
 		$content .= '<p>'.implode(' | ', $links).'</p>';
@@ -1381,8 +1376,7 @@ function theme_followers($feed, $hide_pagination = false) {
 		$rows[] = array('data' => array(array('data' => theme('avatar', theme_get_avatar($user)), 'class' => 'avatar'),array('data' => $content, 'class' => 'status shift')),'class' => 'tweet');
 	}
 	$content = theme('table', array(), $rows, array('class' => 'followers'));
-//	if (!$hide_pagination)
-	$content .= theme('list_pagination', $feed);
+	if (!$hide_pagination) $content .= theme('list_pagination', $feed);
 	return $content;
 }
 
@@ -1400,8 +1394,7 @@ function theme_retweeters($feed, $hide_pagination = false) {
 		$rows[] = array('data' => array(array('data' => theme('avatar', theme_get_avatar($user)), 'class' => 'avatar'),array('data' => $content, 'class' => 'status shift')),'class' => 'tweet');
 	}
 	$content = theme('table', array(), $rows, array('class' => 'followers'));
-//	if (!$hide_pagination)
-	$content .= theme('list_pagination', $feed);
+	if (!$hide_pagination) $content .= theme('list_pagination', $feed);
 	return $content;
 }
 
