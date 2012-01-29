@@ -553,7 +553,7 @@ function twitter_status_page($query) {
 			$tl = array();
 			foreach ($array as $key=>$value) {
 				array_push($tl, $value->value);
-				if ($value->value->in_reply_to_status_id_str && $value->value->in_reply_to_status_id_str == $status->id_str && $value->value->id_str != $status->id_str) array_push($tl, $status);
+				if ($value->value->in_reply_to_status_id_str && $value->value->in_reply_to_status_id_str == $status->id_str && $value->value->id_str != $thread_id) array_push($tl, $status);
 			}
 			$tl = twitter_standard_timeline($tl, 'replies');
 			$content .= '<p>对话素酱紫滴：</p>'.theme('timeline', $tl);
