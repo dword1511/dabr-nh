@@ -491,7 +491,6 @@ function twitter_status_page($query) {
 	if (is_numeric($id)) {
 		$request = API_URL."statuses/show/{$id}.json?include_entities=true";
 		$status = twitter_process($request);
-		$headuser = $status->user;
 		$content = theme('status', $status);
 		$content .= '<a href="http://translate.google.com/m?hl=zh-CN&tl=zh-CN&sl=auto&ie=UTF-8&q='.urlencode($status->text).'" target="'.get_target().'">请 Google 翻译一下这货</a></p>';
 		$thread_id = $status->id_str;
@@ -501,12 +500,13 @@ function twitter_status_page($query) {
 			$array = $threadstatus[0]->results;
 			$tl = array();
 			foreach ($array as $key=>$value) {
-				if ($value->value->in_reply_to_status_id_str == $thread_id && $array[key]->value->screen_name != "") array_push($tl, $value->value);
-				array_push($tl, $status);
-//				else {
-//					$status->user=$headuser;
-//					array_push($tl, $status);
-//				}
+				array_push($tl, $value->value);
+				if ($value->value->in_reply_to_status_id_str == $thread_id && $array[key]->value->screen_name != "") array_push($tl, $status);
+				else {
+					$tmp->user=$status->user;
+					array_push($tl, $tmp);
+					array_push($tl, $status);
+				}
 			}
 			$tl = twitter_standard_timeline($tl, 'replies');
 			$content .= '<p>对话素酱紫滴：</p>'.theme('timeline', $tl);
