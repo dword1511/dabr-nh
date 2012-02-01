@@ -502,11 +502,6 @@ function twitter_status_page($query) {
 			foreach ($array as $key=>$value) {
 				array_push($tl, $value->value);
 				if ($value->value->in_reply_to_status_id_str == $thread_id && $array[key]->value->screen_name != "") array_push($tl, $status);
-				else {
-					$tmp->user=$status->user;
-					array_push($tl, $tmp);
-					array_push($tl, $status);
-				}
 			}
 			$tl = twitter_standard_timeline($tl, 'replies');
 			$content .= '<p>对话素酱紫滴：</p>'.theme('timeline', $tl);
