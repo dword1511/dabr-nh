@@ -102,13 +102,15 @@ menu_register(array(
 	),
 	'followers' => array(
 		'security' => true,
+		'hidden' => true,
 		'callback' => 'twitter_followers_page',
-		'display' => '粉丝',
+//		'display' => '粉丝',
 	),
 	'friends' => array(
 		'security' => true,
+		'hidden' => true,
 		'callback' => 'twitter_friends_page',
-		'display' => '偶像',
+//		'display' => '偶像',
 	),
 	'delete' => array(
 		'hidden' => true,
@@ -132,18 +134,21 @@ menu_register(array(
 	),
 	'picture' => array(
 		'security' => true,
+		'hidden' => true,
 		'callback' => 'twitter_media_page',
-		'display' => '上图',
+//		'display' => '上图',
 	),
 	'trends' => array(
 		'security' => true,
+		'hidden' => true,
 		'callback' => 'twitter_trends_page',
-		'display' => '趋势',
+//		'display' => '趋势',
 	),
 	'retweets' => array(
 		'security' => true,
+		'hidden' => true,
 		'callback' => 'twitter_retweets_page',
-		'display' => '转发',
+//		'display' => '转发',
 	),
 	'retweeted_by' => array(
 		'security' => true,
@@ -152,8 +157,9 @@ menu_register(array(
 	),
 	'editbio' => array(
 		'security' => true,
+		'hidden' => true,
 		'callback' => 'twitter_profile_page',
-		'display' => '自传',
+//		'display' => '自传',
 	)
 ));
 
@@ -914,7 +920,7 @@ function twitter_hashtag_page($query) {
 function theme_status_form($text = '', $in_reply_to_id = NULL) {
 	if (user_is_authenticated()) {
 		if ($_GET['status']) $text = $_GET['status'];
-		return "<fieldset><legend><img src='".BASE_URL."images/bird_16_blue.png' width='16' height='16'/>发生了神马？</legend><form method='post' action='update'><input name='status' value='{$text}' maxlength='140' /><input name='in_reply_to_id' value='{$in_reply_to_id}' type='hidden'/><input type='submit' value='推！'/></form></fieldset>";
+		return "<fieldset><legend><img src='".BASE_URL."images/bird_16_blue.png' width='16' height='16'/>发生了神马？</legend><form method='post' action='update'><input name='status' value='{$text}' maxlength='140' /><input name='in_reply_to_id' value='{$in_reply_to_id}' type='hidden'/><input type='submit' value='推！'/></form><a href='picture'>发图片</a></fieldset>";
 	}
 }
 
@@ -954,20 +960,20 @@ function theme_user_header($user) {
 	$link = theme('external_link', $user->url);
 	$cleanLocation = str_replace(array("iPhone: ","ÜT: "),"",$user->location);
 	$raw_date_joined = strtotime($user->created_at);
-	$date_joined = date('jS M Y', $raw_date_joined);
+	$date_joined = date('Y 年 m 月 d 日', $raw_date_joined);
 	$tweets_per_day = twitter_tweets_per_day($user, 1);
 	$bio = twitter_parse_tags($user->description);
 	$out = "<div class='profile'>";
 	$out .= "<span class='avatar'>".theme('external_link', $full_avatar, theme('avatar', theme_get_avatar($user)))."</span>";
-	$out .= "<span class='status shift'><b>{$name}</b><br />";
+	$out .= "<span class='status shift'><b>{$name}</b><br/>";
 	$out .= "<span class='about'>";
-	if ($user->verified == true) $out .= '<strong>已认证账户</strong><br />';
-	if ($user->protected == true) $out .= '<strong>保密的消息</strong><br />';
-
-	$out .= "简介：{$bio}<br />";
-	$out .= "链接：{$link}<br />";
-	$out .= "地址：<a href=\"http://maps.google.com.hk/m?q={$cleanLocation}\" target=\"" . get_target() . "\">{$user->location}</a><br />";
-	$out .= "加入时间：{$date_joined} （每天约 ".$tweets_per_day." 条消息）";
+	if ($user->verified == true) $out .= '<strong>已认证账户</strong><br/>';
+	if ($user->protected == true) $out .= '<strong>保密的消息</strong><br/>';
+	$out .= "简介：{$bio}<br/>";
+	$out .= "链接：{$link}<br/>";
+	$out .= "地址：<a href=\"http://maps.google.com.hk/m?q={$cleanLocation}\" target=\"" . get_target() . "\">{$user->location}</a><br/>";
+	$out .= "加入时间：{$date_joined} （每天约 ".$tweets_per_day." 条消息）<br/>";
+	if ($user == $user_current_username) $out .= "<a href='editbio'>编辑个人资料</a>";
 	$out .= "</span></span>";
 	$out .= "<div class='features'>";
 	$out .= $user->statuses_count.' 条消息';
@@ -993,6 +999,7 @@ function theme_user_header($user) {
 		$out .= " | <a href='confirm/spam/{$user->screen_name}/{$user->id}'>报告为垃圾信息</a>";
 	}
 	$out .= " | <a href='search?query=%40{$user->screen_name}'>搜索 @{$user->screen_name}</a>";
+	if ($user == $user_current_username) $out .= " | <a href='retweets'>被转发的消息</a>";
 	$out .= "</div></div>";
 	return $out;
 }
@@ -1257,7 +1264,7 @@ function theme_no_tweets() {
 
 function theme_search_form($query) {
 	$query = stripslashes(htmlentities($query,ENT_QUOTES,"UTF-8"));
-	return '<form action="search" method="get"><input name="query" value="'. $query .'"/><input type="submit" value="给我搜"/></form>';
+	return '<form action="search" method="get"><input name="query" value="'. $query .'"/><input type="submit" value="给我搜"/></form><a href="trends">趋势</a>';
 }
 
 function theme_external_link($url, $content = null) {
