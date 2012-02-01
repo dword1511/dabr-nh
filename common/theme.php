@@ -11,8 +11,7 @@ function theme() {
 
 	if ($current_theme) {
 		$custom_function = $current_theme.'_'.$function;
-		if (function_exists($custom_function))
-		$function = $custom_function;
+		if (function_exists($custom_function)) $function = $custom_function;
 	} else {
 		if (!function_exists($function))
 		return "<p>错误：与视觉主题相关的“ <b>$function</b> ”函数被失踪了。</p>";
@@ -22,20 +21,14 @@ function theme() {
 
 function theme_csv($headers, $rows) {
 	$out = implode(',', $headers)."\n";
-	foreach ($rows as $row) {
-		$out .= implode(',', $row)."\n";
-	}
+	foreach ($rows as $row) $out .= implode(',', $row)."\n";
 	return $out;
 }
 
 function theme_list($items, $attributes) {
-	if (!is_array($items) || count($items) == 0) {
-		return '';
-	}
+	if (!is_array($items) || count($items) == 0) return '';
 	$output = '<ul'.theme_attributes($attributes).'>';
-	foreach ($items as $item) {
-		$output .= "<li>$item</li>\n";
-	}
+	foreach ($items as $item) $output .= "<li>$item</li>\n";
 	$output .= "</ul>\n";
 	return $output;
 }
@@ -48,18 +41,15 @@ function theme_options($options, $selected = NULL) {
 			$output .= '<optgroup label="'.$value.'">';
 			$output .= theme('options', $name, $selected);
 			$output .= '</optgroup>';
-		} else {
-			$output .= '<option value="'.$value.'"'.($selected == $value ? ' selected="selected"' : '').'>'.$name."</option>\n";
 		}
+		else $output .= '<option value="'.$value.'"'.($selected == $value ? ' selected="selected"' : '').'>'.$name."</option>\n";
 	}
 	return $output;
 }
 
 function theme_info($info) {
 	$rows = array();
-	foreach ($info as $name => $value) {
-		$rows[] = array($name, $value);
-	}
+	foreach ($info as $name => $value) $rows[] = array($name, $value);
 	return theme('table', array(), $rows);
 }
 
@@ -67,14 +57,10 @@ function theme_table($headers, $rows, $attributes = NULL) {
 	$out = '<div'.theme_attributes($attributes).'>';
 	if (count($headers) > 0) {
 		$out .= '<thead><tr>';
-		foreach ($headers as $cell) {
-			$out .= theme_table_cell($cell, TRUE);
-		}
+		foreach ($headers as $cell) $out .= theme_table_cell($cell, TRUE);
 		$out .= '</tr></thead>';
 	}
-	if (count($rows) > 0) {
-		$out .= theme('table_rows', $rows);
-	}
+	if (count($rows) > 0) $out .= theme('table_rows', $rows);
 	$out .= '</div>';
 	return $out;
 }
@@ -86,15 +72,14 @@ function theme_table_rows($rows) {
 			$cells = $row['data'];
 			unset($row['data']);
 			$attributes = $row;
-		} else {
+		}
+		else {
 			$cells = $row;
 			$attributes = FALSE;
 		}
 		$attributes['class'] .= ($attributes['class'] ? ' ' : '') . ($i++ %2 ? 'even' : 'odd');
 		$out .= '<div'.theme_attributes($attributes).'>';
-		foreach ($cells as $cell) {
-			$out .= theme_table_cell($cell);
-		}
+		foreach ($cells as $cell) $out .= theme_table_cell($cell);
 		$out .= "</div>\n";
 	}
 	return $out;
@@ -102,9 +87,7 @@ function theme_table_rows($rows) {
 
 function theme_attributes($attributes) {
 	if (!$attributes) return;
-	foreach ($attributes as $name => $value) {
-		$out .= " $name=\"$value\"";
-	}
+	foreach ($attributes as $name => $value) $out .= " $name=\"$value\"";
 	return $out;
 }
 
@@ -114,13 +97,13 @@ function theme_table_cell($contents, $header = FALSE) {
 		$value = $contents['data'];
 		unset($contents['data']);
 		$attributes = $contents;
-	} else {
+	}
+	else {
 		$value = $contents;
 		$attributes = false;
 	}
 	return "<span".theme_attributes($attributes).">$value</span>";
 }
-
 
 function theme_error($message) {
 	theme_page('Error', $message);
@@ -182,28 +165,28 @@ function theme_colours() {
 function theme_css() {
 	$c = theme('colours');
 	return "<style type='text/css'>
-  a{color:#{$c->links}}
-  table{border-collapse:collapse}
-  form{margin:.3em;}
-  td{vertical-align:top;padding:0.3em}
-  img{border:0}
-  small,small a{color:#{$c->small}}
-  body{background:#{$c->bodybg};
-  color:#{$c->bodyt};margin:0;font:90% sans-serif}
-  .odd{background:#{$c->odd}}
-  .even{background:#{$c->even}}
-  .reply{background:#{$c->replyodd}}
-  .reply.even{background: #{$c->replyeven}}
-  .menu{color:#{$c->menut};background:#{$c->menubg};padding: 2px}
-  .menu a{color:#{$c->menua};text-decoration: none}
-  .tweet,.features{padding:5px}
-  .date{padding:5px;font-size:0.8em;font-weight:bold;color:#{$c->small}}
-  .about,.time{font-size:0.75em;color:#{$c->small}}
-  .avatar{display:block; height:26px; width:26px; left:0.3em; margin:0; overflow:hidden; position:absolute;}
-  .status{display:block;word-wrap:break-word;}
-  .shift{margin-left:30px;min-height:24px;}
-  .from{font-size:0.75em;color:#{$c->small};font-family:serif;}
-  .from a{color:#{$c->small};}
+a{color:#{$c->links}}
+table{border-collapse:collapse}
+form{margin:.3em;}
+td{vertical-align:top;padding:0.3em}
+img{border:0}
+small,small a{color:#{$c->small}}
+body{background:#{$c->bodybg};
+color:#{$c->bodyt};margin:0;font:90% sans-serif}
+.odd{background:#{$c->odd}}
+.even{background:#{$c->even}}
+.reply{background:#{$c->replyodd}}
+.reply.even{background: #{$c->replyeven}}
+.menu{color:#{$c->menut};background:#{$c->menubg};padding: 2px}
+.menu a{color:#{$c->menua};text-decoration: none}
+.tweet,.features{padding:5px}
+.date{padding:5px;font-size:0.8em;font-weight:bold;color:#{$c->small}}
+.about,.time{font-size:0.75em;color:#{$c->small}}
+.avatar{display:block; height:26px; width:26px; left:0.3em; margin:0; overflow:hidden; position:absolute;}
+.status{display:block;word-wrap:break-word;}
+.shift{margin-left:30px;min-height:24px;}
+.from{font-size:0.75em;color:#{$c->small};font-family:serif;}
+.from a{color:#{$c->small};}
 </style>";
 }
 
