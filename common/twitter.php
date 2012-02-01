@@ -973,7 +973,7 @@ function theme_user_header($user) {
 	$out .= "链接：{$link}<br/>";
 	$out .= "地址：<a href=\"http://maps.google.com.hk/m?q={$cleanLocation}\" target=\"" . get_target() . "\">{$user->location}</a><br/>";
 	$out .= "加入时间：{$date_joined} （每天约 ".$tweets_per_day." 条消息）<br/>";
-	if ($user == $user_current_username) $out .= "<a href='editbio'>编辑个人资料</a>";
+	if (user_is_current_user($user)) $out .= "<a href='editbio'>编辑个人资料</a>";
 	$out .= "</span></span>";
 	$out .= "<div class='features'>";
 	$out .= $user->statuses_count.' 条消息';
@@ -999,7 +999,7 @@ function theme_user_header($user) {
 		$out .= " | <a href='confirm/spam/{$user->screen_name}/{$user->id}'>报告为垃圾信息</a>";
 	}
 	$out .= " | <a href='search?query=%40{$user->screen_name}'>搜索 @{$user->screen_name}</a>";
-	if ($user == $user_current_username) $out .= " | <a href='retweets'>被转发的消息</a>";
+	if (user_is_current_user($user)) $out .= " | <a href='retweets'>被转发的消息</a>";
 	$out .= "</div></div>";
 	return $out;
 }
@@ -1145,19 +1145,13 @@ function theme_timeline($feed) {
 		}
 		else $date = $status->created_at;
 		$text = $status->text;
-		if (!in_array(setting_fetch('browser'), array('text', 'worksafe'))) {
-			$media = twitter_get_media($status);
-		}
+		if (!in_array(setting_fetch('browser'), array('text', 'worksafe'))) $media = twitter_get_media($status);
 		$link = theme('status_time_link', $status, !$status->is_direct);
 		$actions = theme('action_icons', $status);
 		$avatar = theme('avatar', theme_get_avatar($status->from));
 		$source = $status->source ? "来自 ".str_replace('rel="nofollow"', 'rel="nofollow" target="' . get_target() . '"', preg_replace('/&(?![a-z][a-z0-9]*;|#[0-9]+;|#x[0-9a-f]+;)/i', '&amp;', $status->source)." 部门") : ''; //need to replace & in links with &amps and force new window on links
-		if ($status->place->name) {
-			$source .= " " . $status->place->name . ", " . $status->place->country;
-		}
-		if ($status->in_reply_to_status_id) {
-			$source .= " <a href='status/{$status->in_reply_to_status_id_str}'>对 {$status->in_reply_to_screen_name} 的回复</a>";
-		}
+		if ($status->place->name) $source .= " " . $status->place->name . ", " . $status->place->country;
+		if ($status->in_reply_to_status_id) $source .= " <a href='status/{$status->in_reply_to_status_id_str}'>对 {$status->in_reply_to_screen_name} 的回复</a>";
 		if ($status->retweet_count) {
 			$source .= " <a href='retweeted_by/{$status->id}'>被转发了 ";
 			$source .= $status->retweet_count . " 次</a>";
@@ -1264,7 +1258,7 @@ function theme_no_tweets() {
 
 function theme_search_form($query) {
 	$query = stripslashes(htmlentities($query,ENT_QUOTES,"UTF-8"));
-	return '<form action="search" method="get"><input name="query" value="'. $query .'"/><input type="submit" value="给我搜"/></form><a href="trends">趋势</a>';
+	return '<form action="search" method="get"><input name="query" value="'. $query .'"/><input type="submit" value="给我搜"/></form><strong><a href="trends">趋势 →</a></strong>';
 }
 
 function theme_external_link($url, $content = null) {

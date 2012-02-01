@@ -2,7 +2,8 @@
 menu_register(array (
 	'about' => array (
 		'callback' => 'about_page',
-		'display' => '关于',
+		'hidden' => true,
+//		'display' => '关于',
 	),
 ));
 
