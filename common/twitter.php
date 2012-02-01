@@ -492,7 +492,7 @@ function twitter_status_page($query) {
 		$request = API_URL."statuses/show/{$id}.json?include_entities=true";
 		$status = twitter_process($request);
 		$content = theme('status', $status);
-		$content .= '<a href="http://translate.google.com/m?hl=zh-CN&tl=zh-CN&sl=auto&ie=UTF-8&q='.urlencode($text).'" target="'.get_target().'">请 Google 翻译一下这货</a></p>';
+		$content .= '<a href="http://translate.google.com/m?hl=zh-CN&tl=zh-CN&sl=auto&ie=UTF-8&q='.urlencode($status->text).'" target="'.get_target().'">请 Google 翻译一下这货</a></p>';
 		$thread_id = $status->id_str;
 		$request = API_URL."related_results/show/{$thread_id}.json";
 		$threadstatus = twitter_process($request);
@@ -678,9 +678,7 @@ function twitter_update() {
 		$request = API_URL.'statuses/update.json';
 		$post_data = array('source' => 'dabr', 'status' => $status);
 		$in_reply_to_id = (string) $_POST['in_reply_to_id'];
-		if (is_numeric($in_reply_to_id)) {
-			$post_data['in_reply_to_status_id'] = $in_reply_to_id;
-		}
+		if (is_numeric($in_reply_to_id)) $post_data['in_reply_to_status_id'] = $in_reply_to_id;
 		list($lat, $long) = explode(',', $_POST['location']);
 		$geo = 'N';
 		if (is_numeric($lat) && is_numeric($long)) {
