@@ -1,7 +1,4 @@
-(SIE-MC60),text
-(Android|iPhone|Maemo|5800|NokiaN97),touch
-(BlackBerry),blackberry
-(N95),desktop
+(SIE-MC60|Lynx|Links),text
+(N95|BlackBerry|Android|iPhone|Maemo|5800|NokiaN97|Opera Mini|Opera Mobi|Firefox|Chrome|Opera|MSIE|Safari),desktop
 (IEMobile|Symbian|SAMSUNG),mobile
-(Opera Mini|Opera Mobi),desktop
-(Firefox|Chrome|Opera|MSIE|Safari),desktop
+
