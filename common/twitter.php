@@ -973,7 +973,7 @@ function theme_user_header($user) {
 	$out .= "链接：{$link}<br/>";
 	$out .= "地址：<a href=\"http://maps.google.com.hk/m?q={$cleanLocation}\" target=\"" . get_target() . "\">{$user->location}</a><br/>";
 	$out .= "加入时间：{$date_joined} （每天约 ".$tweets_per_day." 条消息）<br/>";
-	if (user_is_current_user($user)) $out .= "<a href='editbio'>编辑个人资料</a>";
+	if (user_is_current_user($user->screen_name)) $out .= "<strong><a href='editbio'>编辑个人资料 →</a></strong>";
 	$out .= "</span></span>";
 	$out .= "<div class='features'>";
 	$out .= $user->statuses_count.' 条消息';
@@ -999,7 +999,7 @@ function theme_user_header($user) {
 		$out .= " | <a href='confirm/spam/{$user->screen_name}/{$user->id}'>报告为垃圾信息</a>";
 	}
 	$out .= " | <a href='search?query=%40{$user->screen_name}'>搜索 @{$user->screen_name}</a>";
-	if (user_is_current_user($user)) $out .= " | <a href='retweets'>被转发的消息</a>";
+	if (user_is_current_user($user->screen_name)) $out .= " | <a href='retweets'>被转发的消息</a>";
 	$out .= "</div></div>";
 	return $out;
 }
@@ -1258,7 +1258,7 @@ function theme_no_tweets() {
 
 function theme_search_form($query) {
 	$query = stripslashes(htmlentities($query,ENT_QUOTES,"UTF-8"));
-	return '<form action="search" method="get"><input name="query" value="'. $query .'"/><input type="submit" value="给我搜"/></form><strong><a href="trends">趋势 →</a></strong>';
+	return '<form action="search" method="get"><input name="query" value="'. $query .'"/><input type="submit" value="给我搜"/></form><p><strong><a href="trends">趋势 →</a></strong></p>';
 }
 
 function theme_external_link($url, $content = null) {

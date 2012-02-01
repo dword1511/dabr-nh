@@ -132,6 +132,6 @@ function settings_page($args) {
 	$content .= '<p><label>现在的 UTC 时间是 ' . gmdate('H:i') . ' ，考虑到存在 <input type="text" name="utc_offset" value="'. $utc_offset .'" size="3" /> 的时差，我会把时间显示成 ' . twitter_date('H:i') . ' 这样。<br />呐，如果你觉得时间不对就调调时差吧。</label></p>';
 	if (MYSQL_USERS == 'ON' && user_is_authenticated()) $content .= '<fieldset><legend>Dabr 账户</legend><small>如果你被墙了，你可以通过 Dabr 帐号和密码登录（当然 OAuth 还得翻墙的）。</small></p><p>修改 Dabr 密码<br /><input type="password" name="newpassword" /><br /><small>不想改的话就甭填好了。</small></fieldset>';
 	$content .= '<p><input type="submit" value="存起来吧" style="width:60%;max-width:200px;"/></p></form>';
-	$content .= '<hr /><p>访问<a href="reset">重置</a>页面，如果事情变得不太对头的话 —— 你会被登出，所有的设置也会被清空。</p><a href="about">关于 Dabr-nh</a>';
+	$content .= '<hr /><p>访问<a href="reset">重置</a>页面，如果事情变得不太对头的话 —— 你会被登出，所有的设置也会被清空。</p><p><strong><a href="about">关于 Dabr-nh →</a></strong></p>';
 	return theme('page', '设置', $content);
 }
