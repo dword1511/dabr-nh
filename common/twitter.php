@@ -329,11 +329,11 @@ function twitter_media_page($query) {
 		if (!$_POST['message']) $content .= "<p>为这张图添加点说明文字吧。</p>";
 		if (!$_FILES['image']['tmp_name']) $content .= "<p>请选择一幅图片来上传。</p>";
 	}	
-	$content .= "<form method='post' action='picture' enctype='multipart/form-data' name='upload_pict'>图片：<input type='file' name='image'/><br/>消息（可选）：<br/><textarea name='message' style='width:90%; max-width: 400px;' rows='3' id='message'>".$status."</textarea><br><input type='submit' value='发送'><span id='remaining'>120</span>";
-	if(setting_fetch('browser') == 'desktop') $content .= "<script type='text/javascript'>document.onkeydown = function (){if(event.ctrlKey && window.event.keyCode == 13) document.upload_pict.submit();}</script>";
-	if(setting_fetch('browser') == 'desktop') $content .= geoloc($_COOKIE['geo']);
+	$content .= "<form method='post' action='picture' enctype='multipart/form-data' name='upload_pict'>图片：<input type='file' name='image'/><br/>消息（可选）：<br/><textarea name='message' style='width:90%; max-width: 400px;' rows='3' id='message'>".$status."</textarea><br><input type='submit' value='发送'>";
+	if(setting_fetch('browser') != 'mobile') $content .= "<span id='remaining'>120</span>";
+	if(setting_fetch('browser') == 'desktop') $content .= "<script type='text/javascript'>document.onkeydown = function (){if(event.ctrlKey && window.event.keyCode == 13) document.upload_pict.submit();}</script>".geoloc($_COOKIE['geo']);
 	$content .= '</form>';
-	$content .= js_counter("message", "120");
+	if(setting_fetch('browser') != 'mobile') $content .= js_counter("message", "120");
 	return theme('page', '上传图片', $content);
 }
 
@@ -775,8 +775,11 @@ function theme_directs_form($to) {
 		$html_to .= "发私信给 <b>$to</b><input name='to' value='$to' type='hidden'>";
 	}
 	else $html_to .= "发送给：<br/><input name='to'><br/>消息：<br/>";
-	$content = "<form action='directs/send' method='post'>$html_to<br><textarea name='message' style='width:90%; max-width: 400px;' rows='3' id='message'></textarea><br><input type='submit' value='发送'><span id='remaining'>140</span></form>";
-	$content .= js_counter("message");
+	$content = "<form action='directs/send' method='post' name='dmsg'>$html_to<br><textarea name='message' style='width:90%; max-width: 400px;' rows='3' id='message'></textarea><br><input type='submit' value='发送'>";
+	if(setting_fetch('browser') != 'mobile') $content .= "<span id='remaining'>140</span>";
+	$content .= "</form>";
+	if(setting_fetch('browser') == 'desktop') $content .= "<script type='text/javascript'>document.onkeydown = function (){if(event.ctrlKey && window.event.keyCode == 13) document.dmsg.submit();}</script>";
+	if(setting_fetch('browser') != 'mobile') $content .= js_counter("message");
 	return $content;
 }
 
@@ -936,11 +939,12 @@ function theme_retweet($status) {
 	$from = substr($_SERVER['HTTP_REFERER'], strlen(BASE_URL));
 	if($status->user->protected == 0) $content.="<p>直接转发：</p><form action='twitter-retweet/{$status->id_str}' method='post'><input type='hidden' name='from' value='$from'/><input type='submit' value='直接转发'/></form><hr/>";
 	else $content.="<p>@{$status->user->screen_name} 不让你转发这条消息。但是你可以假装编辑下再发啊。</p>";
-	$content .= "<p>编辑后转发：</p><form action='update' method='post' name='rt_edited'><input type='hidden' name='from' value='$from'/><textarea name='status' style='width:90%; max-width: 400px;' rows='3' id='status'>$text</textarea><br/><input type='submit' value='转发'/><span id='remaining'>".(140-$length)."</span>";
+	$content .= "<p>编辑后转发：</p><form action='update' method='post' name='rt_edited'><input type='hidden' name='from' value='$from'/><textarea name='status' style='width:90%; max-width: 400px;' rows='3' id='status'>$text</textarea><br/><input type='submit' value='转发'/>";
+	if(setting_fetch('browser') != 'mobile') $content .= "<span id='remaining'>".(140-$length)."</span>";
 	if(setting_fetch('browser') == 'desktop') $content .= geoloc($_COOKIE['geo']);
 	$content .= "</form>";
 	if(setting_fetch('browser') == 'desktop') $content .= "<script type='text/javascript'>document.onkeydown = function (){if(event.ctrlKey && window.event.keyCode == 13) document.rt_edited.submit();}</script>";
-	$content .= js_counter("status");
+	if(setting_fetch('browser') != 'mobile') $content .= js_counter("status");
 	return $content;
 }
 
