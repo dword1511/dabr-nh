@@ -96,9 +96,10 @@ menu_register(array(
 		'callback' => 'twitter_spam_page',
 	),
 	'favourites' => array(
+		'hidden' => true,
 		'security' => true,
 		'callback' =>  'twitter_favourites_page',
-		'display' => '收藏',
+//		'display' => '收藏',
 	),
 	'followers' => array(
 		'security' => true,
