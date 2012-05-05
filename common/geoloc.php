@@ -36,7 +36,7 @@ function goGeo(node) {
  if(started) return;
  started = true;
  geoStatus("正在定位…");
- navigator.geolocation.getCurrentPosition(geoSuccess, geoError);
+ navigator.geolocation.getCurrentPosition(geoSuccess, geoError, {enableHighAccuracy:true, maximumAge:600000, timeout:10000});
 }
 
 function geoStatus(msg) {
@@ -61,7 +61,7 @@ function geoError(error) {
 }
 
 function geoSuccess(position) {
- geoStatus("'.$msga.'<a href=\'http://maps.google.com.hk/m?q=" + position.coords.latitude + "," + position.coords.longitude + "\' target=\''.get_target().'\'>'.$msgb.'</a>'.$msgc.'");
+ geoStatus("'.$msga.'<a href=\'http://maps.google.com.hk/m?q=" + position.coords.latitude + "," + position.coords.longitude + "\' target=\''.get_target().'\' title=\'您的位置：" + position.address.country + position.address.region + "省" + position.address.city + "市，精度：" + position.coords.accuracy + "米\'>'.$msgb.'</a>'.$msgc.'");
  chkbox.value = position.coords.latitude + "," + position.coords.longitude;
 }
 </script></form>';
