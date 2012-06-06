@@ -151,7 +151,23 @@ function lists_list_members_page($user, $list) {
 	$p = twitter_lists_list_members($user, $list);
 
 	// TODO: use a different theme() function? Add a "delete member" link for each member
-	$content = theme('followers', $p, 1);
+	//$content = theme('followers', $p, 1);
+
+	// Place the users into an array
+	$sortedUsers = array();
+
+	foreach($p as $user) {
+	  $user_id = $user->id;
+	  // $tl is *unsorted* - but $ids is *sorted*. So we place the users from $tl into a new array based on how they're sorted in $ids
+	  $key = array_search($user_id, $ids);
+	  $sortedUsers[$key] = $user;
+	}
+
+	// Sort the array by key so the most recent is at the top
+	ksort($sortedUsers);
+
+	// Format the output
+	$content = theme('followers', $sortedUsers, null);
 	$content .= theme('list_pagination', $p);
 	theme('page', "{$user}/{$list} 的成员", $content);
 }
