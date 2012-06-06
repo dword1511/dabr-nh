@@ -1069,7 +1069,7 @@ function theme_user_header($user) {
 		$out .= " | <a href='favourites/{$user->screen_name}'>" . $user->favourites_count . " 条收藏</a>";
 	}
 
-	$out .= " | <a href='lists/{$user->screen_name}'>" . "在 " . $user->listed_count . " 个列表中</a>";
+	$out .= " | <a href='lists/{$user->screen_name}/memberships'>" . "在 " . $user->listed_count . " 个列表中</a>";
 	$out .=	" | <a href='directs/create/{$user->screen_name}'>发私信</a>";
 
 	if (strtolower($user->screen_name) !== strtolower(user_current_username())) {
