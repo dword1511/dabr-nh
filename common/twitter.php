@@ -388,7 +388,7 @@ function twitter_process($url, $post_data = false) {
 			$result = $result->error ? $result->error : $response;
 			if (strlen($result) > 500) $result = "Twitter 抽风了，甭见怪。也许你现在有机会去围观鲸鱼图。过会再试试吧。<pre>┈┈╭━━━━━━╮┏╮╭┓┈┈\n┈┈┃╰╯┈┈┈┈┃╰╮╭╯┈┈\n┈┈┣━╯┈┈┈┈╰━╯┃┈┈┈\n┈┈╰━━━━━━━━━╯┈┈┈\n╭┳╭┳╭┳╭┳╭┳╭┳╭┳╭┳\n╯╰╯╰╯╰╯╰╯╰╯╰╯╰╯╰</pre>";
 			else if ($result == "Status is over 140 characters.") {
-			  theme('error', "<h2>您太啰嗦了，在 140 字里面把话说清楚吧……</h2><p>{$rate_limit}</p><p>{$status}</p><hr>");
+			  theme('error', "<h2>您太啰嗦了，在 140 字里面把话说清楚吧……</h2><p>{$rate_limit}</p><p>原文：</p><p>{$status}</p><hr>");
 			  //theme('status_form',$status);
 			}
 			theme('error', "<h2>调用 Twitter API 时粗线了一个错误。</h2><p>{$response_info['http_code']}: {$result}</p><hr>");
@@ -646,26 +646,98 @@ function twitter_confirmed_page($query) {
 }
 
 function twitter_friends_page($query) {
+	// Which user's friends are we looking for?
 	$user = $query[1];
 	if (!$user) {
 		user_ensure_authenticated();
 		$user = user_current_username();
 	}
-	$request = API_URL."statuses/friends/{$user}.xml";
+
+	// How many users to show
+	$perPage = setting_fetch('perPage', 20);
+	// Poor man's pagination to fix broken Twitter API
+	// friends/edent/30
+	$nextPage = $query[2];
+	$nextPageURL = "friends/" . $user . "/";
+	if (!$nextPage) {
+	  $nextPage = 0;
+	  $nextPageURL .= $perPage;
+	}
+	else $nextPageURL .= ($nextPage + $perPage);
+	// Get all the user ID of the friends
+	$request_ids = API_URL."friends/ids.json?screen_name={$user}";
+	$json = twitter_process($request_ids);
+	$ids = $json->ids;
+	// Paginate through the user IDs and build a API query
+	$user_ids = "";
+	for ($i=$nextPage;$i<($nextPage+$perPage);$i++) $user_ids .= $ids[$i] . ",";
+	// Construct the request
+	$request = API_URL."users/lookup.xml?user_id=".$user_ids;
+	// Get the XML (no real pagination going on :-(
+
 	$tl = lists_paginated_process($request);
-	$content = theme('followers', $tl);
+
+	// Place the users into an array
+	$sortedUsers = array();
+	foreach ($tl as $user) {
+	  $user_id = $user->id;
+	  // $tl is *unsorted* - but $ids is *sorted*. So we place the users from $tl into a new array based on how they're sorted in $ids
+	  $key = array_search($user_id, $ids);
+	  $sortedUsers[$key] = $user;
+	}
+	// Sort the array by key so the most recent is at the top
+	ksort($sortedUsers);
+	// Format the output
+	$content = theme('followers', $sortedUsers, $nextPageURL);
+
 	theme('page', $user.' 关注的人', $content);
 }
 
 function twitter_followers_page($query) {
+	// Which user's friends are we looking for?
 	$user = $query[1];
 	if (!$user) {
-		user_ensure_authenticated();
-		$user = user_current_username();
+	  user_ensure_authenticated();
+	  $user = user_current_username();
 	}
-	$request = API_URL."statuses/followers/{$user}.xml";
+
+	// How many users to show
+	$perPage = setting_fetch('perPage', 20);
+	// Poor man's pagination to fix broken Twitter API
+	// friends/edent/30
+	$nextPage = $query[2];
+	$nextPageURL = "followers/" . $user . "/";
+	if (!$nextPage) {
+	  $nextPage = 0;
+	  $nextPageURL .= $perPage;
+	}
+	else $nextPageURL .= ($nextPage + $perPage);
+	// Get all the user ID of the friends
+	$request_ids = API_URL."followers/ids.json?screen_name={$user}";
+	$json = twitter_process($request_ids);
+	$ids = $json->ids;
+	// Paginate through the user IDs and build a API query
+	$user_ids = "";
+	for ($i=$nextPage;$i<($nextPage+$perPage);$i++) $user_ids .= $ids[$i] . ",";
+	// Construct the request
+	$request = API_URL."users/lookup.xml?user_id=".$user_ids;
+	// Get the XML (no real pagination going on :-(
+
 	$tl = lists_paginated_process($request);
-	$content = theme('followers', $tl);
+
+	// Place the users into an array
+	$sortedUsers = array();
+	foreach ($tl as $user) {
+		$user_id = $user->id;
+		// $tl is *unsorted* - but $ids is *sorted*. So we place the users from $tl into a new array based on how they're sorted in $ids
+		$key = array_search($user_id, $ids);
+		$sortedUsers[$key] = $user;
+	}
+	// Sort the array by key so the most recent is at the top
+	ksort($sortedUsers);
+	// Format the output
+	$content = theme('followers', $sortedUsers, $nextPageURL);
+
 	theme('page', '关注 '.$user.' 的人', $content);
 }
 
@@ -1206,10 +1278,10 @@ function twitter_is_reply($status) {
 	return false;
 }
 
-function theme_followers($feed, $hide_pagination = false) {
+function theme_followers($feed, $nextPageURL) {
 	$rows = array();
-	if (count($feed) == 0 || $feed == '[]') return '<p>兄弟，你混得贼惨了吧。</p>';
-	foreach ($feed->users->user as $user) {
+	if(count($feed) == 0 || $feed == '[]') return '<p>兄弟，你混得贼惨了吧。</p>';
+	foreach ($feed as $user) {
 		$name = theme('full_name', $user);
 		$tweets_per_day = twitter_tweets_per_day($user);
 		$last_tweet = strtotime($user->status->created_at);
@@ -1224,7 +1296,7 @@ function theme_followers($feed, $hide_pagination = false) {
 		$rows[] = array('data' => array(array('data' => theme('avatar', theme_get_avatar($user)), 'class' => 'avatar'),array('data' => $content, 'class' => 'status shift')),'class' => 'tweet');
 	}
 	$content = theme('table', array(), $rows, array('class' => 'followers'));
-	if (!$hide_pagination) $content .= theme('list_pagination', $feed);
+	if($nextPageURL) $content .= "<a href='{$nextPageURL}'>下一页</a>";
 	return $content;
 }
 
