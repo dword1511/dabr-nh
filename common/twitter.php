@@ -409,9 +409,9 @@ function twitter_process($url, $post_data = false) {
 	curl_close($ch);
 	global $api_time;
 	global $rate_limit;
-/*
+
 	// Split that headers and the body
-	list($headers, $body) = explode("\n\n", $response, 2);
+	list($headers, $body) = explode("\r\n\r\n", $response, 2);
 
 	// Place the headers into an array
 	$headers = explode("\n", $headers);
@@ -430,11 +430,11 @@ function twitter_process($url, $post_data = false) {
 		$currentdate = strtotime("now");
 		$rate_limit = "剩余体力：" . $headers_array['X-RateLimit-Remaining'] . " / " . $headers_array['X-RateLimit-Limit'] . " ；冷却时间：$minutes_until_reset 分钟。";
 	}
-
+/*
 	// The body of the request is at the end of the headers
 	$body = end($headers);
 */
-	$body = $response;
+//	$body = $response;
 
 	$api_time += microtime(1) - $api_start;
 	switch( intval( $response_info['http_code'] ) ) {
