@@ -884,7 +884,7 @@ function twitter_retweeters_page($query) {
 	ksort($sortedUsers);
 
 	// Format the output
-	$content = theme('retweeters', $sortedUsers, $nextPageURL);
+	$content = theme('followers', $sortedUsers, $nextPageURL);
 	theme('page', "目力所及范围内转发了 {$id} 的家伙", $content);
 }
 
@@ -1419,7 +1419,7 @@ function twitter_is_reply($status) {
 
 function theme_followers($feed, $nextPageURL) {
 	$rows = array();
-	if(count($feed) == 0 || $feed == '[]') return '<p>兄弟，你混得贼惨了吧。</p>';
+	if(count($feed) == 0 || $feed == '[]') return '<p>这里没有任何消息。</p>';
 	foreach ($feed as $user) {
 		$name = theme('full_name', $user);
 		$tweets_per_day = twitter_tweets_per_day($user);
