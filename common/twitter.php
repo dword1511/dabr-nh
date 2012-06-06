@@ -182,6 +182,43 @@ function twitter_profile_page() {
 		$content = "<h2>个人资料已更新。新的资料会在一分钟内生效。</h2>";
 	}
 
+	// http://api.twitter.com/1/account/update_profile_image.format
+	if ($_FILES['image']['tmp_name']){
+		require 'tmhOAuth.php';
+
+		list($oauth_token, $oauth_token_secret) = explode('|', $GLOBALS['user']['password']);
+
+		$tmhOAuth = new tmhOAuth(array(
+			'consumer_key'    => OAUTH_CONSUMER_KEY,
+			'consumer_secret' => OAUTH_CONSUMER_SECRET,
+			'user_token'      => $oauth_token,
+			'user_secret'     => $oauth_token_secret,
+		));
+
+		// note the type and filename are set here as well
+		$params = array(
+			'image' => "@{$_FILES['image']['tmp_name']};type={$_FILES['image']['type']};filename={$_FILES['image']['name']}",
+		);
+
+		$code = $tmhOAuth->request('POST',
+			$tmhOAuth->url("1/account/update_profile_image"),
+			$params,
+			true, // use auth
+			true // multipart
+		);
+
+		if ($code == 200)  $content = "<h2>换头成功。</h2>";
+		else {
+			$content = "Damn! Something went wrong. Sorry :-("."<br/> code=".$code."<br/> status=".$status."<br/> image=".$image
+		//."<br /> response=<pre>"
+		//. print_r($tmhOAuth->response['response'], TRUE)
+		. "</pre><br /> info=<pre>"
+		. print_r($tmhOAuth->response['info'], TRUE)
+		. "</pre><br /> code=<pre>"
+		. print_r($tmhOAuth->response['code'], TRUE) . "</pre>";
+		}
+	}
+
 	$user = twitter_user_info(user_current_username());
 	$content .= theme('user_header', $user);
 	$content .= theme('profile_form', $user);
@@ -189,8 +226,9 @@ function twitter_profile_page() {
 }
 
 function theme_profile_form($user) {
-	$out .= "<form name='profile' action='editbio' method='post'>
+	$out .= "<form name='profile' action='editbio' method='post' enctype='multipart/form-data'>
 <hr/>名字：<input name='name' size=40 maxlength='20' value='". htmlspecialchars($user->name, ENT_QUOTES)."'/>
+<br/>头像：<img src='".theme_get_avatar($user)."' /> <input type='file' name='image' />
 <br/>简介：<input name='description' size=40 maxlength='160' value='". htmlspecialchars($user->description, ENT_QUOTES)."'/>
 <br/>链接：<input name='url' maxlength='100' size=40 value='". htmlspecialchars($user->url, ENT_QUOTES)."'/>
 <br/>地址：<input name='location' maxlength='30' size=40 value='". htmlspecialchars($user->location, ENT_QUOTES)."'/>
