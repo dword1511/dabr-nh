@@ -177,7 +177,7 @@ function twitter_profile_page() {
 			"location"	=> stripslashes($_POST['location']),
 			"description"	=> stripslashes($_POST['description']),
 		);
-		$url = "https://twitter.com/account/update_profile.json";
+		$url = API_URL."account/update_profile.json";
 		$user = twitter_process($url, $post_data);
 		$content = "<h2>个人资料已更新。新的资料会在一分钟内生效。</h2>";
 	}
@@ -340,8 +340,9 @@ function twitter_media_page($query) {
 
 function twitter_process($url, $post_data = false) {
 	if ($post_data === true) $post_data = array();
+	$status = $post_data['status'];
 	if (user_type() == 'oauth' && ( strpos($url, '/twitter.com') !== false || strpos($url, 'api.twitter.com') !== false || strpos($url, 'upload.twitter.com') !== false)) user_oauth_sign($url, $post_data);
-	elseif (strpos($url, 'api.twitter.com') !== false && is_array($post_data)) {
+	else if (strpos($url, 'api.twitter.com') !== false && is_array($post_data)) {
 		$s = array();
 		foreach ($post_data as $name => $value)
 		$s[] = $name.'='.urlencode($value);
@@ -386,6 +387,10 @@ function twitter_process($url, $post_data = false) {
 			$result = json_decode($response);
 			$result = $result->error ? $result->error : $response;
 			if (strlen($result) > 500) $result = "Twitter 抽风了，甭见怪。也许你现在有机会去围观鲸鱼图。过会再试试吧。<pre>┈┈╭━━━━━━╮┏╮╭┓┈┈\n┈┈┃╰╯┈┈┈┈┃╰╮╭╯┈┈\n┈┈┣━╯┈┈┈┈╰━╯┃┈┈┈\n┈┈╰━━━━━━━━━╯┈┈┈\n╭┳╭┳╭┳╭┳╭┳╭┳╭┳╭┳\n╯╰╯╰╯╰╯╰╯╰╯╰╯╰╯╰</pre>";
+			else if ($result == "Status is over 140 characters.") {
+			  theme('error', "<h2>您太啰嗦了，在 140 字里面把话说清楚吧……</h2><p>{$rate_limit}</p><p>{$status}</p><hr>");
+			  //theme('status_form',$status);
+			}
 			theme('error', "<h2>调用 Twitter API 时粗线了一个错误。</h2><p>{$response_info['http_code']}: {$result}</p><hr>");
 	}
 }
