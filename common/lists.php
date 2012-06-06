@@ -151,25 +151,29 @@ function lists_list_members_page($user, $list) {
 	$p = twitter_lists_list_members($user, $list);
 
 	// TODO: use a different theme() function? Add a "delete member" link for each member
-	//$content = theme('followers', $p, 1);
-
-	// Place the users into an array
-	$sortedUsers = array();
-
-	foreach($p as $user) {
-	  $user_id = $user->id;
-	  // $tl is *unsorted* - but $ids is *sorted*. So we place the users from $tl into a new array based on how they're sorted in $ids
-	  $key = array_search($user_id, $ids);
-	  $sortedUsers[$key] = $user;
-	}
-
-	// Sort the array by key so the most recent is at the top
-	ksort($sortedUsers);
-
-	// Format the output
-	$content = theme('followers', $sortedUsers, null);
+	$content = theme('listmembers', $p);
 	$content .= theme('list_pagination', $p);
 	theme('page', "{$user}/{$list} 的成员", $content);
+}
+
+function theme_listmembers($feed) {
+	$rows = array();
+	if (count($feed) == 0 || $feed == '[]') return '<p>这个列表目前还是空的。</p>';
+	foreach ($feed->users->user as $user) {
+		$name = theme('full_name', $user);
+		$tweets_per_day = twitter_tweets_per_day($user);
+		$last_tweet = strtotime($user->status->created_at);
+		$content = "{$name}<br/><span class='about'>";
+		if($user->description != "") $content .= "简介：" . twitter_parse_tags($user->description) . "<br/>";
+		if($user->location != "") $content .= "地址：{$user->location}<br/>";
+		$content .= "统计：".$user->statuses_count." 条消息，".$user->friends_count." 个偶像，".$user->followers_count." 个粉丝，每天约 ".$tweets_per_day." 条消息<br/>";
+		if($user->protected == 'true' && $last_tweet == 0) $content .= "保密的消息";
+		else if($last_tweet == 0) $content .= "该用户从未发过推";
+		else $content .= "上一条消息于 ".twitter_date('Y 年 m 月 d 日 H:i:s', $last_tweet)." 发出";
+		$content .= "</span>";
+		$rows[] = array('data' => array(array('data' => theme('avatar', theme_get_avatar($user)), 'class' => 'avatar'),array('data' => $content, 'class' => 'status shift')),'class' => 'tweet');
+	}
+	return theme('table', array(), $rows, array('class' => 'followers'));
 }
 
 function lists_list_subscribers_page($user, $list) {
