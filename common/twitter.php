@@ -207,7 +207,7 @@ function twitter_profile_page() {
 			true // multipart
 		);
 
-		if ($code == 200)  $content = "<h2>换头成功。</h2>";
+		if ($code == 200)  $content .= "<h2>换头成功。</h2>";
 		else {
 			$content = "Damn! Something went wrong. Sorry :-("."<br/> code=".$code."<br/> status=".$status."<br/> image=".$image
 		//."<br /> response=<pre>"
@@ -399,9 +399,9 @@ function twitter_process($url, $post_data = false) {
 	curl_setopt($ch, CURLOPT_HTTPHEADER, array('Expect:'));
 	curl_setopt($ch, CURLOPT_TIMEOUT, 10);
 	curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
-	curl_setopt($ch, CURLOPT_HEADER, FALSE);
+	curl_setopt($ch, CURLOPT_HEADER, TRUE);
 	curl_setopt($ch, CURLINFO_HEADER_OUT, TRUE);
-	curl_setopt($ch, CURLOPT_VERBOSE, true);
+	curl_setopt($ch, CURLOPT_VERBOSE, TRUE);
 	$response = curl_exec($ch);
 	$response_info=curl_getinfo($ch);
 	$erno = curl_errno($ch);
@@ -409,14 +409,38 @@ function twitter_process($url, $post_data = false) {
 	curl_close($ch);
 	global $api_time;
 	global $rate_limit;
-	$rate_limit = $response_info['X-RateLimit-Limit'];
+
+	// Split that headers and the body
+	list($headers, $body) = explode("\n\n", $response, 2);
+
+	// Place the headers into an array
+	$headers = explode("\n", $headers);
+	$headers_array;
+	foreach($headers as $header) {
+		list($key, $value) = explode(':', $header, 2);
+		$headers_array[$key] = $value;
+	}
+
+	// Not ever request is rate limited
+	if ($headers_array['X-RateLimit-Limit']) {
+		$current_time = time();
+		$ratelimit_time = $headers_array['X-RateLimit-Reset'];
+		$time_until_reset = $ratelimit_time - $current_time;
+		$minutes_until_reset = round($time_until_reset / 60);
+		$currentdate = strtotime("now");
+		$rate_limit = "Rate Limit: " . $headers_array['X-RateLimit-Remaining'] . " / " . $headers_array['X-RateLimit-Limit'] . " for the next $minutes_until_reset minutes";
+	}
+
+	//	The body of the request is at the end of the headers
+	$body = end($headers);
+
 	$api_time += microtime(1) - $api_start;
 	switch( intval( $response_info['http_code'] ) ) {
 		case 200:
 		case 201:
-			$json = json_decode($response);
+			$json = json_decode($body);
 			if ($json) return $json;
-			return $response;
+			return $body;
 		case 401:
 			user_logout();
 			theme('error', "<p>错误：您的登录信息有问题。也许您被管理员耍了。</p><p>{$response_info['http_code']}: {$result}</p><hr><p>$url</p>");
@@ -424,11 +448,11 @@ function twitter_process($url, $post_data = false) {
 			$result = $erno . ":" . $er . "<br/>";
 			theme('error', '<h2>Twitter 它它它……超时了！</h2><p>Dabr 决定不再等待 Twitter 的回应了。管理员会找 ISP 扯皮的。过会再试试吧。<br />'. $result . ' </p>');
 		default:
-			$result = json_decode($response);
-			$result = $result->error ? $result->error : $response;
+			$result = json_decode($body);
+			$result = $result->error ? $result->error : $body;
 			if (strlen($result) > 500) $result = "Twitter 抽风了，甭见怪。也许你现在有机会去围观鲸鱼图。过会再试试吧。<pre>┈┈╭━━━━━━╮┏╮╭┓┈┈\n┈┈┃╰╯┈┈┈┈┃╰╮╭╯┈┈\n┈┈┣━╯┈┈┈┈╰━╯┃┈┈┈\n┈┈╰━━━━━━━━━╯┈┈┈\n╭┳╭┳╭┳╭┳╭┳╭┳╭┳╭┳\n╯╰╯╰╯╰╯╰╯╰╯╰╯╰╯╰</pre>";
 			else if ($result == "Status is over 140 characters.") {
-			  theme('error', "<h2>您太啰嗦了，在 140 字里面把话说清楚吧……</h2><p>{$rate_limit}</p><p>原文：</p><p>{$status}</p><hr>");
+			  theme('error', "<h2>您太啰嗦了，在 140 字里面把话说清楚吧……</h2><p>原文：<br/>{$status}</p><hr>");
 			  //theme('status_form',$status);
 			}
 			theme('error', "<h2>调用 Twitter API 时粗线了一个错误。</h2><p>{$response_info['http_code']}: {$result}</p><hr>");

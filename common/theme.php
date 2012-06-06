@@ -116,7 +116,7 @@ function theme_page($title, $content) {
 	if (DEBUG_MODE == 'ON') {
 		global $dabr_start, $api_time, $services_time, $rate_limit;
 		$time = microtime(1) - $dabr_start;
-		$body .= '<p>总计磨蹭了 '.round($time, 4).' 秒。（ Dabr ：'.round(($time - $api_time - $services_time) / $time * 100).'% ，Twitter ：'.round($api_time / $time * 100).'% ，其他服务：'.round($services_time / $time * 100).'% ）</p>';
+		$body .= '<p>总计磨蹭了 '.round($time, 4).' 秒。（ Dabr ：'.round(($time - $api_time - $services_time) / $time * 100).'% ，Twitter ：'.round($api_time / $time * 100).'% ，其他服务：'.round($services_time / $time * 100).'% ）<br/>'.$rate_limit.'</p>';
 	}
 	if ($title == 'Login') {
 		$title = 'Dabr - 登录到 Twitter';
@@ -131,7 +131,7 @@ function theme_page($title, $content) {
 <meta name="viewport" content="width=device-width; initial-scale=1.0;" />
 '.$meta.theme('css').'
 </head><body id="thepage"><a name="top">';
-	echo "<div id=\"advert\">" . show_advert() . "</div></a>"; //theme('advert');
+	echo "<div id=\"advert\">" . show_advert() . "</div></a>";
 	echo $body;
 	// If the cookies haven't been set, remind the user that they can set how Dabr looks
 	if (setting_fetch('colours') == null) echo '<p>觉得 Dabr 很难看？（其实就是嘛！） <a href="settings">更改配色方案吧！</a>（有毛线用。。。）</p>';
