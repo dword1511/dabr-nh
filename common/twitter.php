@@ -428,7 +428,7 @@ function twitter_process($url, $post_data = false) {
 		$time_until_reset = $ratelimit_time - $current_time;
 		$minutes_until_reset = round($time_until_reset / 60);
 		$currentdate = strtotime("now");
-		$rate_limit = "Rate Limit: " . $headers_array['X-RateLimit-Remaining'] . " / " . $headers_array['X-RateLimit-Limit'] . " for the next $minutes_until_reset minutes";
+		$rate_limit = "剩余体力：" . $headers_array['X-RateLimit-Remaining'] . " / " . $headers_array['X-RateLimit-Limit'] . " ；冷却时间：$minutes_until_reset 分钟。";
 	}
 
 	//	The body of the request is at the end of the headers
@@ -884,7 +884,7 @@ function twitter_retweeters_page($query) {
 	ksort($sortedUsers);
 
 	// Format the output
-	$content = theme('followers', $sortedUsers, $nextPageURL);
+	$content = theme('retweeters', $sortedUsers, $nextPageURL);
 	theme('page', "目力所及范围内转发了 {$id} 的家伙", $content);
 }
 
