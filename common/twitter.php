@@ -369,10 +369,10 @@ function twitter_media_page($query) {
 		if (!$_FILES['image']['tmp_name']) $content .= "<p>请选择一幅图片来上传。</p>";
 	}	
 	$content .= "<form method='post' action='picture' enctype='multipart/form-data' name='upload_pict'>图片：<input type='file' name='image'/><br/>消息（可选）：<br/><textarea name='message' style='width:90%; max-width: 400px;' rows='3' id='message'>".$status."</textarea><br><input type='submit' value='发送'>";
-	if(setting_fetch('browser') != 'mobile') $content .= "<span id='remaining'>120</span>";
+	if(setting_fetch('browser') != 'mobile') $content .= "<span id='remaining'>119</span>";
 	if(setting_fetch('browser') == 'desktop') $content .= "<script type='text/javascript'>document.onkeydown = function (){if(event.ctrlKey && window.event.keyCode == 13) document.upload_pict.submit();}</script>".geoloc($_COOKIE['geo']);
 	$content .= '</form>';
-	if(setting_fetch('browser') != 'mobile') $content .= js_counter("message", "120");
+	if(setting_fetch('browser') != 'mobile') $content .= js_counter("message", "119");
 	return theme('page', '上传图片', $content);
 }
 
@@ -399,7 +399,7 @@ function twitter_process($url, $post_data = false) {
 	curl_setopt($ch, CURLOPT_HTTPHEADER, array('Expect:'));
 	curl_setopt($ch, CURLOPT_TIMEOUT, 10);
 	curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
-	curl_setopt($ch, CURLOPT_HEADER, TRUE);
+	curl_setopt($ch, CURLOPT_HEADER, FALSE);
 	curl_setopt($ch, CURLINFO_HEADER_OUT, TRUE);
 	curl_setopt($ch, CURLOPT_VERBOSE, TRUE);
 	$response = curl_exec($ch);
@@ -409,7 +409,7 @@ function twitter_process($url, $post_data = false) {
 	curl_close($ch);
 	global $api_time;
 	global $rate_limit;
-
+/*
 	// Split that headers and the body
 	list($headers, $body) = explode("\n\n", $response, 2);
 
@@ -431,8 +431,10 @@ function twitter_process($url, $post_data = false) {
 		$rate_limit = "剩余体力：" . $headers_array['X-RateLimit-Remaining'] . " / " . $headers_array['X-RateLimit-Limit'] . " ；冷却时间：$minutes_until_reset 分钟。";
 	}
 
-	//	The body of the request is at the end of the headers
+	// The body of the request is at the end of the headers
 	$body = end($headers);
+*/
+	$body = $response;
 
 	$api_time += microtime(1) - $api_start;
 	switch( intval( $response_info['http_code'] ) ) {
@@ -474,14 +476,24 @@ function twitter_fetch($url) {
 	return $response;
 }
 
+//      http://dev.twitter.com/pages/tweet_entities
 function twitter_get_media($status) {
-	if($status->entities->media && setting_fetch('hide_inline') != 'yes') {
-		$image = $status->entities->media[0]->media_url_https;
-		$media_html = "<a href=\"" . BASE_URL . "simpleproxy.php?url=" . $image . ":large" . "\" target='" . get_target() . "'>";
-		$media_html .= "<img src=\"" . BASE_URL . "simpleproxy.php?url=" . $image . ":thumb\"/>";
-		$media_html .= "</a><br />";
-		return $media_html;
-	}
+        if($status->entities->media) {
+                $media_html = '';
+                foreach($status->entities->media as $media) {
+                        $image = $media->media_url_https;
+                        $link = $media->url;
+
+                        $width = $media->sizes->thumb->w;
+                        $height = $media->sizes->thumb->h;
+
+			$media_html = "<a href=\"" . BASE_URL . "simpleproxy.php?url=" . $image . ":large" . "\" target='" . get_target() . "'>";
+			$media_html .= "<img src=\"" . BASE_URL . "simpleproxy.php?url=" . $image . ":thumb\"/>";
+                        $media_html .= "</a>";
+                }
+        
+                return $media_html . "<br/>";
+        }       
 }
 
 function twitter_parse_tags($input, $entities = false) {
@@ -1294,6 +1306,10 @@ function twitter_standard_timeline($feed, $source) {
 					),
 					'created_at' => $status->created_at,
 					'geo' => $status->geo,
+					'entities' => $status->entities,
+                                        'in_reply_to_status_id' => $status->in_reply_to_status_id,
+                                        'in_reply_to_status_id_str' => $status->in_reply_to_status_id_str,
+                                        'in_reply_to_screen_name' => $status->to_user,
 				);
 			}
 			return $output;

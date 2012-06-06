@@ -27,7 +27,7 @@ function link_site($url, $title) {
 }
 
 function theme_about() {
-	$content = '<div id="about" style="margin:0.5em; padding:0.1em 1em;"><h3>嘛是 Dabr?</h3>
+	$content = '<div id="about"><h3>嘛是 Dabr?</h3>
 <ul><li>使用 Twitter API 的基于 Web 的客户端。</li><li>一个';
 	$content .= link_site('http://code.google.com/p/dabr/','开源的');
 	$content .= '项目，原始版本是';
