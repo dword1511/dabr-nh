@@ -399,7 +399,7 @@ function twitter_process($url, $post_data = false) {
 	curl_setopt($ch, CURLOPT_HTTPHEADER, array('Expect:'));
 	curl_setopt($ch, CURLOPT_TIMEOUT, 10);
 	curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
-	curl_setopt($ch, CURLOPT_HEADER, FALSE);
+	curl_setopt($ch, CURLOPT_HEADER, TRUE);
 	curl_setopt($ch, CURLINFO_HEADER_OUT, TRUE);
 	curl_setopt($ch, CURLOPT_VERBOSE, TRUE);
 	$response = curl_exec($ch);
