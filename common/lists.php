@@ -179,7 +179,7 @@ function theme_listmembers($feed) {
 function lists_list_subscribers_page($user, $list) {
 	// Show subscribers of a list
 	$p = twitter_lists_list_subscribers($user, $list);
-	$content = theme('followers', $p, 1);
+	$content = theme('listmembers', $p);
 	$content .= theme('list_pagination', $p);
 	theme('page', "{$user}/{$list} 的订阅者", $content);
 }

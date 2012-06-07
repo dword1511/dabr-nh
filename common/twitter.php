@@ -853,7 +853,7 @@ function twitter_retweeters_page($query) {
 	// Get all the user ID of the friends	
 	$request_ids = API_URL."statuses/{$id}/retweeted_by/ids.json?count=100";
 	$json = twitter_process($request_ids);
-	$ids = $json;	
+	$ids = $json;
 
 	// Poor man's pagination to fix broken Twitter API
 	// retweeted_by/1234567980/20
@@ -1216,12 +1216,12 @@ function theme_user_header($user) {
 	}
 
 	$out .= " | <a href='lists/{$user->screen_name}/memberships'>" . "在 " . $user->listed_count . " 个列表中</a>";
-	$out .=	" | <a href='directs/create/{$user->screen_name}'>发私信</a>";
 
 	if (strtolower($user->screen_name) !== strtolower(user_current_username())) {
+		$out .= " | <a href='directs/create/{$user->screen_name}'>发私信</a>";
 		if ($followed_by == false) $out .= " | <a href='follow/{$user->screen_name}'>关注</a>";
 		else $out .= " | <a href='unfollow/{$user->screen_name}'>取消关注</a>";
-		$out.= " | <a href='confirm/block/{$user->screen_name}/{$user->id}'>屏蔽/取消屏蔽</a>";
+		$out .= " | <a href='confirm/block/{$user->screen_name}/{$user->id}'>屏蔽/取消屏蔽</a>";
 		$out .= " | <a href='confirm/spam/{$user->screen_name}/{$user->id}'>报告为垃圾信息</a>";
 	}
 	$out .= " | <a href='search?query=%40{$user->screen_name}'>搜索 @{$user->screen_name}</a>";
