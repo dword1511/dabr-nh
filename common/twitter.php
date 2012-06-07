@@ -1145,7 +1145,7 @@ function twitter_hashtag_page($query) {
 function theme_status_form($text = '', $in_reply_to_id = NULL) {
 	if (user_is_authenticated()) {
 		if ($_GET['status']) $text = $_GET['status'];
-		return "<fieldset><legend><img src='".BASE_URL."images/bird_16_blue.png' width='16' height='16'/>发生了神马？</legend><form method='post' action='update'><input name='status' value='{$text}' maxlength='140' /><input name='in_reply_to_id' value='{$in_reply_to_id}' type='hidden'/><input type='submit' value='推！'/></form><a href='picture'>发图片</a></fieldset>";
+		return "<fieldset><legend><img src='".BASE_URL."images/twitter-bird-16x16.png' width='16' height='16'/>发生了神马？</legend><form method='post' action='update'><input name='status' value='{$text}' maxlength='140' /><input name='in_reply_to_id' value='{$in_reply_to_id}' type='hidden'/><input type='submit' value='推！'/></form><a href='picture'>发图片</a></fieldset>";
 	}
 }
 
