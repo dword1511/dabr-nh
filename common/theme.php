@@ -117,11 +117,10 @@ function theme_page($title, $content) {
 	}
 	ob_start('ob_gzhandler');
 	header('Content-Type: text/html; charset=utf-8');
-	echo '<html><head><title>Dabr - ',$title,'</title>
-<base href="',BASE_URL,'" />
+	echo '<!DOCTYPE html PUBLIC "-//WAPFORUM//DTD XHTML Mobile 1.0//EN" "http://www.wapforum.org/DTD/xhtml-mobile10.dtd">
+<html><head><title>Dabr - ',$title,'</title><base href="',BASE_URL,'" />
 <meta name="viewport" content="width=device-width; initial-scale=1.0;" />
-'.$meta.theme('css').'
-</head><body id="thepage"><a name="top">';
+'.$meta.theme('css').'</head><body id="thepage"><a name="top">';
 	echo $body;
 	echo '<p><a href="'.$_SERVER['REQUEST_URI'].'#top">回页首</a>';
 	global $GA_ACCOUNT;
