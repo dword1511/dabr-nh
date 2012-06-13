@@ -47,15 +47,14 @@ function desktop_theme_page($title, $content) {
 	}
 	ob_start('ob_gzhandler');
 	header('Content-Type: text/html; charset=utf-8');
-	echo '<!DOCTYPE html PUBLIC "-//WAPFORUM//DTD XHTML Mobile 1.0//EN" "http://www.wapforum.org/DTD/xhtml-mobile10.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml"><head>
+	echo '<html"><head>
 <title>Dabr - ',$title,'</title><base href="',BASE_URL,'" />'.$meta.theme('css').'</head><body id="thepage"><a name="top">';
 	echo $body;
 	// If the cookies haven't been set, remind the user that they can set how Dabr looks
 	if (setting_fetch('colours') == null) echo '<p>觉得 Dabr 很难看？（其实就是嘛！） <a href="settings">更改配色方案吧！</a>（有毛线用。。。）</p>';
 	global $GA_ACCOUNT;
 	if ($GA_ACCOUNT) echo '<img src="' . googleAnalyticsGetImageUrl() . '"/>';
-	echo '</p></body></html>';
+	echo '</body></html>';
 	exit();
 }
 
