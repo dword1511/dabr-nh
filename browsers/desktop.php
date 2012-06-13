@@ -47,7 +47,7 @@ function desktop_theme_page($title, $content) {
 	}
 	ob_start('ob_gzhandler');
 	header('Content-Type: text/html; charset=utf-8');
-	echo '<html"><head>
+	echo '<html><head>
 <title>Dabr - ',$title,'</title><base href="',BASE_URL,'" />'.$meta.theme('css').'</head><body id="thepage"><a name="top">';
 	echo $body;
 	// If the cookies haven't been set, remind the user that they can set how Dabr looks
