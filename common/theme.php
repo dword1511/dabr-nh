@@ -117,8 +117,7 @@ function theme_page($title, $content) {
 	}
 	ob_start('ob_gzhandler');
 	header('Content-Type: text/html; charset=utf-8');
-	echo '<html xmlns="http://www.w3.org/1999/xhtml"><head>
-<title>Dabr - ',$title,'</title>
+	echo '<html><head><title>Dabr - ',$title,'</title>
 <base href="',BASE_URL,'" />
 <meta name="viewport" content="width=device-width; initial-scale=1.0;" />
 '.$meta.theme('css').'
