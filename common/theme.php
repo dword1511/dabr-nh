@@ -1,5 +1,4 @@
 <?php
-require_once ("common/advert.php");
 
 $current_theme = false;
 
@@ -125,7 +124,6 @@ function theme_page($title, $content) {
 <meta name="viewport" content="width=device-width; initial-scale=1.0;" />
 '.$meta.theme('css').'
 </head><body id="thepage"><a name="top">';
-	echo "<div id=\"advert\">" . show_advert() . "</div></a>";
 	echo $body;
 	echo '<p><a href="'.$_SERVER['REQUEST_URI'].'#top">回页首</a>';
 	global $GA_ACCOUNT;
