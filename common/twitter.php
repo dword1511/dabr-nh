@@ -1516,8 +1516,12 @@ function theme_action_icons($status) {
 	if (!$status->is_direct) {
 		if ($status->favorited == '1') $actions[] = theme('action_icon', "unfavourite/{$status->id}", BASE_URL.'images/star.png','UNFAV');
 		else $actions[] = theme('action_icon', "favourite/{$status->id}", BASE_URL.'images/star_grey.png','FAV');
-		if ($retweeted_by) $actions[] = theme('action_icon', "retweet/{$status->id}", BASE_URL.'images/retweeted.png','RT');
-		else $actions[] = theme('action_icon', "retweet/{$status->id}", BASE_URL.'images/retweet.png','RT');
+		
+		if (!user_is_current_user($from)) {
+			if ($retweeted_by) $actions[] = theme('action_icon', "retweet/{$status->id}", BASE_URL.'images/retweeted.png','RT');
+			else $actions[] = theme('action_icon', "retweet/{$status->id}", BASE_URL.'images/retweet.png','RT');
+		}
+		
 		if (user_is_current_user($from)) $actions[] = theme('action_icon', "confirm/delete/{$status->id}", BASE_URL.'images/trash.png','DEL');
 		if ($retweeted_by && user_is_current_user($retweeted_by)) $actions[] = theme('action_icon',"confirm/delete/{$retweeted_id}", BASE_URL.'images/trash.png', 'DEL');
 	}
@@ -1528,7 +1532,7 @@ function theme_action_icons($status) {
 		$long = $latlong[1];
 		$actions[] = theme('action_icon', "http://maps.google.com.hk/m?q={$lat},{$long}", BASE_URL.'images/map.png','MAP');
 	}
-	if(setting_fetch('browser') == 'desktop') {
+	if(setting_fetch('browser') == 'desktop') { // Actions that are usually not used.
 		if (!user_is_current_user($from)) $actions[] = theme('action_icon', "directs/create/{$from}", BASE_URL.'images/dm.png','DM');
 		$actions[] = theme('action_icon',"search?query=%40{$from}",BASE_URL.'images/q.png','?');
 		$actions[] = theme('action_icon',"http://twitter.com/{$from}/statuses/{$status->id}",BASE_URL.'images/lnk.png','LINK');

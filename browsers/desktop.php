@@ -32,4 +32,31 @@ function desktop_theme_css() {
 	return $out;
 }
 
+function desktop_theme_page($title, $content) {
+	$body = theme('menu_top');
+	$body .= $content;
+	$body .= theme('menu_bottom');
+	if (DEBUG_MODE == 'ON') {
+		global $dabr_start, $api_time, $services_time, $rate_limit;
+		$time = microtime(1) - $dabr_start;
+		$body .= '<p>总计磨蹭了 '.round($time, 4).' 秒。（ Dabr ：'.round(($time - $api_time - $services_time) / $time * 100).'% ，Twitter ：'.round($api_time / $time * 100).'% ，其他服务：'.round($services_time / $time * 100).'% ）<br/>'.$rate_limit.'</p>';
+	}
+	if ($title == 'Login') {
+		$title = 'Dabr - 登录到 Twitter';
+		$meta = '<meta name="description" content="免费而且不太河蟹的移动版 Twitter 替代品，为挪鸡鸭量身打造。" />';
+	}
+	ob_start('ob_gzhandler');
+	header('Content-Type: text/html; charset=utf-8');
+	echo '<!DOCTYPE html PUBLIC "-//WAPFORUM//DTD XHTML Mobile 1.0//EN" "http://www.wapforum.org/DTD/xhtml-mobile10.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"><head>
+<title>Dabr - ',$title,'</title><base href="',BASE_URL,'" />'.$meta.theme('css').'</head><body id="thepage"><a name="top">';
+	echo $body;
+	// If the cookies haven't been set, remind the user that they can set how Dabr looks
+	if (setting_fetch('colours') == null) echo '<p>觉得 Dabr 很难看？（其实就是嘛！） <a href="settings">更改配色方案吧！</a>（有毛线用。。。）</p>';
+	global $GA_ACCOUNT;
+	if ($GA_ACCOUNT) echo '<img src="' . googleAnalyticsGetImageUrl() . '"/>';
+	echo '</p></body></html>';
+	exit();
+}
+
 ?>

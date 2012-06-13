@@ -112,12 +112,6 @@ function theme_error($message) {
 function theme_page($title, $content) {
 	$body = theme('menu_top');
 	$body .= $content;
-	$body .= theme('menu_bottom');
-	if (DEBUG_MODE == 'ON') {
-		global $dabr_start, $api_time, $services_time, $rate_limit;
-		$time = microtime(1) - $dabr_start;
-		$body .= '<p>总计磨蹭了 '.round($time, 4).' 秒。（ Dabr ：'.round(($time - $api_time - $services_time) / $time * 100).'% ，Twitter ：'.round($api_time / $time * 100).'% ，其他服务：'.round($services_time / $time * 100).'% ）<br/>'.$rate_limit.'</p>';
-	}
 	if ($title == 'Login') {
 		$title = 'Dabr - 登录到 Twitter';
 		$meta = '<meta name="description" content="免费而且不太河蟹的移动版 Twitter 替代品，为挪鸡鸭量身打造。" />';
@@ -133,14 +127,11 @@ function theme_page($title, $content) {
 </head><body id="thepage"><a name="top">';
 	echo "<div id=\"advert\">" . show_advert() . "</div></a>";
 	echo $body;
-	// If the cookies haven't been set, remind the user that they can set how Dabr looks
-	if (setting_fetch('colours') == null) echo '<p>觉得 Dabr 很难看？（其实就是嘛！） <a href="settings">更改配色方案吧！</a>（有毛线用。。。）</p>';
 	echo '<p><a href="'.$_SERVER['REQUEST_URI'].'#top">回页首</a>';
 	global $GA_ACCOUNT;
 	if ($GA_ACCOUNT) echo '<img src="' . googleAnalyticsGetImageUrl() . '"/>';
 	echo '</p></body></html>';
 	exit();
-// <meta http-equiv="Content-Type" content="text/html; charset=utf-8" /> Already set in header, not needed.
 }
 
 function theme_colours() {
