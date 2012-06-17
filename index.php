@@ -26,7 +26,8 @@ menu_register(array (
 	'logout' => array (
 		'security' => true,
 		'callback' => 'logout_page',
-		'display' => '登出',
+		//'display' => '登出',
+		'hidden' => true,
 	),
 ));
 
