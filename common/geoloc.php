@@ -62,9 +62,9 @@ function geoError(error) {
 
 function geoSuccess(position) {
  if(typeof position.address !== "undefined")
-  geoStatus("'.$msga.'<a href=\'http://maps.google.com.hk/m?q=" + position.coords.latitude + "," + position.coords.longitude + "\' target=\''.get_target().'\' title=\'您的位置：" + position.address.country + position.address.region + "省" + position.address.city + "市，精确到" + position.coords.accuracy + "米\'>'.$msgb.'</a>'.$msgc.'");
+  geoStatus("'.$msga.'<a href=\'https://maps.google.com/maps?q=" + position.coords.latitude + "," + position.coords.longitude + "\' target=\''.get_target().'\' title=\'您的位置：" + position.address.country + position.address.region + "省" + position.address.city + "市，精确到" + position.coords.accuracy + "米\'>'.$msgb.'</a>'.$msgc.'");
  else
-  geoStatus("'.$msga.'<a href=\'http://maps.google.com.hk/m?q=" + position.coords.latitude + "," + position.coords.longitude + "\' target=\''.get_target().'\' title=\'您的位置精确到" + position.coords.accuracy + "米\'>'.$msgb.'</a>'.$msgc.'");
+  geoStatus("'.$msga.'<a href=\'https://maps.google.com/maps?q=" + position.coords.latitude + "," + position.coords.longitude + "\' target=\''.get_target().'\' title=\'您的位置精确到" + position.coords.accuracy + "米\'>'.$msgb.'</a>'.$msgc.'");
  chkbox.value = position.coords.latitude + "," + position.coords.longitude;
 }
 </script></form>';

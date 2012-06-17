@@ -1197,7 +1197,7 @@ function theme_user_header($user) {
 	if ($user->protected == true) $out .= '<strong>保密的消息</strong><br/>';
 	$out .= "简介：{$bio}<br/>";
 	$out .= "链接：{$link}<br/>";
-	$out .= "地址：<a href=\"http://maps.google.com.hk/m?q={$cleanLocation}\" target=\"" . get_target() . "\">{$user->location}</a><br/>";
+	$out .= "地址：<a href=\"https://maps.google.com/maps?q={$cleanLocation}\" target=\"" . get_target() . "\">{$user->location}</a><br/>";
 	$out .= "加入时间：{$date_joined} （每天约 ".$tweets_per_day." 条消息）<br/>";
 	if (user_is_current_user($user->screen_name)) $out .= "<strong><a href='editbio'>编辑个人资料 →</a></strong>";
 	$out .= "</span></span>";
@@ -1530,7 +1530,7 @@ function theme_action_icons($status) {
 		$latlong = $geo->coordinates;
 		$lat = $latlong[0];
 		$long = $latlong[1];
-		$actions[] = theme('action_icon', "http://maps.google.com.hk/m?q={$lat},{$long}", BASE_URL.'images/map.png','MAP');
+		$actions[] = theme('action_icon', "https://maps.google.com/maps?q={$lat},{$long}", BASE_URL.'images/map.png','MAP');
 	}
 	if(setting_fetch('browser') == 'desktop') { // Actions that are usually not used.
 		if (!user_is_current_user($from)) $actions[] = theme('action_icon', "directs/create/{$from}", BASE_URL.'images/dm.png','DM');
