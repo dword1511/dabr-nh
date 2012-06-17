@@ -1228,7 +1228,7 @@ function theme_user_header($user) {
 	if (user_is_current_user($user->screen_name)) {
 		$out .= " | <a href='retweets'>被转发的消息</a>";
 		$out .= " | <a href='settings'>个人设置</a>";
-		$out .= " | <a href='logout>登出</a>";
+		$out .= " | <a href='logout'>登出</a>";
 	}
 	$out .= "</div></div>";
 	return $out;
