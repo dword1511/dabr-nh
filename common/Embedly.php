@@ -27,7 +27,7 @@ function embedly_embed_thumbnails(&$feed) {
 		'#imgur\.com\/([\w]{5})[\s\.ls][\.\w]*#i' => 'http://imgur.com/%ss.png',
 		'#imgur\.com\/gallery\/([\w]+)#i'			=> 'http://imgur.com/%ss.png',
 		'#brizzly\.com\/pic\/([\w]+)#i'				=> 'http://pics.brizzly.com/thumb_sm_%s.jpg',
-		'#img\.ly\/([\w\d]+)#i'							=> 'http://img.ly/show/large/%s',
+		'#img\.ly\/([\w\d]+)#i'							=> 'http://img.ly/show/medium/%s',
 		'#picplz\.com\/([\d\w\.]+)#'					=> 'http://picplz.com/%s/thumb',
 		'#pk\.gd\/([\d\w]+)#i'							=> 'http://img.pikchur.com/pic_%s_s.jpg',
 		'#pikchur\.com\/([\d\w]+)#i'					=> 'http://img.pikchur.com/pic_%s_s.jpg',
