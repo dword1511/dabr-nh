@@ -67,7 +67,7 @@ function geoSuccess(position) {
   geoStatus("'.$msga.'<a href=\'https://maps.google.com/maps?q=" + position.coords.latitude + "," + position.coords.longitude + "\' target=\''.get_target().'\' title=\'您的位置精确到" + position.coords.accuracy + "米\'>'.$msgb.'</a>'.$msgc.'");
  chkbox.value = position.coords.latitude + "," + position.coords.longitude;
 }
-</script></form>';
+</script>';
 	return $content;
 }
 ?>
