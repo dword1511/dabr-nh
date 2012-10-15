@@ -31,7 +31,7 @@ function user_oauth() {
 
 		// Fetch the user's screen name with a quick API call
 		unset($_SESSION['oauth_request_token_secret']);
-		$user = twitter_process('https://api.twitter.com/account/verify_credentials.json');
+		$user = twitter_process('https://api.twitter.com/1.1/account/verify_credentials.json');
 		$GLOBALS['user']['username'] = $user->screen_name;
 
 		_user_save_cookie(1);
