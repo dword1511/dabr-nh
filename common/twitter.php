@@ -576,12 +576,11 @@ function twitter_status_page($query) {
 		if ($threadstatus[0]->results) {
 			$array = $threadstatus[0]->results;
 			$tl = array();
+                        //$status = twitter_process($request);
+                        $status->user = $status->from;
+                        $tl[] = $status;
 			foreach ($array as $key=>$value) {
                                 array_push($tl, $value->value);
-                                if ($value->value->in_reply_to_status_id_str == $thread_id ) {
-                                        $status->user = $status->from;
-                                        array_push($tl, $status);
-                                }
 			}
 			$tl = twitter_standard_timeline($tl, 'replies');
 			$content .= '<p>对话素酱紫滴：</p>'.theme('timeline', $tl);
@@ -1289,6 +1288,7 @@ function twitter_standard_timeline($feed, $source) {
 				unset($new->user);
 				$output[(string) $new->id] = $new;
 			}
+                        krsort($output);
 			return $output;
 		case 'search':
 			foreach ($feed as $status) {
