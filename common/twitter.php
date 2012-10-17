@@ -580,7 +580,7 @@ function twitter_status_page($query) {
                                 array_push($tl, $value->value);
                                 if ($value->value->in_reply_to_status_id_str == $thread_id ) {
                                         $status->user = $status->from;
-                                        array_push($tl, $status)
+                                        array_push($tl, $status);
                                 }
 			}
 			$tl = twitter_standard_timeline($tl, 'replies');
