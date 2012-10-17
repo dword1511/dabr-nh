@@ -577,8 +577,11 @@ function twitter_status_page($query) {
 			$array = $threadstatus[0]->results;
 			$tl = array();
 			foreach ($array as $key=>$value) {
-				array_push($tl, $value->value);
-				if ($value->value->in_reply_to_status_id_str == $thread_id && $array[key]->value->screen_name != "") array_push($tl, $status);
+                                array_push($tl, $value->value);
+                                if ($value->value->in_reply_to_status_id_str == $thread_id ) {
+                                        $status->user = $status->from;
+                                        array_push($tl, $status)
+                                }
 			}
 			$tl = twitter_standard_timeline($tl, 'replies');
 			$content .= '<p>对话素酱紫滴：</p>'.theme('timeline', $tl);
