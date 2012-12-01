@@ -1543,7 +1543,6 @@ function theme_action_icons($status) {
 		if (!user_is_current_user($from)) $actions[] = theme('action_icon', "directs/create/{$from}", BASE_URL.'images/dm.png','DM');
 		$actions[] = theme('action_icon',"search?query=%40{$from}",BASE_URL.'images/q.png','?');
 		$actions[] = theme('action_icon',"http://twitter.com/{$from}/statuses/{$status->id}",BASE_URL.'images/lnk.png','LINK');
-		$actions[] = theme('action_icon',"http://twitter.com/statuses/user_timeline/{$from}.rss",BASE_URL.'images/rss.png','RSS');
 		$actions[] = theme('action_icon',"http://zh-tw.whotwi.com/user/{$from}",BASE_URL.'images/pie.png','ANAL');
 		//TODO: add embed tweet links.
 	}
