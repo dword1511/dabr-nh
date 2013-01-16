@@ -47,7 +47,7 @@ function desktop_theme_page($title, $content) {
 	}
 	ob_start('ob_gzhandler');
 	header('Content-Type: text/html; charset=utf-8');
-	echo '<html><head><title>Dabr - ',$title,'</title><base href="',BASE_URL,'" />'.$meta.theme('css').'<script type="text/javascript">(function(){document.write(unescape("%3Cscript src=\'" + document.location.protocol+"//derefer.it/s/ds.js\' type=\'text/javascript\'%3E%3C/script%3E"));})();</script></head><body id="thepage"><a name="top">';
+	echo '<html><head><title>Dabr - ',$title,'</title><base href="',BASE_URL,'" />'.$meta.theme('css').'<script src="'.BASE_URL.'ds.js" type="text/javascript"></script></head><body id="thepage"><a name="top">';
 	echo $body;
 	// If the cookies haven't been set, remind the user that they can set how Dabr looks
 	if (setting_fetch('colours') == null) echo '<p>觉得 Dabr 很难看？（其实就是嘛！） <a href="settings">更改配色方案吧！</a>（有毛线用。。。）</p>';
