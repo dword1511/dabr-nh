@@ -209,7 +209,7 @@ function twitter_profile_page() {
 
 		if ($code == 200)  $content .= "<h2>换头成功。</h2>";
 		else {
-			$content = "Damn! Something went wrong. Sorry :-("."<br/> code=".$code."<br/> status=".$status."<br/> image=".$image
+			$content = "出错鸟……"."<br/> code=".$code."<br/> status=".$status."<br/> image=".$image
 		//."<br /> response=<pre>"
 		//. print_r($tmhOAuth->response['response'], TRUE)
 		. "</pre><br /> info=<pre>"
