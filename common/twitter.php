@@ -582,7 +582,7 @@ function twitter_status_page($query) {
 		$content = theme('status', $status);
 		$content .= '<a href="http://translate.google.com/m?hl=zh-CN&tl=zh-CN&sl=auto&ie=UTF-8&q='.urlencode($status->text).'" target="'.get_target().'">请 Google 翻译一下这货</a></p>';
 		$thread_id = $status->id_str;
-		$request = API_NEW."related_results/show/{$thread_id}.json";
+		$request = API_OLD."related_results/show/{$thread_id}.json";
 		$threadstatus = twitter_process($request);
 		if ($threadstatus[0]->results) {
 			$array = $threadstatus[0]->results;
@@ -600,6 +600,33 @@ function twitter_status_page($query) {
 		theme('page', "消息 $id", $content);
 	}
 }
+
+/*
+function twitter_status_page($query) {
+	$id = (string) $query[1];
+	if(is_numeric($id)) {
+		$request     = API_NEW."statuses/show.json?id={$id}";
+		$status      = twitter_process($request);
+		$text        = $status->text;
+		$content     = theme('status', $status);
+		$screen_name = $status->from->screen_name;
+		$content    .= '<p><a href="https://mobile.twitter.com/' . $screen_name . '/status/' . $id . '" target="'. get_target() . '">在 Twitter 上查看原文</a> | ';
+		$content    .= '<a href="http://translate.google.com/m?hl=en&sl=auto&ie=UTF-8&q=' . urlencode($text) . '" target="'. get_target() . '">请 Google 翻译一下这货</a></p>';
+
+		if (!$status->user->protected) $thread = twitter_thread_timeline($id);
+		if($thread) $content .= '<p>对话素酱紫滴：</p>'.theme('timeline', $thread);
+		else        $content .= '<p>木有对话可供显示。</p>';
+
+		theme('page', "消息 $id", $content);
+	}
+}
+
+function twitter_thread_timeline($thread_id) {
+	$request = "https://search.twitter.com/search/thread/{$thread_id}";
+	$tl      = twitter_standard_timeline(twitter_fetch($request), 'thread');
+	return $tl;
+}
+*/
 
 function twitter_retweet_page($query) {
 	$id = (string) $query[1];
