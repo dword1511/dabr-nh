@@ -20,51 +20,42 @@ function lists_paginated_process($url) {
 	// Adds cursor/pagination parameters to a query
 	$cursor = $_GET['cursor'];
 	if (!is_numeric($cursor)) $cursor = -1;
-	$url .= '?cursor='.$cursor;
-	$xml = twitter_process($url);
-	return simplexml_load_string($xml);
+	$url .= '&cursor='.$cursor;
+	return twitter_process($url);
 }
 
 function twitter_lists_tweets($user, $list) {
 	// Tweets belonging to a list
-
-	// https://dev.twitter.com/docs/api/1/get/lists/statuses
-
-	// How many tweets to show
-	$perPage = setting_fetch('perPage', 20);
-
-	$url = API_URL."lists/statuses.json?slug={$list}&owner_screen_name={$user}&per_page={$perPage}&include_entities=true&include_rts=true";
-
-	$page = intval($_GET['page']);
-	if ($page > 0) $url .= '&page='.$page;
+	$url = API_NEW."lists/statuses.json?owner_screen_name={$user}&slug={$list}";
+	if($_GET['max_id']) $url .= '&max_id=' . $_GET['max_id'];
 	return twitter_process($url);
 }
 
 function twitter_lists_user_lists($user) {
 	// Lists a user has created
-	return lists_paginated_process(API_URL."{$user}/lists.xml");
+	return twitter_process(API_NEW."lists/list.json?screen_name={$user}");
 }
 
 function twitter_lists_user_memberships($user) {
 	// Lists a user belongs to
-	return lists_paginated_process(API_URL."{$user}/lists/memberships.xml");
+	return lists_paginated_process(API_NEW."lists/memberships.json?screen_name={$user}");
 }
 
 function twitter_lists_list_members($user, $list) {
 	// Members of a list
-	return lists_paginated_process(API_URL."{$user}/{$list}/members.xml");
+	return lists_paginated_process(API_NEW."lists/members.json?owner_screen_name={$user}&slug={$list}");
 }
 
 function twitter_lists_list_subscribers($user, $list) {
 	// Subscribers of a list
-	return lists_paginated_process(API_URL."{$user}/{$list}/subscribers.xml");
+	return lists_paginated_process(API_NEW."lists/subscribers.json?owner_screen_name={$user}&slug={$list}");
 }
 
 /* Front controller for the new pages
 
 List URLS:
 lists -- current user's lists
-lists/$user -- xhosen user's lists
+lists/$user -- chosen user's lists
 lists/$user/lists -- alias of the above
 lists/$user/memberships -- lists user is in
 lists/$user/$list -- tweets
@@ -151,8 +142,8 @@ function lists_list_members_page($user, $list) {
 	$p = twitter_lists_list_members($user, $list);
 
 	// TODO: use a different theme() function? Add a "delete member" link for each member
-	$content = theme('listmembers', $p);
-	$content .= theme('list_pagination', $p);
+	$content  = "<div class='heading'><a href='user/{$user}'>@{$user}</a>/<a href='lists/{$user}/{$list}'>{$list}</a> 里的成员：</div>\n";
+	$content .= theme('followers_list', $p);
 	theme('page', "{$user}/{$list} 的成员", $content);
 }
 
@@ -179,20 +170,21 @@ function theme_listmembers($feed) {
 function lists_list_subscribers_page($user, $list) {
 	// Show subscribers of a list
 	$p = twitter_lists_list_subscribers($user, $list);
-	$content = theme('listmembers', $p);
-	$content .= theme('list_pagination', $p);
+	$content  = "<div class='heading'><a href='user/{$user}'>@{$user}</a>/<a href='lists/{$user}/{$list}'>{$list}</a> 的订阅者：</div>\n";
+	$content .= theme('followers_list', $p);
 	theme('page', "{$user}/{$list} 的订阅者", $content);
 }
 
 /* Theme functions */
 
 function theme_lists($json) {
-	if (count($json->lists) == 0) {
-		return "<p>木有列表可供显示。</p>";
-	}
-	$rows = array();
+	if($json->lists) $lists = $json->lists;
+	else             $lists = $json;
+	if(count($lists) == 0) return "<p>木有列表可供显示。</p><pre>" . print_r($json,1) . "</pre>";
+
+	$rows    = array();
 	$headers = array('列表 ', '成员数 ', '订阅者数');
-	foreach ($json->lists->list as $list) {
+	foreach($lists as $list) {
 		$url = "lists/{$list->user->screen_name}/{$list->slug}";
 		$rows[] = array(
 			"<a href='user/{$list->user->screen_name}'>@{$list->user->screen_name}</a>/<a href='{$url}'><strong>{$list->slug}</strong></a> ",

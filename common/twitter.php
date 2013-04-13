@@ -177,7 +177,7 @@ function twitter_profile_page() {
 			"location"	=> stripslashes($_POST['location']),
 			"description"	=> stripslashes($_POST['description']),
 		);
-		$url = API_URL."account/update_profile.json";
+		$url = API_NEW."account/update_profile.json";
 		$user = twitter_process($url, $post_data);
 		$content = "<h2>个人资料已更新。新的资料会在一分钟内生效。</h2>";
 	}
@@ -252,30 +252,40 @@ function long_url($shortURL) {
 }
 
 function friendship_exists($user_a) {
-	$request = API_URL.'friendships/show.json?target_screen_name=' . $user_a;
+	$request   = API_NEW.'friendships/show.json?target_screen_name=' . $user_a;
 	$following = twitter_process($request);
 	if ($following->relationship->target->following == 1) return true;
 	else return false;
 }
 
 function friendship($user_a) {
-	$request = API_URL.'friendships/show.json?target_screen_name=' . $user_a;
+	$request = API_NEW.'friendships/show.json?target_screen_name=' . $user_a;
 	return twitter_process($request);
 }
 
 function twitter_block_exists($query) {
-	$request = API_URL.'blocks/blocking/ids.json';
-	$blocked = (array) twitter_process($request);
+	//Get an array of all ids the authenticated user is blocking (limited at 5000 without cursoring)
+	$request  = API_NEW.'blocks/ids.json';
+	$response = twitter_process($request);
+	$blocked  = $response->ids;
+	//If the authenticate user has blocked $query it will appear in the array
 	return in_array($query,$blocked);
 }
 
 function twitter_trends_page($query) {
 	$woeid = $_GET['woeid'];
-	if($woeid == '') $woeid = '1';
 
-	$request = API_URL.'trends/available.json';
-	$local = twitter_process($request);
-	$header = '<form method="get" action="trends"><select name="woeid">';
+	if(isset($woeid)) {
+		$duration = time() + (3600 * 24 * 365);
+		setcookie('woeid', $woeid, $duration, '/');
+	}
+	else $woeid = $_COOKIE['woeid'];
+
+	if($woeid == '') $woeid = '1'; //worldwide
+
+	$request = API_NEW.'trends/available.json';
+	$local   = twitter_process($request);
+	$header  = '<form method="get" action="trends"><select name="woeid">';
 	$header .= '<option value="1"' . (($woeid == 1) ? ' selected="selected"' : '') . '>Worldwide</option>';
 
 	foreach($local as $key => $row) {
@@ -294,8 +304,8 @@ function twitter_trends_page($query) {
 	}
 	$header .= '</select> <input type="submit" value="应用" /></form>';
 
-	$request = API_URL.'trends/' . $woeid . '.json';
-	$trends = twitter_process($request);
+	$request    = API_NEW . 'trends/place.json?id=' . $woeid;
+	$trends     = twitter_process($request);
 	$search_url = 'search?query=';
 	foreach($trends[0]->trends as $trend) {
 		$row = array('<strong><a href="' . str_replace('http://twitter.com/search/', $search_url, $trend->url) . '">' . $trend->name . '</a></strong>');
@@ -307,8 +317,9 @@ function twitter_trends_page($query) {
 }
 
 function js_counter($name, $length='140') {
-	if(setting_fetch('browser') == 'mobile') return '';
-	$script = '<script type="text/javascript">
+	//if(setting_fetch('browser') == 'mobile') return '';
+	// mobile browsers could want this too.
+	return '<script type="text/javascript">
 function updateCount() {
 var remaining = ' . $length . ' - document.getElementById("' . $name . '").value.length;
 document.getElementById("remaining").innerHTML = remaining;
@@ -325,7 +336,6 @@ setTimeout(updateCount, 400);
 }
 updateCount();
 </script>';
-	return $script;
 }
 
 function twitter_media_page($query) {
@@ -452,7 +462,9 @@ function twitter_process($url, $post_data = false) {
 			  theme('error', "<h2>您太啰嗦了，在 140 字里面把话说清楚吧……</h2><p>原文：<br/>{$status}</p><hr>");
 			  //theme('status_form',$status);
 			}
-			theme('error', "<h2>调用 Twitter API 时粗线了一个错误。</h2><p>{$response_info['http_code']}: {$result}</p><hr>");
+
+			if(DEBUG_MODE == 'ON') theme('error', "<h2>调用 Twitter API 时粗线了一个错误： </h2><p>{$response_info['http_code']}: {$result}<br />{$url}</p><hr>");
+			else theme('error', "<h2>调用 Twitter API 时粗线了一个错误。。。</h2><hr>");
 	}
 }
 
@@ -486,9 +498,8 @@ function twitter_get_media($status) {
 			$media_html .= "<img src=\"" . BASE_URL . "simpleproxy.php?url=" . $image . ":thumb\"/>";
                         $media_html .= "</a>";
                 }
-        
                 return $media_html . "<br/>";
-        }       
+        }
 }
 
 function twitter_parse_tags($input, $entities = false) {
@@ -566,12 +577,12 @@ function format_interval($timestamp, $granularity = 2) {
 function twitter_status_page($query) {
 	$id = (string) $query[1];
 	if (is_numeric($id)) {
-		$request = API_URL."statuses/show/{$id}.json?include_entities=true";
+		$request = API_NEW."statuses/show.json?id={$id}";
 		$status = twitter_process($request);
 		$content = theme('status', $status);
 		$content .= '<a href="http://translate.google.com/m?hl=zh-CN&tl=zh-CN&sl=auto&ie=UTF-8&q='.urlencode($status->text).'" target="'.get_target().'">请 Google 翻译一下这货</a></p>';
 		$thread_id = $status->id_str;
-		$request = API_URL."related_results/show/{$thread_id}.json";
+		$request = API_NEW."related_results/show/{$thread_id}.json";
 		$threadstatus = twitter_process($request);
 		if ($threadstatus[0]->results) {
 			$array = $threadstatus[0]->results;
@@ -593,7 +604,7 @@ function twitter_status_page($query) {
 function twitter_retweet_page($query) {
 	$id = (string) $query[1];
 	if (is_numeric($id)) {
-		$request = API_URL."statuses/show/{$id}.json?include_entities=true";
+		$request = API_NEW."statuses/show.json?id={$id}";
 		$tl = twitter_process($request);
 		$content = theme('retweet', $tl);
 		theme('page', '转发', $content);
@@ -611,7 +622,7 @@ function twitter_delete_page($query) {
 	twitter_ensure_post_action();
 	$id = (string) $query[1];
 	if (is_numeric($id)) {
-		$request = API_URL."statuses/destroy/{$id}.json?page=".intval($_GET['page']);
+		$request = API_NEW."statuses/destroy/{$id}.json";
 		$tl = twitter_process($request, true);
 		twitter_refresh('user/'.user_current_username());
 	}
@@ -621,7 +632,7 @@ function twitter_deleteDM_page($query) {
 	twitter_ensure_post_action();
 	$id = (string) $query[1];
 	if (is_numeric($id)) {
-		$request = API_URL."direct_messages/destroy/$id.json";
+		$request = API_NEW."direct_messages/destroy.json?id={$id}";
 		twitter_process($request, true);
 		twitter_refresh('directs/');
 	}
@@ -634,8 +645,8 @@ function twitter_ensure_post_action() {
 function twitter_follow_page($query) {
 	$user = $query[1];
 	if ($user) {
-		if($query[0] == 'follow') $request = API_URL."friendships/create/{$user}.json";
-		else $request = API_URL."friendships/destroy/{$user}.json";
+		if($query[0] == 'follow') $request = API_NEW."friendships/create.json?screen_name={$user}";
+		else $request = API_NEW."friendships/destroy.json?screen_name={$user}";
 		twitter_process($request, true);
 		twitter_refresh('friends');
 	}
@@ -646,14 +657,14 @@ function twitter_block_page($query) {
 	$user = $query[1];
 	if ($user) {
 		if($query[0] == 'block'){
-			$request = API_URL."blocks/create/create.json?screen_name={$user}";
+			$request = API_NEW."blocks/create.json?screen_name={$user}";
 			twitter_process($request, true);
-	                twitter_refresh("confirmed/block/{$user}");
+			twitter_refresh("confirmed/block/{$user}");
 		}
 		else {
-			$request = API_URL."blocks/destroy/destroy.json?screen_name={$user}";
+			$request = API_NEW."blocks/destroy.json?screen_name={$user}";
 			twitter_process($request, true);
-	                twitter_refresh("confirmed/unblock/{$user}");
+			twitter_refresh("confirmed/unblock/{$user}");
 		}
 	}
 }
@@ -662,7 +673,7 @@ function twitter_spam_page($query) {
 	twitter_ensure_post_action();
 	$user = $query[1];
 	$post_data = array("screen_name" => $user);
-	$request = API_URL."report_spam.json";
+	$request = API_NEW."users/report_spam.json";
 	twitter_process($request, $post_data);
 	twitter_refresh("confirmed/spam/{$user}");
 }
@@ -701,159 +712,69 @@ function twitter_confirmation_page($query) {
 }
 
 function twitter_confirmed_page($query) {
-        $action = $query[1]; // The action. block, unblock, spam
-        $target = $query[2]; // The username of the target
-	
+	$action = $query[1]; // The action. block, unblock, spam
+	$target = $query[2]; // The username of the target
+
 	switch ($action) {
-                case 'block':
+		case 'block':
 			$content  = "<p><span class='avatar'><img src='".BASE_URL."images/dabr.png' width='48' height='48' /></span><span class='status shift'>再见鸟<strong>被B掉的</strong> @$target 。</span></p>";
-                        break;
-                case 'unblock':
-                        $content  = "<p><span class='avatar'><img src='".BASE_URL."images/dabr.png' width='48' height='48' /></span><span class='status shift'>欢迎回来，<strong>被解封的</strong> @$target 。</span></p>";
-                        break;
-                case 'spam':
-                        $content = "<p><span class='avatar'><img src='".BASE_URL."images/dabr.png' width='48' height='48' /></span><span class='status shift'>哼！再见鸟可恶滴 @$target 。</span></p>";
-                        break;
+			break;
+		case 'unblock':
+			$content  = "<p><span class='avatar'><img src='".BASE_URL."images/dabr.png' width='48' height='48' /></span><span class='status shift'>欢迎回来，<strong>被解封的</strong> @$target 。</span></p>";
+			break;
+		case 'spam':
+			$content  = "<p><span class='avatar'><img src='".BASE_URL."images/dabr.png' width='48' height='48' /></span><span class='status shift'>哼！再见鸟可恶滴 @$target 。</span></p>";
+			break;
 	}
- 	theme ('Page', '已确认！', $content);
+	theme ('Page', '已确认！', $content);
 }
 
 function twitter_friends_page($query) {
-	// Which user's friends are we looking for?
 	$user = $query[1];
 	if(!$user) {
 	  user_ensure_authenticated();
 	  $user = user_current_username();
 	}
-	$title_user = $user;
 
-	// How many users to show	
-	$perPage = setting_fetch('perPage', 20);
+	$cursor = $_GET['cursor'];
+	if (!is_numeric($cursor)) $cursor = -1;
 
-	// Bug in Twitter (?) can't feth more than 100 users at a time
-	if($perPage >= 100) $perPage = 100;
-
-	// Get all the user ID of the friends	
-	$request_ids = API_URL."friends/ids.json?screen_name={$user}";
-	$json = twitter_process($request_ids);
-	$ids = $json->ids;	
-
-	// Poor man's pagination to fix broken Twitter API
-	// friends/edent/30
-	if($query[2]) $nextPage = $query[2];
-	else $nextPage = 0;
-
-	$nextPageURL = "friends/" . $user . "/";
-	if(count($ids) < ($nextPage + $perPage)) $nextPageURL = null;
-	else $nextPageURL .= ($nextPage + $perPage);
-
-	// Paginate through the user IDs and build a API query
-	$user_ids = "";
-	for($i=$nextPage;$i<($nextPage+$perPage);$i++) $user_ids .= $ids[$i] . ",";
-	// Twitter requests that we POST these User IDs
-	$user_id_array = array();
-	$user_id_array["user_id"] = $user_ids;
-
-	// Construct the request
-	$request = API_URL."users/lookup.xml";
-
-	// Get the XML
-	$xml = twitter_process($request, $user_id_array);
-	$tl = simplexml_load_string($xml);
-
-	// Place the users into an array
-	$sortedUsers = array();
-	
-	foreach($tl as $user) {
-	  $user_id = $user->id;
-	  // $tl is *unsorted* - but $ids is *sorted*. So we place the users from $tl into a new array based on how they're sorted in $ids
-	  $key = array_search($user_id, $ids);
-	  $sortedUsers[$key] = $user;
-	}
-
-	// Sort the array by key so the most recent is at the top
-	ksort($sortedUsers);
-
-	// Format the output
-	$content = theme('followers', $sortedUsers, $nextPageURL);
-	theme('page', $title_user.' 关注的人', $content);
+	$request = API_NEW."friends/list.json?screen_name={$user}&cursor={$cursor}";
+	$tl      = twitter_process($request);
+	$content = theme('followers_list', $tl);
+	theme('page', $user.' 关注的人', $content);
 }
 
 function twitter_followers_page($query) {
-	// Which user's friends are we looking for?
 	$user = $query[1];
 	if(!$user) {
 	  user_ensure_authenticated();
 	  $user = user_current_username();
 	}
-	$title_user = $user;
 
-	// How many users to show	
-	$perPage = setting_fetch('perPage', 20);
+	$cursor = $_GET['cursor'];
+	if (!is_numeric($cursor)) $cursor = -1;
 
-	// Bug in Twitter (?) can't feth more than 100 users at a time
-	if($perPage >= 100) $perPage = 100;
-
-	// Get all the user ID of the friends	
-	$request_ids = API_URL."followers/ids.json?screen_name={$user}";
-	$json = twitter_process($request_ids);
-	$ids = $json->ids;	
-
-	// Poor man's pagination to fix broken Twitter API
-	// followers/edent/30
-	if($query[2]) $nextPage = $query[2];
-	else $nextPage = 0;
-
-	$nextPageURL = "followers/" . $user . "/";
-	if(count($ids) < ($nextPage + $perPage)) $nextPageURL = null;
-	else $nextPageURL .= ($nextPage + $perPage);
-
-	// Paginate through the user IDs and build a API query
-	$user_ids = "";
-	for($i=$nextPage;$i<($nextPage+$perPage);$i++) $user_ids .= $ids[$i] . ",";
-
-	// Twitter requests that we POST these User IDs
-	$user_id_array = array();
-	$user_id_array["user_id"] = $user_ids;
-
-	// Construct the request
-	$request = API_URL."users/lookup.xml";
-
-	// Get the XML
-	$xml = twitter_process($request, $user_id_array);
-	$tl = simplexml_load_string($xml);
-
-	// Place the users into an array
-	$sortedUsers = array();
-	
-	foreach($tl as $user) {
-	  $user_id = $user->id;
-	  // $tl is *unsorted* - but $ids is *sorted*. So we place the users from $tl into a new array based on how they're sorted in $ids
-	  $key = array_search($user_id, $ids);
-	  $sortedUsers[$key] = $user;
-	}
-
-	// Sort the array by key so the most recent is at the top
-	ksort($sortedUsers);
-
-	// Format the output
-	$content = theme('followers', $sortedUsers, $nextPageURL);
-	theme('page', $title_user.' 的粉丝', $content);
+	$request = API_NEW."followers/list.json?screen_name={$user}&cursor={$cursor}";
+	$tl      = twitter_process($request);
+	$content = theme('followers_list', $tl);
+	theme('page', $user.' 的粉丝', $content);
 }
 
-//  Shows every user who retweeted a specific status
+// Shows every user who retweeted a specific status
+// NOTE: This actually does not work well.
 function twitter_retweeters_page($query) {
 	// Which tweet are we looking for?
 	$id = $query[1];
 
 	// How many users to show	
-	$perPage = setting_fetch('perPage', 20);
+	$per_page = setting_fetch('perPage', 20);
 
 	// Bug in Twitter (?) can't feth more than 100 users at a time
-	if ($perPage >= 100) $perPage = 100;
+	if ($per_page >= 100) $per_page = 100;
 
 	// Get all the user ID of the friends	
-	$request_ids = API_URL."statuses/{$id}/retweeted_by/ids.json?count=100";
+	$request_ids = API_OLD."statuses/{$id}/retweeted_by/ids.json?count=100";
 	$json = twitter_process($request_ids);
 	$ids = $json;
 
@@ -861,19 +782,19 @@ function twitter_retweeters_page($query) {
 	// retweeted_by/1234567980/20
 	$nextPage = $query[2];
 	$nextPageURL = "retweeted_by/" . $id . "/";
-	if (count($ids) < $nextPage + $perPage) $nextPageURL = null;
-	else $nextPageURL .= ($nextPage + $perPage);
+	if (count($ids) < $nextPage + $per_page) $nextPageURL = null;
+	else $nextPageURL .= ($nextPage + $per_page);
 
 	// Paginate through the user IDs and build a API query
 	$user_ids = "";
-	for($i=$nextPage;$i<($nextPage+$perPage);$i++) $user_ids .= $ids[$i] . ",";
+	for($i=$nextPage;$i<($nextPage+$per_page);$i++) $user_ids .= $ids[$i] . ",";
 
 	// Twitter requests that we POST these User IDs
 	$user_id_array = array();
 	$user_id_array["user_id"] = $user_ids;
 
 	// Construct the request
-	$request = API_URL."users/lookup.xml";
+	$request = API_OLD."users/lookup.xml";
 
 	// Get the XML
 	$xml = twitter_process($request, $user_id_array);
@@ -901,7 +822,7 @@ function twitter_update() {
 	twitter_ensure_post_action();
 	$status = stripslashes(trim($_POST['status']));
 	if ($status) {
-		$request = API_URL.'statuses/update.json';
+		$request = API_NEW.'statuses/update.json';
 		$post_data = array('source' => 'dabr', 'status' => $status);
 		$in_reply_to_id = (string) $_POST['in_reply_to_id'];
 		if (is_numeric($in_reply_to_id)) $post_data['in_reply_to_status_id'] = $in_reply_to_id;
@@ -919,7 +840,7 @@ function twitter_update() {
 }
 
 function twitter_get_place($lat, $long) {
-	$request = API_URL.'geo/reverse_geocode.json';
+	$request = API_OLD.'geo/reverse_geocode.json';
 	$request .= '?lat='.$lat.'&long='.$long.'&max_results=1';
 	$locations = twitter_process($request);
 	$places = $locations->result->places;
@@ -930,16 +851,18 @@ function twitter_get_place($lat, $long) {
 function twitter_retweet($query) {
 	twitter_ensure_post_action();
 	$id = $query[1];
-	if (is_numeric($id)) {
-		$request = API_URL.'statuses/retweet/'.$id.'.xml';
+	if(is_numeric($id)) {
+		$request = API_NEW."statuses/retweet/{$id}.json";
 		twitter_process($request, true);
 	}
 	twitter_refresh($_POST['from'] ? $_POST['from'] : '');
 }
 
 function twitter_replies_page() {
-	$perPage = setting_fetch('perPage', 20);
-	$request = API_URL.'statuses/mentions.json?page='.intval($_GET['page']).'&include_entities=true&count='.$perPage;
+	$per_page = setting_fetch('perPage', 20);
+	$request = API_NEW."statuses/mentions_timeline.json?count={$per_page}";
+	if($_GET['max_id']) $request .= '&max_id='.$_GET['max_id'];
+
 	$tl = twitter_process($request);
 	$tl = twitter_standard_timeline($tl, 'replies');
 	$content = theme('status_form');
@@ -948,8 +871,10 @@ function twitter_replies_page() {
 }
 
 function twitter_retweets_page() {
-	$perPage = setting_fetch('perPage', 20);
-	$request = API_URL.'statuses/retweets_of_me.json?page='.intval($_GET['page']).'&include_entities=true&count='.$perPage;
+	$per_page = setting_fetch('perPage', 20);
+	$request = API_NEW."statuses/retweets_of_me.json?count={$per_page}";
+	if($_GET['max_id']) $request .= '&max_id='.$_GET['max_id'];
+
 	$tl = twitter_process($request);
 	$tl = twitter_standard_timeline($tl, 'retweets');
 	$content = theme('status_form');
@@ -958,34 +883,38 @@ function twitter_retweets_page() {
 }
 
 function twitter_directs_page($query) {
-	$perPage = setting_fetch('perPage', 20);
+	$per_page = setting_fetch('perPage', 20);
 	$action = strtolower(trim($query[1]));
 	switch ($action) {
 		case 'create':
-			$to = $query[2];
+			$to      = $query[2];
 			$content = theme('directs_form', $to);
 			theme('page', '写私信', $content);
 
 		case 'send':
 			twitter_ensure_post_action();
-			$to = trim(stripslashes($_POST['to']));
+			$to      = trim(stripslashes(str_replace('@','',$_POST['to'])));
 			$message = trim(stripslashes($_POST['message']));
-			$request = API_URL.'direct_messages/new.json';
-			twitter_process($request, array('user' => $to, 'text' => $message));
+			$request = API_NEW.'direct_messages/new.json';
+			twitter_process($request, array('screen_name' => $to, 'text' => $message));
 			twitter_refresh('directs/sent');
 
 		case 'sent':
-			$request = API_URL.'direct_messages/sent.json?page='.intval($_GET['page']).'&include_entities=true&count='.$perPage;
-			$tl = twitter_standard_timeline(twitter_process($request), 'directs_sent');
-			$content = theme_directs_menu();
+			$request = API_NEW."direct_messages/sent.json?count={$per_page}";
+			if($_GET['max_id']) $request .= '&max_id='.$_GET['max_id'];
+			$tl       = twitter_process($request);
+			$tl       = twitter_standard_timeline($tl, 'directs_sent');
+			$content  = theme_directs_menu();
 			$content .= theme('timeline', $tl);
 			theme('page', '已送出', $content);
 
 		case 'inbox':
 		default:
-			$request = API_URL.'direct_messages.json?page='.intval($_GET['page']).'&include_entities=true&count='.$perPage;
-			$tl = twitter_standard_timeline(twitter_process($request), 'directs_inbox');
-			$content = theme_directs_menu();
+			$request = API_NEW."direct_messages.json?count={$per_page}";
+			if($_GET['max_id']) $request .= '&max_id='.$_GET['max_id'];
+			$tl       = twitter_process($request);
+			$tl       = twitter_standard_timeline($tl, 'directs_inbox');
+			$content  = theme_directs_menu();
 			$content .= theme('timeline', $tl);
 			theme('page', '邮筒', $content);
 	}
@@ -1032,30 +961,27 @@ function twitter_search_page() {
 }
 
 function twitter_search($search_query, $lat = NULL, $long = NULL, $radius = NULL) {
-	$perPage = setting_fetch('perPage', 20);
+	$per_page = setting_fetch('perPage', 20);
+	$request  = API_NEW."search/tweets.json?result_type=recent&q={$search_query}&rpp={$per_page}";
+	if($_GET['max_id']) $request .= '&max_id='.$_GET['max_id'];
 
-	$page = (int) $_GET['page'];
-	if ($page == 0) $page = 1;
-	$request = 'https://search.twitter.com/search.json?rpp='.$perPage.'&result_type=recent&q=' . urlencode($search_query).'&page='.$page.'&include_entities=true';
-	
-	if ($lat && $long) {
+	if($lat && $long) {
 		$request .= "&geocode=$lat,$long,";
-		if ($radius) $request .="$radius";
-		else $request .="1km";
+		if($radius) $request .="$radius";
 	}
 
 	$tl = twitter_process($request);
-	$tl = twitter_standard_timeline($tl->results, 'search');
+	$tl = twitter_standard_timeline($tl->statuses, 'search');
 	return $tl;
 }
 
 function twitter_find_tweet_in_timeline($tweet_id, $tl) {
-	if (!is_numeric($tweet_id) || !$tl) return;
+	if(!is_numeric($tweet_id) || !$tl) return;
 
-	if (array_key_exists($tweet_id, $tl)) $tweet = $tl[$tweet_id];
+	if(array_key_exists($tweet_id, $tl)) $tweet = $tl[$tweet_id];
 	else {
-		$request = API_URL."statuses/show/{$tweet_id}.json?include_entities=true";
-		$tweet = twitter_process($request);
+		$request = API_NEW."statuses/show.json?id={$tweet_id}";
+		$tweet   = twitter_process($request);
 	}
 	return $tweet;
 }
@@ -1066,12 +992,13 @@ function twitter_user_page($query) {
 	$in_reply_to_id = (string) $query[3];
 	$content = '';
 
-	if (!$screen_name) theme('error', '木有用户名啊！');
+	if(!$screen_name) theme('error', '木有用户名啊！');
 
 	$user = twitter_user_info($screen_name);
 
-	if (isset($user->status)) {
-		$request = API_URL."statuses/user_timeline.json?screen_name={$screen_name}&include_rts=true&include_entities=true&page=".intval($_GET['page']);
+	if(isset($user->status)) {
+		$request = API_NEW."statuses/user_timeline.json?screen_name={$screen_name}";
+		if($_GET['max_id']) $request .= '&max_id='.$_GET['max_id'];
 		$tl = twitter_process($request);
 		$tl = twitter_standard_timeline($tl, 'user');
 	}
@@ -1102,11 +1029,12 @@ function twitter_user_page($query) {
 
 function twitter_favourites_page($query) {
 	$screen_name = $query[1];
-	if (!$screen_name) {
+	if(!$screen_name) {
 		user_ensure_authenticated();
 		$screen_name = user_current_username();
 	}
-	$request = API_URL."favorites/{$screen_name}.json?page=".intval($_GET['page']).'&include_entities=true';
+	$request = API_NEW."favorites/list.json?screen_name={$screen_name}";
+	if($_GET['max_id']) $request .= '&max_id=' . $_GET['max_id'];
 	$tl = twitter_process($request);
 	$tl = twitter_standard_timeline($tl, 'favourites');
 	$content = theme('status_form');
@@ -1116,19 +1044,19 @@ function twitter_favourites_page($query) {
 
 function twitter_mark_favourite_page($query) {
 	$id = (string) $query[1];
-	if (!is_numeric($id)) return;
-	if ($query[0] == 'unfavourite') $request = API_URL."favorites/destroy/$id.json";
-	else $request = API_URL."favorites/create/$id.json";
+	if(!is_numeric($id)) return;
+	if($query[0] == 'unfavourite') $request = API_NEW."favorites/destroy.json?id={$id}";
+	else                           $request = API_NEW."favorites/create.json?id={$id}";
 	twitter_process($request, true);
 	twitter_refresh();
 }
 
 function twitter_home_page() {
 	user_ensure_authenticated();
-	$perPage = setting_fetch('perPage', 20);
-	$request = API_URL.'statuses/home_timeline.json?include_rts=true&include_entities=true&count='.$perPage;
-	if ($_GET['max_id']) $request .= '&max_id='.$_GET['max_id'];
-	if ($_GET['since_id']) $request .= '&since_id='.$_GET['since_id'];
+	$per_page = setting_fetch('perPage', 20);
+	$request = API_NEW."statuses/home_timeline.json?count={$per_page}";
+	if($_GET['max_id'])   $request .= '&max_id='.$_GET['max_id'];
+	if($_GET['since_id']) $request .= '&since_id='.$_GET['since_id'];
 	$tl = twitter_process($request);
 	$tl = twitter_standard_timeline($tl, 'friends');
 	$content = theme('status_form');
@@ -1180,33 +1108,35 @@ function twitter_tweets_per_day($user, $rounding = 1) {
 }
 
 function theme_user_header($user) {
-	$following = friendship($user->screen_name);
-	$followed_by = $following->relationship->target->followed_by; //The $user is followed by the authenticating
-	$following = $following->relationship->target->following;
-	$name = theme('full_name', $user);
-	$full_avatar = theme_get_full_avatar($user);
-	$link = theme('external_link', $user->url);
-	$cleanLocation = str_replace(array("iPhone: ","ÜT: "),"",$user->location);
+	$friendship      = friendship($user->screen_name);
+	$followed_by     = $friendship->relationship->target->followed_by; //The $user is followed by the authenticating
+	$following       = $friendship->relationship->target->following;
+	$blocked         = $friendship->relationship->source->blocking;
+	$name            = theme('full_name', $user);
+	$full_avatar     = theme_get_full_avatar($user);
+	$link            = theme('external_link', $user->url);
+	$cleanLocation   = str_replace(array("iPhone: ", "ÜT: "), "", $user->location);
 	$raw_date_joined = strtotime($user->created_at);
-	$date_joined = date('Y 年 m 月 d 日', $raw_date_joined);
-	$tweets_per_day = twitter_tweets_per_day($user, 1);
-	$bio = twitter_parse_tags($user->description);
-	$out = "<div class='profile'>";
+	$date_joined     = date('Y 年 m 月 d 日', $raw_date_joined);
+	$tweets_per_day  = twitter_tweets_per_day($user, 1);
+	$bio             = twitter_parse_tags($user->description);
+	$out  = "<div class='profile'>";
 	$out .= "<span class='avatar'>".theme('external_link', $full_avatar, theme('avatar', theme_get_avatar($user)))."</span>";
 	$out .= "<span class='status shift'><b>{$name}</b><br/>";
 	$out .= "<span class='about'>";
-	if ($user->verified == true) $out .= '<strong>已认证账户</strong><br/>';
-	if ($user->protected == true) $out .= '<strong>保密的消息</strong><br/>';
+	if($user->verified  == true) $out .= '<strong>已认证账户</strong><br/>';
+	if($user->protected == true) $out .= '<strong>保密的消息</strong><br/>';
+	if($blocked         == true) $out .= '<strong>已被您屏蔽</strong><br/>';
 	$out .= "简介：{$bio}<br/>";
 	$out .= "链接：{$link}<br/>";
 	$out .= "地址：<a href=\"https://maps.google.com/maps?q={$cleanLocation}\" target=\"" . get_target() . "\">{$user->location}</a><br/>";
 	$out .= "加入时间：{$date_joined} （每天约 ".$tweets_per_day." 条消息）<br/>";
-	if (user_is_current_user($user->screen_name)) $out .= "<strong><a href='editbio'>编辑个人资料 →</a></strong>";
+	if(user_is_current_user($user->screen_name)) $out .= "<strong><a href='editbio'>编辑个人资料 →</a></strong>";
 	$out .= "</span></span>";
 	$out .= "<div class='features'>";
 	$out .= $user->statuses_count.' 条消息';
 
-	if ($user->protected == true && $followed_by == false) {
+	if($user->protected == true && $followed_by == false) {
 		$out .= " | " . $user->followers_count . ' 个粉丝';
 		$out .= " | " . $user->friends_count . ' 个偶像';
 		$out .= " | " . $user->favourites_count . ' 条收藏';
@@ -1218,16 +1148,16 @@ function theme_user_header($user) {
 	}
 
 	$out .= " | <a href='lists/{$user->screen_name}/memberships'>" . "在 " . $user->listed_count . " 个列表中</a>";
-
-	if (strtolower($user->screen_name) !== strtolower(user_current_username())) {
-		$out .= " | <a href='directs/create/{$user->screen_name}'>发私信</a>";
-		if ($followed_by == false) $out .= " | <a href='follow/{$user->screen_name}'>关注</a>";
-		else $out .= " | <a href='unfollow/{$user->screen_name}'>取消关注</a>";
-		$out .= " | <a href='confirm/block/{$user->screen_name}/{$user->id}'>屏蔽/取消屏蔽</a>";
+	if($following) $out .= " | <a href='directs/create/{$user->screen_name}'>发私信</a>";
+	if(strtolower($user->screen_name) !== strtolower(user_current_username())) {
+		if($followed_by == false) $out .= " | <a href='follow/{$user->screen_name}'>关注</a>";
+		else                      $out .= " | <a href='unfollow/{$user->screen_name}'>取消关注</a>";
+		if($blocked == true) $out .= " | <a href='confirm/block/{$user->screen_name}/{$user->id}'>取消屏蔽</a>";
+		else                 $out .= " | <a href='confirm/block/{$user->screen_name}/{$user->id}'>屏蔽</a>";
 		$out .= " | <a href='confirm/spam/{$user->screen_name}/{$user->id}'>报告为垃圾信息</a>";
 	}
 	$out .= " | <a href='search?query=%40{$user->screen_name}'>搜索 @{$user->screen_name}</a>";
-	if (user_is_current_user($user->screen_name)) {
+	if(user_is_current_user($user->screen_name)) {
 		$out .= " | <a href='retweets'>被转发的消息</a>";
 		$out .= " | <a href='settings'>个人设置</a>";
 		$out .= " | <a href='logout'>登出</a>";
@@ -1243,24 +1173,24 @@ function theme_avatar($url, $force_large = false) {
 
 function theme_status_time_link($status, $is_link = true) {
 	$time = strtotime($status->created_at);
-	if ($time > 0) {
+	if($time > 0) {
 		if (twitter_date('dmy') == twitter_date('dmy', $time) && !setting_fetch('timestamp'))  $out = format_interval(time() - $time, 1). '前';
 		else $out = twitter_date('H:i', $time);
 	}
 	else $out = $status->created_at;
-	if ($is_link) $out = "<a href='status/{$status->id}' class='time'>$out</a>";
+	if($is_link) $out = "<a href='status/{$status->id}' class='time'>$out</a>";
 	return $out;
 }
 
 function twitter_date($format, $timestamp = null) {
 	$offset = setting_fetch('utc_offset', 0) * 3600;
-	if (!isset($timestamp)) $timestamp = time();
+	if(!isset($timestamp)) $timestamp = time();
 	return gmdate($format, $timestamp + $offset);
 }
 
 function twitter_standard_timeline($feed, $source) {
 	$output = array();
-	if (!is_array($feed)) return $output;
+	if(!is_array($feed)) return $output;
 
 	foreach($feed as $key => $status) {
 		if($status->id_str) $feed[$key]->id = $status->id_str;
@@ -1275,7 +1205,8 @@ function twitter_standard_timeline($feed, $source) {
 		case 'replies':
 		case 'retweets':
 		case 'user':
-			foreach ($feed as $status) {
+		case 'search':
+			foreach($feed as $status) {
 				$new = $status;
 				if ($new->retweeted_status) {
 					$retweet = $new->retweeted_status;
@@ -1290,36 +1221,11 @@ function twitter_standard_timeline($feed, $source) {
 			}
                         krsort($output);
 			return $output;
-		case 'search':
-			foreach ($feed as $status) {
-				$output[(string) $status->id] = (object) array(
-					'id' => $status->id,
-					'text' => $status->text,
-					'source' => strpos($status->source, '&lt;') !== false ? html_entity_decode($status->source) : $status->source,
-					'from' => (object) array(
-						'id' => $status->from_user_id,
-						'screen_name' => $status->from_user,
-						'profile_image_url' => $status->profile_image_url,
-						'profile_image_url_https' => $status->profile_image_url,
-					),
-					'to' => (object) array(
-						'id' => $status->to_user_id,
-						'screen_name' => $status->to_user,
-					),
-					'created_at' => $status->created_at,
-					'geo' => $status->geo,
-					'entities' => $status->entities,
-                                        'in_reply_to_status_id' => $status->in_reply_to_status_id,
-                                        'in_reply_to_status_id_str' => $status->in_reply_to_status_id_str,
-                                        'in_reply_to_screen_name' => $status->to_user,
-				);
-			}
-			return $output;
 		case 'directs_sent':
 		case 'directs_inbox':
-			foreach ($feed as $status) {
+			foreach($feed as $status) {
 				$new = $status;
-				if ($source == 'directs_inbox') {
+				if($source == 'directs_inbox') {
 					$new->from = $new->sender;
 					$new->to = $new->recipient;
 				}
@@ -1344,88 +1250,92 @@ function preg_match_one($pattern, $subject, $flags = NULL) {
 }
 
 function twitter_user_info($username = null) {
-	if (!$username)
-	$username = user_current_username();
-	$request = API_URL."users/show.json?screen_name=$username&include_entities=true";
+	if(!$username) $username = user_current_username();
+	$request = API_NEW."users/show.json?screen_name={$username}";
 	$user = twitter_process($request);
 	return $user;
 }
 
-function theme_timeline($feed) {
+function theme_timeline($feed, $paginate = true) {
 	if (count($feed) == 0) return theme('no_tweets');
-	if (count($feed) == 1) $hide_pagination = true;
+	if (count($feed)  < 2) $hide_pagination = true;
 	$rows = array();
 	$page = menu_current_page();
 	$date_heading = false;
 	$first=0;
 
-	foreach ($feed as &$status) $status->text = twitter_parse_tags($status->text, $status->entities);
+	foreach($feed as &$status) $status->text = twitter_parse_tags($status->text, $status->entities);
 	unset($status);
 
-	if (!in_array(setting_fetch('browser'), array('text', 'worksafe'))&&EMBEDLY_KEY != '') embedly_embed_thumbnails($feed);
-	foreach ($feed as $status) {
-		if ($first==0) {
+	if(!in_array(setting_fetch('browser'), array('text', 'worksafe')) && EMBEDLY_KEY != '') embedly_embed_thumbnails($feed);
+	foreach($feed as $status) {
+		if($first==0) {
 			$since_id = $status->id;
 			$first++;
 		}
 		else {
 			$max_id =  $status->id;
-			if ($status->original_id) $max_id =  $status->original_id;
+			if($status->original_id) $max_id =  $status->original_id;
 		}
 		$time = strtotime($status->created_at);
-		if ($time > 0) {
+		if($time > 0) {
 			$date = twitter_date('l jS F Y', strtotime($status->created_at));
-			if ($date_heading !== $date) {
+			if($date_heading !== $date) {
 				$date_heading = $date;
 				$rows[] = array('data' => array(twitter_date('↓↓↓ Y 年 m 月 d 日 ↓↓↓', strtotime($status->created_at))), 'class' => 'date');
 			}
 		}
 		else $date = $status->created_at;
-		$text = $status->text;
-		if (!in_array(setting_fetch('browser'), array('text', 'worksafe'))) $media = twitter_get_media($status);
-		$link = theme('status_time_link', $status, !$status->is_direct);
+		$text    = $status->text;
+		if(!in_array(setting_fetch('browser'), array('text', 'worksafe'))) $media = twitter_get_media($status);
+		$link    = theme('status_time_link', $status, !$status->is_direct);
 		$actions = theme('action_icons', $status);
-		$avatar = theme('avatar', theme_get_avatar($status->from));
-		$source = $status->source ? "来自 ".str_replace('rel="nofollow"', 'rel="nofollow" target="' . get_target() . '"', preg_replace('/&(?![a-z][a-z0-9]*;|#[0-9]+;|#x[0-9a-f]+;)/i', '&amp;', $status->source)." 部门") : ''; //need to replace & in links with &amps and force new window on links
-		if ($status->place->name) $source .= " " . $status->place->name . ", " . $status->place->country;
-		if ($status->in_reply_to_status_id) $source .= " <a href='status/{$status->in_reply_to_status_id_str}'>对 {$status->in_reply_to_screen_name} 的回复</a>";
-		if ($status->retweet_count) {
+		$avatar  = theme('avatar', theme_get_avatar($status->from));
+		$source  = $status->source ? "来自 ".str_replace('rel="nofollow"', 'rel="nofollow" target="' . get_target() . '"', preg_replace('/&(?![a-z][a-z0-9]*;|#[0-9]+;|#x[0-9a-f]+;)/i', '&amp;', $status->source)." 部门") : ''; //need to replace & in links with &amps and force new window on links
+		if($status->place->name) $source .= " " . $status->place->name . ", " . $status->place->country;
+		if($status->in_reply_to_status_id) $source .= " <a href='status/{$status->in_reply_to_status_id_str}'>对 {$status->in_reply_to_screen_name} 的回复</a>";
+		if($status->retweet_count) {
 			$source .= " <a href='retweeted_by/{$status->id}'>被转发了 ";
 			$source .= $status->retweet_count . " 次</a>";
 		}
-		if ($status->retweeted_by) {
+		if($status->retweeted_by) {
 			$retweeted_by = $status->retweeted_by->user->screen_name;
 			$source .= "<br /><a href='retweeted_by/{$status->id}'>被下列用户转发：</a> <a href='user/{$retweeted_by}'>{$retweeted_by}</a>";
 		}
 		$html = "<b><a href='user/{$status->from->screen_name}'>{$status->from->screen_name}</a></b> $actions $link<br />{$text}<br />$media<small>$source</small>";
 		unset($row);
 		$class = 'status';
-		if ($page != 'user' && $avatar) {
+		if($page != 'user' && $avatar) {
 			$row[] = array('data' => $avatar, 'class' => 'avatar');
 			$class .= ' shift';
 		}
 		$row[] = array('data' => $html, 'class' => $class);
 		$class = 'tweet';
-		if ($page != 'replies' && twitter_is_reply($status)) $class .= ' reply';
+		if($page != 'replies' && twitter_is_reply($status)) $class .= ' reply';
 		$row = array('data' => $row, 'class' => $class);
 		$rows[] = $row;
 	}
 	$content = theme('table', array(), $rows, array('class' => 'timeline'));
 
-	if ($page != '' && !$hide_pagination) $content .= theme('pagination');
-	else if (!$hide_pagination) {
-		if(is_64bit()) $max_id = intval($max_id) - 1; //stops last tweet appearing as first tweet on next page
-		$links[] = "<a href='{$_GET['q']}?max_id=$max_id' accesskey='9'>更早</a> 9";
-		$content .= '<p>'.implode(' | ', $links).'</p>';
+	if(!$hide_pagination) {
+		if($paginate) {
+			if($page == 'some-unknown-method-which-doesnt-take-max_id') $content .= theme('pagination');
+			else {
+				if(is_64bit()) $max_id = intval($max_id) - 1; //stops last tweet appearing as first tweet on next page
+				$links[]  = "<a href='{$_GET['q']}?max_id=$max_id' accesskey='9'>Older</a> 9";
+				$content .= '<p>'.implode(' | ', $links).'</p>';
+			}
+		}
 	}
+
 	return $content;
 }
 
 function twitter_is_reply($status) {
-	if (!user_is_authenticated()) return false;
+	if(!user_is_authenticated()) return false;
 	$user = user_current_username();
 
-	if ($status->entities) if ($status->entities->user_mentions) {
+	if($status->entities) if ($status->entities->user_mentions) {
 		$entities = $status->entities;
 		foreach($entities->user_mentions as $mentions) if ($mentions->screen_name == $user) return true;
 	}
@@ -1438,7 +1348,7 @@ function twitter_is_reply($status) {
 function theme_followers($feed, $nextPageURL) {
 	$rows = array();
 	if(count($feed) == 0 || $feed == '[]') return '<p>这里没有任何消息。</p>';
-	foreach ($feed as $user) {
+	foreach($feed as $user) {
 		$name = theme('full_name', $user);
 		$tweets_per_day = twitter_tweets_per_day($user);
 		$last_tweet = strtotime($user->status->created_at);
@@ -1459,8 +1369,8 @@ function theme_followers($feed, $nextPageURL) {
 
 function theme_retweeters($feed, $hide_pagination = false) {
 	$rows = array();
-	if (count($feed) == 0 || $feed == '[]') return '<p>木有人转发过这条消息。</p>';
-	foreach ($feed->user as $user) {
+	if(count($feed) == 0 || $feed == '[]') return '<p>木有人转发过这条消息。</p>';
+	foreach($feed->user as $user) {
 		$name = theme('full_name', $user);
 		$tweets_per_day = twitter_tweets_per_day($user);
 		$last_tweet = strtotime($user->status->created_at);
@@ -1471,7 +1381,7 @@ function theme_retweeters($feed, $hide_pagination = false) {
 		$rows[] = array('data' => array(array('data' => theme('avatar', theme_get_avatar($user)), 'class' => 'avatar'),array('data' => $content, 'class' => 'status shift')),'class' => 'tweet');
 	}
 	$content = theme('table', array(), $rows, array('class' => 'followers'));
-	if (!$hide_pagination) $content .= theme('list_pagination', $feed);
+	if(!$hide_pagination) $content .= theme('list_pagination', $feed);
 	return $content;
 }
 
@@ -1503,12 +1413,17 @@ function theme_external_link($url, $content = null) {
 	else return "<a href='$url' target='" . get_target() . "'>$content</a>";
 }
 
-function theme_pagination() {
+function theme_pagination($max_id = false) {
 	$page = intval($_GET['page']);
-	if (preg_match('#&q(.*)#', $_SERVER['QUERY_STRING'], $matches)) $query = $matches[0];
-	if ($page == 0) $page = 1;
-	$links[] = "<a href='{$_GET['q']}?page=".($page+1)."$query' accesskey='9'>更早</a> 9";
-	if ($page > 1) $links[] = "<a href='{$_GET['q']}?page=".($page-1)."$query' accesskey='8'>更晚</a> 8";
+	if(preg_match('#&q(.*)#', $_SERVER['QUERY_STRING'], $matches)) $query = $matches[0];
+	if($max_id) $links[] = "<a href='{$_GET['q']}?max_id=".$max_id."$query' accesskey='9'>Older</a> 9";
+	else {
+		if($page == 0) $page = 1;
+		$links[] = "<a href='{$_GET['q']}?page=".($page+1)."$query' accesskey='9'>Older</a> 9";
+		if($page > 1) $links[] = "<a href='{$_GET['q']}?page=".($page-1)."$query' accesskey='8'>Newer</a> 8";
+	}
+	if($query) $query = '?' . substr($query, 1);
+	$links[] = "<a href='{$_GET['q']}?$query'>First</a>";
 	return '<p>'.implode(' | ', $links).'</p>';
 }
 
@@ -1559,4 +1474,41 @@ function is_64bit() {
 	$int = intval($int);
 	return ($int == 9223372036854775807);
 }
+
+function theme_followers_list($feed, $hide_pagination = false) {
+	if(isset($feed->users)) $users = $feed->users;
+	else $users = $feed;
+	$rows = array();
+	if(count($users) == 0 || $users == '[]') return '<p>没有任何用户可供显示 TAT</p>';
+
+	foreach($users as $user) {
+		if($user->user) $user = $user->user;
+		$name = theme('full_name', $user);
+		$tweets_per_day = twitter_tweets_per_day($user);
+		$last_tweet = strtotime($user->status->created_at);
+		$vicon = ($user->verified) ? theme('action_icon', "", 'images/verified.png', '&#10004;') : '';
+		$content = "{$vicon}{$name}<br /><span class='about'>";
+		if($user->description != "") $content .= "简介：{$user->description}<br />";
+		if($user->location != "") $content .= "地址：{$user->location}<br />";
+		$content .= "信息：";
+		$content .= $user->statuses_count . " 条推文，关注了 ";
+		$content .= $user->friends_count . " 个推油，被 ";
+		$content .= $user->followers_count . "个推油关注，";
+		$content .= "每天约 " . $tweets_per_day . " 条推文。<br />";
+		$content .= "上一条推文发送于：";
+		if($user->protected == 'true' && $last_tweet == 0) $content .= "（保密）";
+		else if($last_tweet == 0) $content .= "（啥也没有）";
+		else $content .= twitter_date('Y 年 m 月 d 日', $last_tweet);
+		$content .= "</span>";
+
+		$rows[] = array('data' => array(array('data' => theme('avatar', $user->profile_image_url), 'class' => 'avatar'),
+		                                array('data' => $content, 'class' => 'status shift')),
+		                'class' => 'tweet');
+	}
+
+	$content = theme('table', array(), $rows, array('class' => 'followers'));
+	if (!$hide_pagination) $content .= theme('list_pagination', $feed);
+	return $content;
+}
+
 ?>
