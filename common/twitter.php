@@ -402,7 +402,6 @@ function twitter_process($url, $post_data = false) {
 	curl_setopt($ch, CURLOPT_TIMEOUT, 10);
 	curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
 	curl_setopt($ch, CURLOPT_HEADER, TRUE);
-	curl_setopt($ch, CURLOPT_VERBOSE, TRUE);
 	$response      = curl_exec($ch);
 	$response_info = curl_getinfo($ch);
 	$erno          = curl_errno($ch);
@@ -474,23 +473,22 @@ function twitter_fetch($url) {
 	return $response;
 }
 
-//      http://dev.twitter.com/pages/tweet_entities
+// http://dev.twitter.com/pages/tweet_entities
 function twitter_get_media($status) {
-        if($status->entities->media) {
-                $media_html = '';
-                foreach($status->entities->media as $media) {
-                        $image = $media->media_url_https;
-                        $link = $media->url;
+	if($status->entities->media) {
+		$media_html = '';
+		foreach($status->entities->media as $media) {
+			$image  = $media->media_url;
+			$link   = $media->url;
+			$width  = $media->sizes->thumb->w;
+			$height = $media->sizes->thumb->h;
 
-                        $width = $media->sizes->thumb->w;
-                        $height = $media->sizes->thumb->h;
-
-			$media_html = "<a href=\"" . BASE_URL . "simpleproxy.php?url=" . $image . ":large" . "\" target='" . get_target() . "'>";
+			$media_html  = "<a href=\"" . BASE_URL . "simpleproxy.php?url=" . $image . ":large" . "\" target='" . get_target() . "'>";
 			$media_html .= "<img src=\"" . BASE_URL . "simpleproxy.php?url=" . $image . ":thumb\"/>";
-                        $media_html .= "</a>";
-                }
-                return $media_html . "<br/>";
-        }
+			$media_html .= "</a>";
+		}
+		return $media_html . "<br/>";
+	}
 }
 
 function twitter_parse_tags($input, $entities = false) {

@@ -3,9 +3,6 @@
 function embedly_embed_thumbnails(&$feed) {
 	if(setting_fetch('hide_inline')) return $text;
 
-	// Find URLs throughout the $feed, noting the tweet IDs they occur in
-	$matched_urls = array();
-
 	$services = array(
 		'#youtube\.com\/watch\?v=([_-\d\w]+)#i'		=> 'http://i.ytimg.com/vi/%s/1.jpg',
 		'#youtu\.be\/([_-\d\w]+)#i'			=> 'http://i.ytimg.com/vi/%s/1.jpg',
@@ -20,7 +17,7 @@ function embedly_embed_thumbnails(&$feed) {
 		'#tweetphoto\.com\/(\d+)#'			=> 'http://api.plixi.com/api/tpapi.svc/imagefromurl?url=http://tweetphoto.com/%s',
 		'#plixi\.com\/p\/(\d+)#'			=> 'http://api.plixi.com/api/tpapi.svc/imagefromurl?url=http://plixi.com/p/%s&size=small',
 		'#phz\.in\/([\d\w]+)#'				=> 'http://api.phreadz.com/thumb/%s?t=code',
-		'#imgur\.com\/([\w]{5})[\s\.ls][\.\w]*#i'	=> 'http://imgur.com/%ss.png',
+		'#imgur\.com\/([\w]+)[\s\.ls][\.\w]*#i'		=> 'http://imgur.com/%ss.png',
 		'#imgur\.com\/gallery\/([\w]+)#i'		=> 'http://imgur.com/%ss.png',
 		'#brizzly\.com\/pic\/([\w]+)#i'			=> 'http://pics.brizzly.com/thumb_sm_%s.jpg',
 		'#img\.ly\/([\w\d]+)#i'				=> 'http://img.ly/show/medium/%s',
