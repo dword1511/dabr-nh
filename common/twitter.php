@@ -8,159 +8,165 @@ require 'geoloc.php';
 
 menu_register(array(
 	'' => array(
-		'callback' => 'twitter_home_page',
+		'callback'  => 'twitter_home_page',
 		'accesskey' => '0',
-		'display' => '主页',
+		'display'   => '主页',
 	),
 	'status' => array(
-		'hidden' => true,
-		'security' => true,
-		'callback' => 'twitter_status_page',
+		'hidden'    => true,
+		'security'  => true,
+		'callback'  => 'twitter_status_page',
 	),
 	'update' => array(
-		'hidden' => true,
-		'security' => true,
-		'callback' => 'twitter_update',
+		'hidden'    => true,
+		'security'  => true,
+		'callback'  => 'twitter_update',
 	),
 	'twitter-retweet' => array(
-		'hidden' => true,
-		'security' => true,
-		'callback' => 'twitter_retweet',
+		'hidden'    => true,
+		'security'  => true,
+		'callback'  => 'twitter_retweet',
 	),
 	'replies' => array(
-		'security' => true,
-		'callback' => 'twitter_replies_page',
+		'security'  => true,
+		'callback'  => 'twitter_replies_page',
 		'accesskey' => '1',
-		'display' => '提及',
+		'display'   => '提及',
 	),
 	'favourite' => array(
-		'hidden' => true,
-		'security' => true,
-		'callback' => 'twitter_mark_favourite_page',
+		'hidden'    => true,
+		'security'  => true,
+		'callback'  => 'twitter_mark_favourite_page',
 	),
 	'unfavourite' => array(
-		'hidden' => true,
-		'security' => true,
-		'callback' => 'twitter_mark_favourite_page',
+		'hidden'    => true,
+		'security'  => true,
+		'callback'  => 'twitter_mark_favourite_page',
 	),
 	'directs' => array(
-		'security' => true,
-		'callback' => 'twitter_directs_page',
+		'security'  => true,
+		'callback'  => 'twitter_directs_page',
 		'accesskey' => '2',
-		'display' => '私信',
+		'display'   => '私信',
 	),
 	'search' => array(
-		'security' => true,
-		'callback' => 'twitter_search_page',
+		'security'  => true,
+		'callback'  => 'twitter_search_page',
 		'accesskey' => '3',
-		'display' => '搜索',
+		'display'   => '搜索',
 	),
 	'user' => array(
-		'hidden' => true,
-		'security' => true,
-		'callback' => 'twitter_user_page',
+		'hidden'    => true,
+		'security'  => true,
+		'callback'  => 'twitter_user_page',
 	),
 	'follow' => array(
-		'hidden' => true,
-		'security' => true,
-		'callback' => 'twitter_follow_page',
+		'hidden'    => true,
+		'security'  => true,
+		'callback'  => 'twitter_follow_page',
 	),
 	'unfollow' => array(
-		'hidden' => true,
-		'security' => true,
-		'callback' => 'twitter_follow_page',
+		'hidden'    => true,
+		'security'  => true,
+		'callback'  => 'twitter_follow_page',
 	),
 	'confirm' => array(
-		'hidden' => true,
-		'security' => true,
-		'callback' => 'twitter_confirmation_page',
+		'hidden'    => true,
+		'security'  => true,
+		'callback'  => 'twitter_confirmation_page',
 	),
 	'confirmed' => array(
-                'hidden' => true,
-                'security' => true,
-                'callback' => 'twitter_confirmed_page',
+                'hidden'    => true,
+                'security'  => true,
+                'callback'  => 'twitter_confirmed_page',
         ),
 	'block' => array(
-		'hidden' => true,
-		'security' => true,
-		'callback' => 'twitter_block_page',
+		'hidden'    => true,
+		'security'  => true,
+		'callback'  => 'twitter_block_page',
 	),
 	'unblock' => array(
-		'hidden' => true,
-		'security' => true,
-		'callback' => 'twitter_block_page',
+		'hidden'    => true,
+		'security'  => true,
+		'callback'  => 'twitter_block_page',
 	),
 	'spam' => array(
-		'hidden' => true,
-		'security' => true,
-		'callback' => 'twitter_spam_page',
+		'hidden'    => true,
+		'security'  => true,
+		'callback'  => 'twitter_spam_page',
 	),
 	'favourites' => array(
-		'hidden' => true,
-		'security' => true,
-		'callback' =>  'twitter_favourites_page',
-//		'display' => '收藏',
+		'hidden'    => true,
+		'security'  => true,
+		'callback'  =>  'twitter_favourites_page',
+//		'display'   => '收藏',
 	),
 	'followers' => array(
-		'security' => true,
-		'hidden' => true,
-		'callback' => 'twitter_followers_page',
-//		'display' => '粉丝',
+		'security'  => true,
+		'hidden'    => true,
+		'callback'  => 'twitter_followers_page',
+//		'display'   => '粉丝',
 	),
 	'friends' => array(
-		'security' => true,
-		'hidden' => true,
-		'callback' => 'twitter_friends_page',
-//		'display' => '偶像',
+		'security'  => true,
+		'hidden'    => true,
+		'callback'  => 'twitter_friends_page',
+//		'display'   => '偶像',
 	),
 	'delete' => array(
-		'hidden' => true,
-		'security' => true,
-		'callback' => 'twitter_delete_page',
+		'hidden'    => true,
+		'security'  => true,
+		'callback'  => 'twitter_delete_page',
 	),
 	'deleteDM' => array(
-		'hidden' => true,
-		'security' => true,
-		'callback' => 'twitter_deleteDM_page',
+		'hidden'    => true,
+		'security'  => true,
+		'callback'  => 'twitter_deleteDM_page',
 	),
 	'retweet' => array(
-		'hidden' => true,
-		'security' => true,
-		'callback' => 'twitter_retweet_page',
+		'hidden'    => true,
+		'security'  => true,
+		'callback'  => 'twitter_retweet_page',
+	),
+	'find' => array(
+		'security'  => true,
+		'hidden'    => true,
+		'callback'  => 'twitter_find_user',
+//		'display'   => '找人',
 	),
 	'hash' => array(
-		'security' => true,
-		'hidden' => true,
-		'callback' => 'twitter_hashtag_page',
+		'security'  => true,
+		'hidden'    => true,
+		'callback'  => 'twitter_hashtag_page',
 	),
 	'picture' => array(
-		'security' => true,
-		'hidden' => true,
-		'callback' => 'twitter_media_page',
-//		'display' => '上图',
+		'security'  => true,
+		'hidden'    => true,
+		'callback'  => 'twitter_media_page',
+//		'display'   => '上图',
 	),
 	'trends' => array(
-		'security' => true,
-		'hidden' => true,
-		'callback' => 'twitter_trends_page',
-//		'display' => '趋势',
+		'security'  => true,
+		'hidden'    => true,
+		'callback'  => 'twitter_trends_page',
+//		'display'   => '趋势',
 	),
 	'retweets' => array(
-		'security' => true,
-		'hidden' => true,
-		'callback' => 'twitter_retweets_page',
-//		'display' => '转发',
+		'security'  => true,
+		'hidden'    => true,
+		'callback'  => 'twitter_retweets_page',
+//		'display'   => '转发',
 	),
 	'retweeted_by' => array(
-		'security' => true,
-		'hidden' => true,
-		'callback' => 'twitter_retweeters_page',
+		'security'  => true,
+		'hidden'    => true,
+		'callback'  => 'twitter_retweeters_page',
 	),
 	'editbio' => array(
-		'security' => true,
-		'hidden' => true,
-		'callback' => 'twitter_profile_page',
-//		'display' => '自传',
+		'security'  => true,
+		'hidden'    => true,
+		'callback'  => 'twitter_profile_page',
+//		'display'   => '自传',
 	)
 ));
 
@@ -308,7 +314,7 @@ function twitter_trends_page($query) {
 	$trends     = twitter_process($request);
 	$search_url = 'search?query=';
 	foreach($trends[0]->trends as $trend) {
-		$row = array('<strong><a href="' . str_replace('http://twitter.com/search/', $search_url, $trend->url) . '">' . $trend->name . '</a></strong>');
+		$row    = array("<strong><a href='{$search_url}{$trend->query}'>{$trend->name}</a></strong>");
 		$rows[] = array('data' => $row,  'class' => 'tweet');
 	}
 	$headers = array($header);
@@ -501,44 +507,52 @@ function twitter_parse_tags($input, $entities = false) {
 				else $display_url = $urls->url;
 				$url = $urls->url;
 				$parsed_url = parse_url($url);
-				if (empty($parsed_url['scheme'])) $url = 'http://' . $url;
-				if (setting_fetch('gwt') == 'on') {
+				if(empty($parsed_url['scheme'])) $url = 'http://' . $url;
+				if(setting_fetch('gwt') == 'on') {
 					$encoded = urlencode($urls->url);
 					$link = "http://google.com/gwt/n?u={$encoded}";
 				}
 				else $link = $display_url;
 				$link_html = '<a href="' . $link . '" target="' . get_target() . '">' . $display_url . '</a>';
-				$url = $urls->url;
-				$pattern = '#((?<!href\=(\'|\"))'.preg_quote($url,'#').')#i';
-				$out = preg_replace($pattern,  $link_html, $out);
+				$url       = $urls->url;
+				$pattern   = '#((?<!href\=(\'|\"))'.preg_quote($url,'#').')#i';
+				$out       = preg_replace($pattern,  $link_html, $out);
 			}
 		}
 		if($entities->hashtags) {
 			foreach($entities->hashtags as $hashtag) {
-				$text = $hashtag->text;
-				$pattern = '/(^|\s)([#＃]+)('. $text .')/iu';
+				$text      = $hashtag->text;
+				$pattern   = '/(^|\s)([#＃]+)('. $text .')/iu';
 				$link_html = ' <a href="hash/' . $text . '">#' . $text . '</a> ';
-				$out = preg_replace($pattern,  $link_html, $out, 1);
+				$out       = preg_replace($pattern,  $link_html, $out, 1);
+			}
+		}
+		if($entities->media) {
+			foreach($entities->media as $media) {
+				$url       = $media->url;
+				$pattern   = '#((?<!href\=(\'|\"))'.preg_quote($url,'#').')#i';
+				$link_html = "<a href='{$media->url}' target='" . get_target() . "'>{$media->display_url}</a>";
+				$out       = preg_replace($pattern,  $link_html, $out, 1);
 			}
 		}
 	}
 	else {
 		$urls = Twitter_Extractor::create($input)->extractURLs();
 
-		if (setting_fetch('gwt') == 'on') {
+		if(setting_fetch('gwt') == 'on') {
 			foreach($urls as $url) {
 				$encoded = urlencode($url);
-				$out = str_replace($url, "<a href='http://google.com/gwt/n?u={$encoded}' target='" . get_target() . "'>{$url}</a>", $out);
+				$out     = str_replace($url, "<a href='http://google.com/gwt/n?u={$encoded}' target='" . get_target() . "'>{$url}</a>", $out);
 			}	
 		}
 		else $out = Twitter_Autolink::create($out)->addLinksToURLs();	
-	
+
 		$out = Twitter_Autolink::create($out)->setTarget('')->addLinksToHashtags();
 	}
 
 	$out = Twitter_Autolink::create($out)->setTarget('')->addLinksToUsernamesAndLists();
 
-	if (setting_fetch('emoticons') != 'off') $out = emoticons($out);
+	if(setting_fetch('emoticons') != 'off') $out = emoticons($out);
 
 	return $out;
 }
@@ -571,6 +585,7 @@ function twitter_status_page($query) {
 		$content = theme('status', $status);
 		$content .= '<a href="http://translate.google.com/m?hl=zh-CN&tl=zh-CN&sl=auto&ie=UTF-8&q='.urlencode($status->text).'" target="'.get_target().'">请 Google 翻译一下这货</a></p>';
 		$thread_id = $status->id_str;
+		// RUNS ON /1/ API, THERE ARE NO PLANS BY TWITTER TO MAKE THIS UNPUBLISHED API CALL WORK WITH /1.1/ :(
 		$request = API_OLD."related_results/show/{$thread_id}.json";
 		$threadstatus = twitter_process($request);
 		if ($threadstatus[0]->results) {
@@ -701,21 +716,21 @@ function twitter_confirmation_page($query) {
 	switch ($action) {
 		case 'block':
 			if (twitter_block_exists($target_id)) {
-				$action = 'unblock';
+				$action   = 'unblock';
 				$content  = "<p>你真的要<strong>解除对 $target 的屏蔽</strong>么？</p>";
 				$content .= '<ul><li>如果他们又fo了你的话他们就又可以看到你的活动了。</li><li>你<em>可以</em>再次B掉他们，如果需要的话。</li></ul>';
 			}
 			else {
-				$content = "<p>你真的要<strong>B掉 $target </strong>么？</p>";
+				$content  = "<p>你真的要<strong>B掉 $target </strong>么？</p>";
 				$content .= "<ul><li>你不会再出现在他们的朋友名单里了。</li><li>他们在你的主页也看不到你发送的消息了。</li><li>他们会没法fo你。</li><li>你<em>可以</em>以后解封但是会需要重新互fo一下。</li></ul>";
 			}
 			break;
 		case 'delete':
-			$content = '<p>你真的要把自己的推文删掉么？</p>';
+			$content  = '<p>你真的要把自己的推文删掉么？</p>';
 			$content .= "<ul><li>消息：<strong>$target</strong></li><li>世上木有后悔药哦亲！</li></ul>";
 			break;
 		case 'deleteDM':
-			$content = '<p>你真的要删掉那条私信么？</p>';
+			$content  = '<p>你真的要删掉那条私信么？</p>';
 			$content .= "<ul><li>消息：<strong>$target</strong></li><li>世上木有后悔药哦亲！</li><li>而且这条私信会被从<em>接收和发送双方</em>的账户里删掉。</li></ul>";
 			break;
 		case 'spam':
@@ -1265,20 +1280,16 @@ function theme_timeline($feed, $paginate = true) {
 		$actions = theme('action_icons', $status);
 		$avatar  = theme('avatar', theme_get_avatar($status->from));
 		$source  = $status->source ? "来自 ".str_replace('rel="nofollow"', 'rel="nofollow" target="' . get_target() . '"', preg_replace('/&(?![a-z][a-z0-9]*;|#[0-9]+;|#x[0-9a-f]+;)/i', '&amp;', $status->source)." 部门") : ''; //need to replace & in links with &amps and force new window on links
-		if($status->place->name) $source .= " " . $status->place->name . ", " . $status->place->country;
+		if($status->place->name)           $source .= "，" . $status->place->name . ", " . $status->place->country.' 分舵';
 		if($status->in_reply_to_status_id) $source .= " <a href='status/{$status->in_reply_to_status_id_str}'>对 {$status->in_reply_to_screen_name} 的回复</a>";
-		if($status->retweet_count) {
-			$source .= " <a href='retweeted_by/{$status->id}'>被转发了 ";
-			$source .= $status->retweet_count . " 次</a>";
-		}
+		if($status->retweet_count)         $source .= " <a href='retweeted_by/{$status->id}'>被转发了 ".$status->retweet_count . " 次</a>";
 		$retweeted = '';
 		if($status->retweeted_by) {
 			$retweeted_by = $status->retweeted_by->user->screen_name;
 			$retweeted = "<br /><small>" . theme('action_icon', "retweeted_by/{$status->id}", 'images/retweet.png', 'RT') . "被下列用户转发：<a href='user/{$retweeted_by}'>{$retweeted_by}</a></small>";
-			//$source .= "<br /><a href='retweeted_by/{$status->id}'>被下列用户转发：</a> <a href='user/{$retweeted_by}'>{$retweeted_by}</a>";
 		}
-		//$html = "<b><a href='user/{$status->from->screen_name}'>{$status->from->screen_name}</a></b> $actions $link<br />{$text}<br />$media<small>$source</small>";
-		$html = "<b><a href='user/{$status->from->screen_name}'>{$status->from->screen_name}</a></b> $actions $link{$retweeted}<br />{$text}<br />$media<small>$source</small>";
+		if($status->favorite_count)        $source .= '，被 '.$status->favorite_count.' 人收藏';
+		$html = "<b><a href='user/{$status->from->screen_name}'>{$status->from->screen_name}</a></b> $actions $link{$retweeted}<br />{$text}<br />$media<span class='from'>$source</span>";
 		unset($row);
 		$class = 'status';
 		if($page != 'user' && $avatar) {
@@ -1297,9 +1308,8 @@ function theme_timeline($feed, $paginate = true) {
 		if($paginate) {
 			if($page == 'some-unknown-method-which-doesnt-take-max_id') $content .= theme('pagination');
 			else {
-				if(is_64bit()) $max_id = intval($max_id) - 1; //stops last tweet appearing as first tweet on next page
-				$links[]  = "<a href='{$_GET['q']}?max_id=$max_id' accesskey='9'>更早</a> 9";
-				$content .= '<p>'.implode(' | ', $links).'</p>';
+				if(is_64bit()) $max_id = intval($max_id) - 1; // stops last tweet appearing as first tweet on next page
+				$content .= theme('pagination', $max_id);
 			}
 		}
 	}
@@ -1321,6 +1331,7 @@ function twitter_is_reply($status) {
 	return false;
 }
 
+/*
 function theme_followers($feed, $nextPageURL) {
 	$rows = array();
 	if(count($feed) == 0 || $feed == '[]') return '<p>这里没有任何消息。</p>';
@@ -1342,7 +1353,9 @@ function theme_followers($feed, $nextPageURL) {
 	if($nextPageURL) $content .= "<a href='{$nextPageURL}'>下一页</a>";
 	return $content;
 }
+*/
 
+/*
 function theme_retweeters($feed, $hide_pagination = false) {
 	$rows = array();
 	if(count($feed) == 0 || $feed == '[]') return '<p>木有人转发过这条消息。</p>';
@@ -1360,6 +1373,7 @@ function theme_retweeters($feed, $hide_pagination = false) {
 	if(!$hide_pagination) $content .= theme('list_pagination', $feed);
 	return $content;
 }
+*/
 
 function theme_full_name($user) {
 	$name = "<a href='user/{$user->screen_name}'>{$user->screen_name}</a>";
@@ -1471,10 +1485,12 @@ function theme_followers_list($feed, $hide_pagination = false) {
 		$content .= $user->friends_count . " 个推油，被 ";
 		$content .= $user->followers_count . "个推油关注，";
 		$content .= "每天约 " . $tweets_per_day . " 条推文。<br />";
-		$content .= "上一条推文发送于：";
-		if($user->protected == 'true' && $last_tweet == 0) $content .= "（保密）";
-		else if($last_tweet == 0) $content .= "（啥也没有）";
-		else $content .= twitter_date('Y 年 m 月 d 日', $last_tweet);
+		if($user->status->created_at) {
+			$content .= "上一条推文发送于：";
+			if($user->protected == 'true' && $last_tweet == 0) $content .= "（保密）";
+			else if($last_tweet == 0) $content .= "（啥也没有）";
+			else $content .= twitter_date('Y 年 m 月 d 日', $last_tweet);
+		}
 		$content .= "</span>";
 
 		$rows[] = array('data' => array(array('data' => theme('avatar', $user->profile_image_url), 'class' => 'avatar'),
@@ -1485,4 +1501,24 @@ function theme_followers_list($feed, $hide_pagination = false) {
 	$content = theme('table', array(), $rows, array('class' => 'followers'));
 	if (!$hide_pagination) $content .= theme('list_pagination', $feed);
 	return $content;
+}
+
+function twitter_find_user() {
+	// /1.1/ possibility to add the option to paginate via page=2 on these
+	$name = $_GET['name'];
+	if(strpos($name, '@') === 0) twitter_refresh('user/' . str_replace('@','',$name));
+	$output  = '<form method="get" action="find">查找用户：<input name="name" id="name" value="'.urldecode($name).'" /><input type="submit" value="给我搜" /></form>';
+	$output .= '<p>（留空以便查看推荐）</p>';
+	if($name) {
+		$request = API_NEW."users/search.json?q=" . urlencode($name);
+		$users   = twitter_process($request);
+	}
+	// ELSE RUNS ON /1/ API, THERE ARE NO PLANS BY TWITTER TO MAKE THIS UNPUBLISHED API CALL WORK WITH /1.1/ :(
+	else {
+		$request = API_OLD."users/recommendations.json?expanded_results_format=1&cursor=-1&pc=true&display_location=wtf-view-all-stream&personalized=false&force_bq=false&algorithm=&connections=true";
+		$users   = twitter_process($request);
+		$output .= "<div class='heading'>Twitter 为寂寞的你推荐：</div>\n";
+	}
+	$output .= theme_followers_list($users, true);
+	theme('page', '找人', $output);
 }
