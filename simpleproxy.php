@@ -38,4 +38,3 @@ fpassthru($fp);
 flush();
 fclose($fp);
 exit;
-?>

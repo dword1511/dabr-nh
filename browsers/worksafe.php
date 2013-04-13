@@ -41,5 +41,3 @@ function worksafe_theme_status_time_link($status, $is_link = true) {
 	$out = "<a href='status/{$status->id}'>$out</a>";
 	return $out;
 }
-
-?>

@@ -192,5 +192,3 @@ function googleAnalyticsGetImageUrl() {
 	$url .= "&guid=ON";
 	return str_replace("&", "&amp;", $url);
 }
-
-?>

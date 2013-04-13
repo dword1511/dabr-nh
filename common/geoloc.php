@@ -70,4 +70,3 @@ function geoSuccess(position) {
 </script>';
 	return $content;
 }
-?>

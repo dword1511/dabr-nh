@@ -29,5 +29,3 @@ function browser_load($browser) {
 		require_once($file);
 	}
 }
-
-?>

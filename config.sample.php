@@ -2,15 +2,6 @@
 
 error_reporting(E_ALL ^ E_NOTICE);
 
-// Twitter's API URL - you can also use https://api.twitter.com/1/ if you want a secure connection to Twitter
-define('API_URL','http://api.twitter.com/1/');
-
-// Image Proxy URL
-// Use http://src.sencha.io/ for regular connections
-// Use https://tinysrc.appspot.com/ for SSL connections
-// NOTICE: Not used in this nh version!
-//define('IMAGE_PROXY_URL', 'https://tinysrc.appspot.com/');
-
 // Cookie encryption key. Max 52 characters
 define('ENCRYPTION_KEY', 'Example Key - Change Me!');
 
@@ -36,9 +27,8 @@ define('DEBUG_MODE', 'OFF');
 // Base URL, should point to your website, including a trailing slash
 // Can be set manually but the following code tries to work it out automatically.
 $base_url = 'http://'.$_SERVER['HTTP_HOST'];
-if ($directory = trim(dirname($_SERVER['SCRIPT_NAME']), '/\,')) {
-	$base_url .= '/'.$directory;
-}
+if($directory = trim(dirname($_SERVER['SCRIPT_NAME']), '/\,')) $base_url .= '/'.$directory;
+
 define('BASE_URL', $base_url.'/');
 // WARNING: To ensure that enforced SSL is working,
 // you'd better edit and uncomment the following line:
@@ -63,8 +53,6 @@ CREATE TABLE IF NOT EXISTS `user` (
 */
 
 // Google Analytics Mobile tracking code
-// You need to download ga.php from the Google Analytics website for this to work
+// You might need to download/update ga.php from the Google Analytics website for this to work
 $GA_ACCOUNT = "";
 $GA_PIXEL = "ga.php";
-
-?>

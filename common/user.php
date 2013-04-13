@@ -243,5 +243,3 @@ function theme_login() {
 function theme_logged_out() {
 	return '<p>已经登出了。<a href="">再登录玩玩？</a></p>';
 }
-
-?>

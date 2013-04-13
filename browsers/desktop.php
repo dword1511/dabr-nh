@@ -56,5 +56,3 @@ function desktop_theme_page($title, $content) {
 	echo '</body></html>';
 	exit();
 }
-
-?>

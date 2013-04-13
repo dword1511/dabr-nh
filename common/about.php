@@ -50,4 +50,3 @@ function theme_about() {
 	$content .= '</li></ul>等人提供的各种 patch 。</p></div>';
 	return $content;
 }
-?>

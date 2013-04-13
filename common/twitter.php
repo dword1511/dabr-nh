@@ -1510,5 +1510,3 @@ function theme_followers_list($feed, $hide_pagination = false) {
 	if (!$hide_pagination) $content .= theme('list_pagination', $feed);
 	return $content;
 }
-
-?>

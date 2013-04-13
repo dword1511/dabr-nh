@@ -1,7 +1,7 @@
 <?php
 
 /*
-Syntax is 
+Syntax is
 'Name|links,bodybg,bodyt,small,odd,even,replyodd,replyeven,menubg,menut,menua',
 
 Assembled in theme_css()
