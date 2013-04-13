@@ -605,33 +605,6 @@ function twitter_status_page($query) {
 	}
 }
 
-/*
-function twitter_status_page($query) {
-	$id = (string) $query[1];
-	if(is_numeric($id)) {
-		$request     = API_NEW."statuses/show.json?id={$id}";
-		$status      = twitter_process($request);
-		$text        = $status->text;
-		$content     = theme('status', $status);
-		$screen_name = $status->from->screen_name;
-		$content    .= '<p><a href="https://mobile.twitter.com/' . $screen_name . '/status/' . $id . '" target="'. get_target() . '">在 Twitter 上查看原文</a> | ';
-		$content    .= '<a href="http://translate.google.com/m?hl=en&sl=auto&ie=UTF-8&q=' . urlencode($text) . '" target="'. get_target() . '">请 Google 翻译一下这货</a></p>';
-
-		if (!$status->user->protected) $thread = twitter_thread_timeline($id);
-		if($thread) $content .= '<p>对话素酱紫滴：</p>'.theme('timeline', $thread);
-		else        $content .= '<p>木有对话可供显示。</p>';
-
-		theme('page', "消息 $id", $content);
-	}
-}
-
-function twitter_thread_timeline($thread_id) {
-	$request = "https://search.twitter.com/search/thread/{$thread_id}";
-	$tl      = twitter_standard_timeline(twitter_fetch($request), 'thread');
-	return $tl;
-}
-*/
-
 function twitter_retweet_page($query) {
 	$id = (string) $query[1];
 	if (is_numeric($id)) {
@@ -827,6 +800,7 @@ function twitter_update() {
 	twitter_refresh($_POST['from'] ? $_POST['from'] : '');
 }
 
+/*
 function twitter_get_place($lat, $long) {
 	$request = API_OLD.'geo/reverse_geocode.json';
 	$request .= '?lat='.$lat.'&long='.$long.'&max_results=1';
@@ -835,6 +809,7 @@ function twitter_get_place($lat, $long) {
 	foreach($places as $place) if ($place->id) return $place->id;
 	return false;
 }
+*/
 
 function twitter_retweet($query) {
 	twitter_ensure_post_action();
@@ -1280,9 +1255,9 @@ function theme_timeline($feed, $paginate = true) {
 		$actions = theme('action_icons', $status);
 		$avatar  = theme('avatar', theme_get_avatar($status->from));
 		$source  = $status->source ? "来自 ".str_replace('rel="nofollow"', 'rel="nofollow" target="' . get_target() . '"', preg_replace('/&(?![a-z][a-z0-9]*;|#[0-9]+;|#x[0-9a-f]+;)/i', '&amp;', $status->source)." 部门") : ''; //need to replace & in links with &amps and force new window on links
-		if($status->place->name)           $source .= "，" . $status->place->name . ", " . $status->place->country.' 分舵';
-		if($status->in_reply_to_status_id) $source .= " <a href='status/{$status->in_reply_to_status_id_str}'>对 {$status->in_reply_to_screen_name} 的回复</a>";
-		if($status->retweet_count)         $source .= " <a href='retweeted_by/{$status->id}'>被转发了 ".$status->retweet_count . " 次</a>";
+		if($status->place->name)           $source .= "，" . $status->place->name . "，" . $status->place->country.' 分舵';
+		if($status->in_reply_to_status_id) $source .= "，<a href='status/{$status->in_reply_to_status_id_str}'>对 {$status->in_reply_to_screen_name} 的回复</a>";
+		if($status->retweet_count)         $source .= "，<a href='retweeted_by/{$status->id}'>被转发了 ".$status->retweet_count . " 次</a>";
 		$retweeted = '';
 		if($status->retweeted_by) {
 			$retweeted_by = $status->retweeted_by->user->screen_name;
@@ -1331,50 +1306,6 @@ function twitter_is_reply($status) {
 	return false;
 }
 
-/*
-function theme_followers($feed, $nextPageURL) {
-	$rows = array();
-	if(count($feed) == 0 || $feed == '[]') return '<p>这里没有任何消息。</p>';
-	foreach($feed as $user) {
-		$name = theme('full_name', $user);
-		$tweets_per_day = twitter_tweets_per_day($user);
-		$last_tweet = strtotime($user->status->created_at);
-		$content = "{$name}<br/><span class='about'>";
-		if($user->description != "") $content .= "简介：" . twitter_parse_tags($user->description) . "<br/>";
-		if($user->location != "") $content .= "地址：{$user->location}<br/>";
-		$content .= "统计：".$user->statuses_count." 条消息，".$user->friends_count." 个偶像，".$user->followers_count." 个粉丝，每天约 ".$tweets_per_day." 条消息<br/>";
-		if($user->protected == 'true' && $last_tweet == 0) $content .= "保密的消息";
-		else if($last_tweet == 0) $content .= "该用户从未发过推";
-		else $content .= "上一条消息于 ".twitter_date('Y 年 m 月 d 日 H:i:s', $last_tweet)." 发出";
-		$content .= "</span>";
-		$rows[] = array('data' => array(array('data' => theme('avatar', theme_get_avatar($user)), 'class' => 'avatar'),array('data' => $content, 'class' => 'status shift')),'class' => 'tweet');
-	}
-	$content = theme('table', array(), $rows, array('class' => 'followers'));
-	if($nextPageURL) $content .= "<a href='{$nextPageURL}'>下一页</a>";
-	return $content;
-}
-*/
-
-/*
-function theme_retweeters($feed, $hide_pagination = false) {
-	$rows = array();
-	if(count($feed) == 0 || $feed == '[]') return '<p>木有人转发过这条消息。</p>';
-	foreach($feed->user as $user) {
-		$name = theme('full_name', $user);
-		$tweets_per_day = twitter_tweets_per_day($user);
-		$last_tweet = strtotime($user->status->created_at);
-		$content = "{$name}<br/><span class='about'>";
-		if($user->description != "") $content .= "简介：" . twitter_parse_tags($user->description) . "<br/>";
-		if($user->location != "") $content .= "地址：{$user->location}<br/>";
-		$content .= "统计：".$user->statuses_count." 条消息，".$user->friends_count." 个偶像，".$user->followers_count." 个粉丝，"."每天约 ".$tweets_per_day." 条消息<br/></span>";
-		$rows[] = array('data' => array(array('data' => theme('avatar', theme_get_avatar($user)), 'class' => 'avatar'),array('data' => $content, 'class' => 'status shift')),'class' => 'tweet');
-	}
-	$content = theme('table', array(), $rows, array('class' => 'followers'));
-	if(!$hide_pagination) $content .= theme('list_pagination', $feed);
-	return $content;
-}
-*/
-
 function theme_full_name($user) {
 	$name = "<a href='user/{$user->screen_name}'>{$user->screen_name}</a>";
 	if($user->name != "") $name .= " ({$user->name})";
@@ -1395,7 +1326,7 @@ function theme_no_tweets() {
 
 function theme_search_form($query) {
 	$query = stripslashes(htmlentities($query,ENT_QUOTES,"UTF-8"));
-	return '<form action="search" method="get"><input name="query" value="'. $query .'"/><input type="submit" value="给我搜"/></form><p><strong><a href="trends">趋势 →</a></strong></p>';
+	return '<form action="search" method="get"><input name="query" value="'. $query .'"/><input type="submit" value="给我搜"/></form><p><strong><a href="trends">趋势 →</a></strong><br /><strong><a href="find">找人 →</a></strong></p>';
 }
 
 function theme_external_link($url, $content = null) {
@@ -1413,7 +1344,7 @@ function theme_pagination($max_id = false) {
 		if($page > 1) $links[] = "<a href='{$_GET['q']}?page=".($page-1)."$query' accesskey='8'>更新</a> 8";
 	}
 	if($query) $query = '?' . substr($query, 1);
-	$links[] = "<a href='{$_GET['q']}?$query'>First</a>";
+	// $links[] = "<a href='{$_GET['q']}?$query'>最早</a>";
 	return '<p>'.implode(' | ', $links).'</p>';
 }
 
