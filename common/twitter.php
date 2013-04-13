@@ -1059,7 +1059,7 @@ function twitter_home_page() {
 	if($_GET['since_id']) $request .= '&since_id='.$_GET['since_id'];
 	$tl = twitter_process($request);
 	$tl = twitter_standard_timeline($tl, 'friends');
-	$content = theme('status_form');
+	$content  = theme('status_form');
 	$content .= theme('timeline', $tl);
 	theme('page', '主页', $content);
 }
@@ -1322,7 +1322,7 @@ function theme_timeline($feed, $paginate = true) {
 			if($page == 'some-unknown-method-which-doesnt-take-max_id') $content .= theme('pagination');
 			else {
 				if(is_64bit()) $max_id = intval($max_id) - 1; //stops last tweet appearing as first tweet on next page
-				$links[]  = "<a href='{$_GET['q']}?max_id=$max_id' accesskey='9'>Older</a> 9";
+				$links[]  = "<a href='{$_GET['q']}?max_id=$max_id' accesskey='9'>更早</a> 9";
 				$content .= '<p>'.implode(' | ', $links).'</p>';
 			}
 		}
@@ -1416,11 +1416,11 @@ function theme_external_link($url, $content = null) {
 function theme_pagination($max_id = false) {
 	$page = intval($_GET['page']);
 	if(preg_match('#&q(.*)#', $_SERVER['QUERY_STRING'], $matches)) $query = $matches[0];
-	if($max_id) $links[] = "<a href='{$_GET['q']}?max_id=".$max_id."$query' accesskey='9'>Older</a> 9";
+	if($max_id) $links[] = "<a href='{$_GET['q']}?max_id=".$max_id."$query' accesskey='9'>更早</a> 9";
 	else {
 		if($page == 0) $page = 1;
-		$links[] = "<a href='{$_GET['q']}?page=".($page+1)."$query' accesskey='9'>Older</a> 9";
-		if($page > 1) $links[] = "<a href='{$_GET['q']}?page=".($page-1)."$query' accesskey='8'>Newer</a> 8";
+		$links[] = "<a href='{$_GET['q']}?page=".($page+1)."$query' accesskey='9'>更早</a> 9";
+		if($page > 1) $links[] = "<a href='{$_GET['q']}?page=".($page-1)."$query' accesskey='8'>更新</a> 8";
 	}
 	if($query) $query = '?' . substr($query, 1);
 	$links[] = "<a href='{$_GET['q']}?$query'>First</a>";
