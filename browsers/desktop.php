@@ -18,7 +18,7 @@ function desktop_theme_status_form($text = '', $in_reply_to_id = NULL) {
 
 function desktop_theme_search_form($query) {
 	$query = stripslashes(htmlentities($query,ENT_QUOTES,"UTF-8"));
-	return '<form action="search" method="get"><input name="query" value="'.$query.'" style="width:60%; max-width: 300px"/><input type="submit" value="给我搜"/>'.geoloc($_COOKIE['geo'],1).'<p><strong><a href="trends">趋势 →</a></strong></p>';
+	return '<form action="search" method="get"><input name="query" value="'.$query.'" style="width:60%; max-width: 300px"/><input type="submit" value="给我搜"/>'.geoloc($_COOKIE['geo'],1).'<p><strong><a href="trends">趋势 →</a></strong><br /><strong><a href="find">找人 →</a></strong></p>';
 }
 
 function desktop_theme_avatar($url, $force_large = false) {
