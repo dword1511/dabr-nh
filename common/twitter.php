@@ -788,60 +788,18 @@ function twitter_followers_page($query) {
 	theme('page', $user.' 的粉丝', $content);
 }
 
-// Shows every user who retweeted a specific status
+// Shows first 100 users who retweeted a specific status (limit defined by twitter)
 // NOTE: This actually does not work well.
 function twitter_retweeters_page($query) {
 	// Which tweet are we looking for?
 	$id = $query[1];
 
-	// How many users to show	
-	$per_page = setting_fetch('perPage', 20);
-
-	// Bug in Twitter (?) can't feth more than 100 users at a time
-	if ($per_page >= 100) $per_page = 100;
-
-	// Get all the user ID of the friends	
-	$request_ids = API_OLD."statuses/{$id}/retweeted_by/ids.json?count=100";
-	$json = twitter_process($request_ids);
-	$ids = $json;
-
-	// Poor man's pagination to fix broken Twitter API
-	// retweeted_by/1234567980/20
-	$nextPage = $query[2];
-	$nextPageURL = "retweeted_by/" . $id . "/";
-	if (count($ids) < $nextPage + $per_page) $nextPageURL = null;
-	else $nextPageURL .= ($nextPage + $per_page);
-
-	// Paginate through the user IDs and build a API query
-	$user_ids = "";
-	for($i=$nextPage;$i<($nextPage+$per_page);$i++) $user_ids .= $ids[$i] . ",";
-
-	// Twitter requests that we POST these User IDs
-	$user_id_array = array();
-	$user_id_array["user_id"] = $user_ids;
-
-	// Construct the request
-	$request = API_OLD."users/lookup.xml";
-
-	// Get the XML
-	$xml = twitter_process($request, $user_id_array);
-	$tl = simplexml_load_string($xml);
-
-	// lace the users into an array
-	$sortedUsers = array();
-
-	foreach($tl as $user) {
-	  $user_id = $user->id;
-	  // $tl is *unsorted* - but $ids is *sorted*. So we place the users from $tl into a new array based on how they're sorted in $ids
-	  $key = array_search($user_id, $ids);
-	  $sortedUsers[$key] = $user;
-	}
-
-	// Sort the array by key so the most recent is at the top
-	ksort($sortedUsers);
+	// Get all the user ID of the friends
+	$request = API_NEW."statuses/retweets/{$id}.json";
+	$users   = twitter_process($request);
 
 	// Format the output
-	$content = theme('followers', $sortedUsers, $nextPageURL);
+	$content = theme('followers_list', $users);
 	theme('page', "目力所及范围内转发了 {$id} 的家伙", $content);
 }
 
@@ -1325,11 +1283,14 @@ function theme_timeline($feed, $paginate = true) {
 			$source .= " <a href='retweeted_by/{$status->id}'>被转发了 ";
 			$source .= $status->retweet_count . " 次</a>";
 		}
+		$retweeted = '';
 		if($status->retweeted_by) {
 			$retweeted_by = $status->retweeted_by->user->screen_name;
-			$source .= "<br /><a href='retweeted_by/{$status->id}'>被下列用户转发：</a> <a href='user/{$retweeted_by}'>{$retweeted_by}</a>";
+			$retweeted = "<br /><small>" . theme('action_icon', "retweeted_by/{$status->id}", 'images/retweet.png', 'RT') . "被下列用户转发：<a href='user/{$retweeted_by}'>{$retweeted_by}</a></small>";
+			//$source .= "<br /><a href='retweeted_by/{$status->id}'>被下列用户转发：</a> <a href='user/{$retweeted_by}'>{$retweeted_by}</a>";
 		}
-		$html = "<b><a href='user/{$status->from->screen_name}'>{$status->from->screen_name}</a></b> $actions $link<br />{$text}<br />$media<small>$source</small>";
+		//$html = "<b><a href='user/{$status->from->screen_name}'>{$status->from->screen_name}</a></b> $actions $link<br />{$text}<br />$media<small>$source</small>";
+		$html = "<b><a href='user/{$status->from->screen_name}'>{$status->from->screen_name}</a></b> $actions $link{$retweeted}<br />{$text}<br />$media<small>$source</small>";
 		unset($row);
 		$class = 'status';
 		if($page != 'user' && $avatar) {
@@ -1460,29 +1421,29 @@ function theme_action_icons($status) {
 	$retweeted_id = $status->retweeted_by->id;
 	$geo = $status->geo;
 	$actions = array();
-	if (!$status->is_direct) $actions[] = theme('action_icon', "user/{$from}/reply/{$status->id}", BASE_URL.'images/reply.png', '@');
-	if( $status->entities->user_mentions ) $actions[] = theme('action_icon', "user/{$from}/replyall/{$status->id}", BASE_URL.'images/replyall.png', 'REPLY ALL');
-	if (!$status->is_direct) {
-		if ($status->favorited == '1') $actions[] = theme('action_icon', "unfavourite/{$status->id}", BASE_URL.'images/star.png','UNFAV');
+	if(!$status->is_direct) $actions[] = theme('action_icon', "user/{$from}/reply/{$status->id}", BASE_URL.'images/reply.png', '@');
+	if( $status->entities->user_mentions) $actions[] = theme('action_icon', "user/{$from}/replyall/{$status->id}", BASE_URL.'images/replyall.png', 'REPLY ALL');
+	if(!$status->is_direct) {
+		if($status->favorited == '1') $actions[] = theme('action_icon', "unfavourite/{$status->id}", BASE_URL.'images/star.png','UNFAV');
 		else $actions[] = theme('action_icon', "favourite/{$status->id}", BASE_URL.'images/star_grey.png','FAV');
 		
-		if (!user_is_current_user($from)) {
-			if ($retweeted_by) $actions[] = theme('action_icon', "retweet/{$status->id}", BASE_URL.'images/retweeted.png','RT');
+		if(!user_is_current_user($from)) {
+			if($status->retweeted || user_is_current_user($retweeted_by)) $actions[] = theme('action_icon', "retweet/{$status->id}", BASE_URL.'images/retweeted.png','RT');
 			else $actions[] = theme('action_icon', "retweet/{$status->id}", BASE_URL.'images/retweet.png','RT');
 		}
 		
-		if (user_is_current_user($from)) $actions[] = theme('action_icon', "confirm/delete/{$status->id}", BASE_URL.'images/trash.png','DEL');
-		if ($retweeted_by && user_is_current_user($retweeted_by)) $actions[] = theme('action_icon',"confirm/delete/{$retweeted_id}", BASE_URL.'images/trash.png', 'DEL');
+		if(user_is_current_user($from)) $actions[] = theme('action_icon', "confirm/delete/{$status->id}", BASE_URL.'images/trash.png','DEL');
+		if(user_is_current_user($retweeted_by)) $actions[] = theme('action_icon',"confirm/delete/{$retweeted_id}", BASE_URL.'images/trash.png', 'DEL');
 	}
 	else $actions[] = theme('action_icon', "confirm/deleteDM/{$status->id}", BASE_URL.'images/trash.png','DEL');
-	if ($geo !== null) {
+	if($geo !== null) {
 		$latlong = $geo->coordinates;
 		$lat = $latlong[0];
 		$long = $latlong[1];
 		$actions[] = theme('action_icon', "https://maps.google.com/maps?q={$lat},{$long}", BASE_URL.'images/map.png','MAP');
 	}
 	if(setting_fetch('browser') == 'desktop') { // Actions that are usually not used.
-		if (!user_is_current_user($from)) $actions[] = theme('action_icon', "directs/create/{$from}", BASE_URL.'images/dm.png','DM');
+		if(!user_is_current_user($from)) $actions[] = theme('action_icon', "directs/create/{$from}", BASE_URL.'images/dm.png','DM');
 		$actions[] = theme('action_icon',"search?query=%40{$from}",BASE_URL.'images/q.png','?');
 		$actions[] = theme('action_icon',"http://twitter.com/{$from}/statuses/{$status->id}",BASE_URL.'images/lnk.png','LINK');
 		$actions[] = theme('action_icon',"http://zh-tw.whotwi.com/user/{$from}",BASE_URL.'images/pie.png','ANAL');
