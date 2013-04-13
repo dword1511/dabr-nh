@@ -388,18 +388,10 @@ function twitter_media_page($query) {
 
 function twitter_process($url, $post_data = false) {
 	if ($post_data === true) $post_data = array();
-	$status = $post_data['status'];
-	//if (user_type() == 'oauth' && ( strpos($url, '/twitter.com') !== false || strpos($url, 'api.twitter.com') !== false || strpos($url, 'upload.twitter.com') !== false)) 
+	$status    = $post_data['status'];
 	user_oauth_sign($url, $post_data);
-	//else if (strpos($url, 'api.twitter.com') !== false && is_array($post_data)) {
-	/* if (strpos($url, 'api.twitter.com') !== false && is_array($post_data)) {
-		$s = array();
-		foreach ($post_data as $name => $value)
-		$s[] = $name.'='.urlencode($value);
-		$post_data = implode('&', $s);
-	} */
 	$api_start = microtime(1);
-	$ch = curl_init();
+	$ch        = curl_init();
 	curl_setopt($ch, CURLOPT_URL, $url);
 	if($post_data !== false && !$_GET['page']) {
 		curl_setopt ($ch, CURLOPT_POST, true);
@@ -410,12 +402,11 @@ function twitter_process($url, $post_data = false) {
 	curl_setopt($ch, CURLOPT_TIMEOUT, 10);
 	curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
 	curl_setopt($ch, CURLOPT_HEADER, TRUE);
-	curl_setopt($ch, CURLINFO_HEADER_OUT, TRUE);
 	curl_setopt($ch, CURLOPT_VERBOSE, TRUE);
-	$response = curl_exec($ch);
-	$response_info=curl_getinfo($ch);
-	$erno = curl_errno($ch);
-	$er = curl_error($ch);
+	$response      = curl_exec($ch);
+	$response_info = curl_getinfo($ch);
+	$erno          = curl_errno($ch);
+	$er            = curl_error($ch);
 	curl_close($ch);
 	global $api_time;
 	global $rate_limit;
@@ -425,20 +416,18 @@ function twitter_process($url, $post_data = false) {
 
 	// Place the headers into an array
 	$headers = explode("\n", $headers);
-	$headers_array;
 	foreach($headers as $header) {
 		list($key, $value) = explode(':', $header, 2);
 		$headers_array[$key] = $value;
 	}
 
-	// Not ever request is rate limited
-	if ($headers_array['X-RateLimit-Limit']) {
-		$current_time = time();
-		$ratelimit_time = $headers_array['X-RateLimit-Reset'];
-		$time_until_reset = $ratelimit_time - $current_time;
+	// Not every request is rate limited
+	if ($headers_array['x-rate-limit-limit']) {
+		$current_time        = time();
+		$ratelimit_time      = $headers_array['x-rate-limit-reset'];
+		$time_until_reset    = $ratelimit_time - $current_time;
 		$minutes_until_reset = round($time_until_reset / 60);
-		$currentdate = strtotime("now");
-		$rate_limit = "剩余体力：" . $headers_array['X-RateLimit-Remaining'] . " / " . $headers_array['X-RateLimit-Limit'] . " ；冷却时间：$minutes_until_reset 分钟。";
+		$rate_limit          = "剩余体力：" . $headers_array['x-rate-limit-remaining'] . " / " . $headers_array['x-rate-limit-limit'] . " ；冷却时间：{$minutes_until_reset} 分钟。";
 	}
 
 	$api_time += microtime(1) - $api_start;
@@ -451,6 +440,8 @@ function twitter_process($url, $post_data = false) {
 		case 401:
 			user_logout();
 			theme('error', "<p>错误：您的登录信息有问题。也许您被管理员耍了。</p><p>{$response_info['http_code']}: {$result}</p><hr><p>$url</p>");
+		case 429:
+			theme('error', "<h2>恭喜您！</h2><p>您已成功解锁成就：话唠被封号！<br />再过 {$minutes_until_reset} 分钟你就又可以唠上 {$headers_array['x-rate-limit-limit']} 推了。</p>");
 		case 0:
 			$result = $erno . ":" . $er . "<br/>";
 			theme('error', '<h2>Twitter 它它它……超时了！</h2><p>Dabr 决定不再等待 Twitter 的回应了。管理员会找 ISP 扯皮的。过会再试试吧。<br />'. $result . ' </p>');
@@ -789,7 +780,6 @@ function twitter_followers_page($query) {
 }
 
 // Shows first 100 users who retweeted a specific status (limit defined by twitter)
-// NOTE: This actually does not work well.
 function twitter_retweeters_page($query) {
 	// Which tweet are we looking for?
 	$id = $query[1];
