@@ -422,7 +422,7 @@ function twitter_process($url, $post_data = false) {
 	}
 
 	// Not every request is rate limited
-	if ($headers_array['x-rate-limit-limit']) {
+	if($headers_array['x-rate-limit-limit']) {
 		$current_time        = time();
 		$ratelimit_time      = $headers_array['x-rate-limit-reset'];
 		$time_until_reset    = $ratelimit_time - $current_time;
@@ -431,7 +431,7 @@ function twitter_process($url, $post_data = false) {
 	}
 
 	$api_time += microtime(1) - $api_start;
-	switch( intval( $response_info['http_code'] ) ) {
+	switch(intval($response_info['http_code'])) {
 		case 200:
 		case 201:
 			$json = json_decode($body);

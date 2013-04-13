@@ -12,11 +12,6 @@ define('COOKIE_PREFIX', '/');
 define('OAUTH_CONSUMER_KEY', '');
 define('OAUTH_CONSUMER_SECRET', '');
 
-// Embedly Key 
-// Embed image previews in tweets
-// Sign up at https://app.embed.ly/
-define('EMBEDLY_KEY', '');
-
 // Optional: Allows you to turn shortened URLs into long URLs http://www.longurlplease.com/docs
 // Uncomment to enable.
 // define('LONGURL_KEY', 'true');
