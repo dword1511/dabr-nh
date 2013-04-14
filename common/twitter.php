@@ -371,24 +371,22 @@ function twitter_media_page($query) {
 								'status' => " " . $status,
 								'lat' => $lat,
 								'long' => $long,
-							),true,	true);
-		if ($code == 200) {
-			$json = json_decode($tmhOAuth->response['response']);
+							),true,true);
+		if($code == 200) {
+			$json      = json_decode($tmhOAuth->response['response']);
 			$image_url = $json->entities->media[0]->media_url_https;
-			$text = $json->text;
-			$content = "<p>上传成功，撒花！</p><p><a href=\"".BASE_URL."simpleproxy.php?url=".$image_url.":large\" target='".get_target()."'><img src=\"".BASE_URL."simpleproxy.php?url=".$image_url.":thumb\" alt='' /></p></a><p>".twitter_parse_tags($text)."</p>";
+			$text      = $json->text;
+			$content   = '<p>上传成功，撒花！</p><p><a href="'.simple_proxy_url($image_url).':large" target="'.get_target().'"><img src="'.simple_proxy_url($image_url).':thumb" alt="" /></p></a><p>'.twitter_parse_tags($text).'</p>';
 		}
-		else $content = "擦！上传失败鸟！<br/>代码：".$code."<br/>状态：".$status;
+		else $content = '擦！上传失败鸟！<br/>代码：'.$code.'<br/>状态：'.$status;
 	}
 	if($_POST) {
-		if (!$_POST['message']) $content .= "<p>为这张图添加点说明文字吧。</p>";
-		if (!$_FILES['image']['tmp_name']) $content .= "<p>请选择一幅图片来上传。</p>";
+		if(!$_POST['message']) $content .= '<p>为这张图添加点说明文字吧。</p>';
+		if(!$_FILES['image']['tmp_name']) $content .= '<p>请选择一幅图片来上传。</p>';
 	}	
-	$content .= "<form method='post' action='picture' enctype='multipart/form-data' name='upload_pict'>图片：<input type='file' name='image'/><br/>消息（可选）：<br/><textarea name='message' style='width:90%; max-width: 400px;' rows='3' id='message'>".$status."</textarea><br><input type='submit' value='发送'>";
-	if(setting_fetch('browser') != 'mobile') $content .= "<span id='remaining'>119</span>";
-	if(setting_fetch('browser') == 'desktop') $content .= "<script type='text/javascript'>document.onkeydown = function (){if(event.ctrlKey && window.event.keyCode == 13) document.upload_pict.submit();}</script>".geoloc($_COOKIE['geo']);
+	$content .= '<form method="post" action="picture" enctype="multipart/form-data" name="upload_pict">图片：<input type="file" name="image"/><br/>消息（可选）：<br/><textarea name="message" style="width:90%; max-width: 400px;" rows="3" id="message">'.$status.'</textarea><br><input type="submit" value="发送"><span id="remaining">119</span>';
+	if(setting_fetch('browser') == 'desktop') $content .= '<script type="text/javascript">document.onkeydown = function (){if(event.ctrlKey && window.event.keyCode == 13) document.upload_pict.submit();}</script>'.geoloc($_COOKIE['geo']);
 	$content .= '</form>';
-	if(setting_fetch('browser') != 'mobile') $content .= js_counter("message", "119");
 	return theme('page', '上传图片', $content);
 }
 
@@ -416,7 +414,7 @@ function twitter_process($url, $post_data = false) {
 	global $api_time;
 	global $rate_limit;
 
-	// Split that headers and the body
+	// Split the headers and the body
 	list($headers, $body) = explode("\r\n\r\n", $response, 2);
 
 	// Place the headers into an array
@@ -489,11 +487,11 @@ function twitter_get_media($status) {
 			$width  = $media->sizes->thumb->w;
 			$height = $media->sizes->thumb->h;
 
-			$media_html  = "<a href=\"" . BASE_URL . "simpleproxy.php?url=" . $image . ":large" . "\" target='" . get_target() . "'>";
-			$media_html .= "<img src=\"" . BASE_URL . "simpleproxy.php?url=" . $image . ":thumb\"/>";
-			$media_html .= "</a>";
+			$media_html  = '<a href="'.simple_proxy_url($image).':large" target="'.get_target().'">';
+			$media_html .= '<img src="'.simple_proxy_url($image).':thumb"/>';
+			$media_html .= '</a>';
 		}
-		return $media_html . "<br/>";
+		return $media_html . '<br/>';
 	}
 }
 
@@ -1302,11 +1300,11 @@ function theme_full_name($user) {
 }
 
 function theme_get_avatar($object) {
-	return BASE_URL . "simpleproxy.php?url=" . $object->profile_image_url_https;
+	return simple_proxy_url($object->profile_image_url_https);
 }
 
 function theme_get_full_avatar($object) {
-	return BASE_URL . "simpleproxy.php?url=" . str_replace('_normal.', '.', $object->profile_image_url_https);
+	return simple_proxy_url(str_replace('_normal.', '.', $object->profile_image_url_https));
 }
 
 function theme_no_tweets() {
@@ -1442,3 +1440,8 @@ function twitter_find_user() {
 	$output .= theme_followers_list($users, true);
 	theme('page', '找人', $output);
 }
+
+function simple_proxy_url($url) {
+	return BASE_URL.'simpleproxy.php?url='.urlencode($url);
+}
+

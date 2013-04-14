@@ -1,40 +1,78 @@
 <?php
-// This is a simple and dirty HTTP proxy for handling images that has simple URL.
+
+// This is a simple HTTP port 80 (SSL forced off) proxy for bypassing raw data.
 // by dword1511 <zhangchi866@gmail.com>
+
 error_reporting(E_ALL ^ E_NOTICE);
-$url = !empty($_REQUEST['url']) ? $_GET['url'] : null;
 
+// Parse the query
+$url = !empty($_GET['url']) ? $_GET['url'] : null;
 if($url == null) {
-  header("HTTP/1.1 200 OK");
-  echo "<html>
-<head><title>Error</title></head>
-<body><h1>URL is Not Specified</h1></body>
-</html>";
+  echo '<html><head><title>Error</title></head><body><h1>URL is not specified or method not supported.</h1></body></html>';
   return;
 }
 
-$fp = fopen($url, "rb");
+// Check URL and extract destination host
+str_replace('https://', 'http://', $url);
+preg_match('#http\:\/\/([\w\.\_\-]+)\/#i', $url, &$matches);
+if(!$matches) preg_match('#http\:\/\/([\w\.\_\-]+)$#i', $url, &$matches);
 
-if($fp == false) {
-  header("HTTP/1.1 404 Not Found");
-  echo "<html>
-<head><title>404 File Not Found</title></head>
-<body><h1>404 File Not Found</h1><em>The requested file '".$url."' is not found on this server.</em></body>
-</html>";
+if(!$matches) {
+  echo '<html><head><title>Error</title></head><body><h1>Bad URL.</h1></body></html>';
   return;
 }
 
-$mime = "application/octet-stream";
-$magic = fread($fp, 4);
-if($magic[0] == 'G' && $magic[1] == 'I' && $magic[2] == 'F' && $magic[3] == '8') $mime = 'image/gif';
-elseif($magic[0] == "\x89" && $magic[1] == 'P' && $magic[2] == 'N' && $magic[3] == 'G') $mime = 'image/png';
-elseif($magic[0] == "\xff" && $magic[1] == "\xd8") $mime = 'image/jpeg';
+// Compose the request
+$req         = apache_request_headers(); // Will be replaced by getallheaders() in PHP 5.4 and above
+$req['Host'] = $matches[1];
+$request     = "GET $url HTTP/1.1\r\n";
+foreach($req as $key => $value) $request .= "$key: $value\r\n";
+$request    .= "\r\n";
+$ip          = gethostbyname($req['Host']);
+$socket      = socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
 
-header("HTTP/1.1 200 OK");
-header("Content-type: ".$mime);
-echo $magic;
-flush();
-fpassthru($fp);
-flush();
-fclose($fp);
-exit;
+// Open the socket
+if($socket === false) {
+  echo '<html><head><title>Error</title></head><body><h1>Socket creation failed.</h1></body></html>';
+  return;
+}
+
+if(socket_connect($socket, $ip, 80) === false) {
+  echo '<html><head><title>Error</title></head><body><h1>Connection failed.</h1></body></html>';
+  return;
+}
+
+// Send request
+socket_write($socket, $request, strlen($request));
+
+// Wait for response header
+$res = '';
+while(strpos($res, "\r\n\r\n") === false) $res .= socket_read($socket, 2048);
+
+// Send header and get content length if provided.
+list($resp, $body) = explode("\r\n\r\n", $res, 2);
+$resp = explode("\r\n", $resp);
+$len  = 0;
+foreach($resp as $value) {
+  header($value);
+  list($k, $v) = explode(':', $value, 2);
+  if($k == 'Content-Length') $len = $v;
+}
+
+// Send content, end connection if finished.
+echo $body;
+$len -= strlen($body);
+while($len > 0) {
+  $out = socket_read($socket, 2048);
+  if($out === false) {
+    // Early finish, maybe a time-out or something.
+    socket_close($socket);
+    exit;
+  }
+  if($out != '') {
+    echo $out;
+    $len -= strlen($out);
+  }
+}
+
+socket_close($socket);

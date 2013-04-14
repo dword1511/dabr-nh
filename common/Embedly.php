@@ -104,7 +104,7 @@ function embedly_embed_thumbnails(&$feed) {
 					foreach($services as $pattern => $thumbnail_url) {
 						if(preg_match_all($pattern, $real_url, $matches, PREG_PATTERN_ORDER) > 0) {
 							foreach($matches[1] as $key => $match) {
-								$html = theme('external_link', $real_url, '<img src="'.BASE_URL.'simpleproxy.php?url='.sprintf($thumbnail_url, $match).'" />');
+								$html = theme('external_link', $real_url, '<img src="'.simple_proxy_url(sprintf($thumbnail_url, $match)).'" />');
 								$feed[$status->id]->text = $html . '<br />' . $feed[$status->id]->text;
 								// shall we add a link here allowing access with internal proxy?
 							}
@@ -117,7 +117,7 @@ function embedly_embed_thumbnails(&$feed) {
 						foreach($services as $pattern => $thumbnail_url) {
 							if(preg_match_all($pattern, $real_url, $matches, PREG_PATTERN_ORDER) > 0) {
 								foreach($matches[1] as $key => $match) {
-									$html = '<img src="'.BASE_URL.'simpleproxy.php?url='.sprintf($thumbnail_url, $match).'" />';
+									$html = '<img src="'.simple_proxy_url(sprintf($thumbnail_url, $match)).'" />';
 									$feed[$status->id]->text = $html.'<br />'.$feed[$status->id]->text;
 								}
 							}
