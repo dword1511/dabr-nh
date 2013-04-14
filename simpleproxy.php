@@ -5,6 +5,17 @@
 
 error_reporting(E_ALL ^ E_NOTICE);
 
+// CGI getallheaders workaround
+if(!function_exists('getallheaders')) {
+  function getallheaders() {
+    $headers = '';
+    foreach($_SERVER as $name => $value)
+      if(substr($name, 0, 5) == 'HTTP_')
+        $headers[str_replace(' ', '-', ucwords(strtolower(str_replace('_', ' ', substr($name, 5)))))] = $value;
+    return $headers;
+  }
+}
+
 // Parse the query
 $url = !empty($_GET['url']) ? $_GET['url'] : null;
 if($url == null) {
@@ -13,7 +24,7 @@ if($url == null) {
 }
 
 // Check URL and extract destination host
-str_replace('https://', 'http://', $url);
+$url = str_replace('https://', 'http://', $url);
 preg_match('#http\:\/\/([\w\.\_\-]+)\/#i', $url, &$matches);
 if(!$matches) preg_match('#http\:\/\/([\w\.\_\-]+)$#i', $url, &$matches);
 
