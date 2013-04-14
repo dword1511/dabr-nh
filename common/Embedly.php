@@ -15,16 +15,13 @@ function get_og_image($url) {
 	global $em_curl;
 	$em_curl = '';
 
-	error_log('Embedly: Processing: '.$url);
-
 	$c = curl_init();
-	//curl_setopt($c, CURLOPT_RETURNTRANSFER, true); // Not compatible with write function?
 	curl_setopt($c, CURLOPT_FOLLOWLOCATION, true);
 	curl_setopt($c, CURLOPT_MAXREDIRS, 5); // nyti.ms produces 5 redirections.
 	curl_setopt($c, CURLOPT_SSL_VERIFYPEER, 0);
 	curl_setopt($c, CURLOPT_TIMEOUT, 3);
 	// skip: '<html xmlns="http://www.w3.org/1999/xhtml" xmlns:og="http://opengraphprotocol.org/schema/"><head><meta '
-	//curl_setopt($c, CURLOPT_RANGE, '104-'); // most server will not support this.
+	//curl_setopt($c, CURLOPT_RANGE, '104-'); // most server will ignore this.
 	curl_setopt($c, CURLOPT_WRITEFUNCTION, 'em_curl_writefn');
 	curl_setopt($c, CURLOPT_URL, $url);
 	curl_exec($c);

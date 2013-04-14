@@ -800,17 +800,6 @@ function twitter_update() {
 	twitter_refresh($_POST['from'] ? $_POST['from'] : '');
 }
 
-/*
-function twitter_get_place($lat, $long) {
-	$request = API_OLD.'geo/reverse_geocode.json';
-	$request .= '?lat='.$lat.'&long='.$long.'&max_results=1';
-	$locations = twitter_process($request);
-	$places = $locations->result->places;
-	foreach($places as $place) if ($place->id) return $place->id;
-	return false;
-}
-*/
-
 function twitter_retweet($query) {
 	twitter_ensure_post_action();
 	$id = $query[1];
