@@ -73,7 +73,7 @@ function embedly_embed_thumbnails(&$feed) {
 		'#znl\.me\/([\d\w]+)#'				=> 'http://www.zannel.com/webservices/content/%s/Image-164x123-JPG.jpg',
 		'#twitrpix\.com\/([\d\w]+)#i'			=> 'http://img.twitrpix.com/thumb/%s',
 		// provided within og:image or twitter:image meta
-		'#irs[\d]\.4sqi\.net\/img\/general\/[\d]+x[\d]+\/([\w.]+)#'
+		'#irs[\d]\.4sqi\.net\/img\/general\/[\d]+x[\d]+\/([\w\.\-]+)#'
 								=> 'http://irs3.4sqi.net/img/general/150x150/%s',
 		'#vines\.s3\.amazonaws\.com\/v\/thumbs\/([\w\-\.\?\=]+)#'
 								=> 'http://vines.s3.amazonaws.com/v/thumbs/%s',
