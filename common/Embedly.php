@@ -5,7 +5,10 @@ function em_curl_writefn($ch, $chunk) {
 	$em_curl .= $chunk;
 
 	// Got what we need / End of header? Kill transfer.
-	if(preg_match('#(property="og:image"|name="twitter:image").*\/\>|\<\/head\>#i', $em_curl) == 1) return -1;
+	if(preg_match('#(property="og:image"|name="twitter:image").*\/\>|\<\/head\>#i', $em_curl) == 1) {
+		error_log('Embedly: Stopping transfer.');
+		return -1;
+	}
 
 	return strlen($chunk);
 }
@@ -15,16 +18,18 @@ function get_og_image($url) {
 	global $em_curl;
 	$em_curl = '';
 
+	error_log('Embedly: Processing: '.$url);
+
 	$c = curl_init();
 	//curl_setopt($c, CURLOPT_RETURNTRANSFER, true); // Not compatible with write function?
 	curl_setopt($c, CURLOPT_FOLLOWLOCATION, true);
-	curl_setopt($c, CURLOPT_MAXREDIRS, 2);
+	curl_setopt($c, CURLOPT_MAXREDIRS, 1);
 	curl_setopt($c, CURLOPT_SSL_VERIFYPEER, 0);
-	curl_setopt($c, CURLOPT_TIMEOUT, 2);
+	curl_setopt($c, CURLOPT_TIMEOUT, 1);
 	// skip: '<html xmlns="http://www.w3.org/1999/xhtml" xmlns:og="http://opengraphprotocol.org/schema/"><head><meta '
 	//curl_setopt($c, CURLOPT_RANGE, '104-'); // most server will not support this.
 	curl_setopt($c, CURLOPT_WRITEFUNCTION, 'em_curl_writefn');
-	curl_setopt($c, CURLOPT_URL, $url);
+	curl_setopt($c, CURLOPT_URL, str_ireplace("http://", "https://", $url));
 	curl_exec($c);
 
 	// twitter:image meta is used first, then og:image, since sometimes og:image can be full-sized images
