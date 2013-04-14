@@ -105,28 +105,30 @@ function embedly_embed_thumbnails(&$feed) {
 				foreach($entities->urls as $urls) {
 					// Use the expanded URL, if it exists
 					// If there is no expanded URL, use the regular URL
-					if($urls->expanded_url != "") {
-						foreach($services as $pattern => $thumbnail_url) {
-							$real_url = $urls->expanded_url;
-							if(preg_match_all($pattern, $real_url, $matches, PREG_PATTERN_ORDER) < 1) $real_url = get_og_image($real_url);
-							if(preg_match_all($pattern, $real_url, $matches, PREG_PATTERN_ORDER) > 0) {
-								foreach($matches[1] as $key => $match) {
-									$html = theme('external_link', $urls->expanded_url, "<img src=\"" . BASE_URL . "simpleproxy.php?url=" . sprintf($thumbnail_url, $match) . "\" />");
-									$feed[$status->id]->text = $html . '<br />' . $feed[$status->id]->text;
-									// shall we add a link here allowing access with internal proxy?
-								}
+					if($urls->expanded_url != "") $real_url = $urls->expanded_url;
+					else $real_url = $urls->url;
+
+					$matched = false;
+					foreach($services as $pattern => $thumbnail_url) {
+						if(preg_match_all($pattern, $real_url, $matches, PREG_PATTERN_ORDER) > 0) {
+							foreach($matches[1] as $key => $match) {
+								$html = theme('external_link', $real_url, "<img src=\"" . BASE_URL . "simpleproxy.php?url=" . sprintf($thumbnail_url, $match) . "\" />");
+								$feed[$status->id]->text = $html . '<br />' . $feed[$status->id]->text;
+								// shall we add a link here allowing access with internal proxy?
 							}
+							$matched == true;
 						}
 					}
-					else {
-						foreach($services as $pattern => $thumbnail_url) {
-							$real_url = $urls->url;
-							if(preg_match_all($pattern, $real_url, $matches, PREG_PATTERN_ORDER) < 1) $real_url = get_og_image($real_url);
-							if(preg_match_all($pattern, $real_url, $matches, PREG_PATTERN_ORDER) > 0) {
-								foreach($matches[1] as $key => $match) {
-									$html = theme('external_link', $urls->url, "<img src=\"" . BASE_URL . "simpleproxy.php?url=" . sprintf($thumbnail_url, $match) . "\" />");
-									$feed[$status->id]->text = $html . '<br />' . $feed[$status->id]->text;
-								}
+
+					if($matched) return;
+					$real_url = get_og_image($real_url);
+
+					foreach($services as $pattern => $thumbnail_url) {
+						if(preg_match_all($pattern, $real_url, $matches, PREG_PATTERN_ORDER) > 0) {
+							foreach($matches[1] as $key => $match) {
+								$html = theme('external_link', $real_url, "<img src=\"" . BASE_URL . "simpleproxy.php?url=" . sprintf($thumbnail_url, $match) . "\" />");
+								$feed[$status->id]->text = $html . '<br />' . $feed[$status->id]->text;
+								// shall we add a link here allowing access with internal proxy?
 							}
 						}
 					}
