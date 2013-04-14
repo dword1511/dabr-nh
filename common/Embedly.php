@@ -1,10 +1,34 @@
 <?php
 
+$em_curl_writefn = function($ch, $chunk) {
+	global $em_curl;
+	$em_curl .= $chunk;
+
+	// End of html header? Kill transfer.
+	if(strpos('</head>', $em_curl) == 1) return -1;
+
+	return strlen($chunk);
+};
+
 function get_og_image($url) {
-	$content = file_get_contents($url);
-	preg_match('/property="og:image" content="(.*?)"/', $content, $matches);
+	// Really needs speed here, better find a way to do this in parallel.
+	global $em_curl;
+	$em_curl = '';
+
+	$c   = curl_init();
+	curl_setopt($c, CURLOPT_RETURNTRANSFER, true);
+	curl_setopt($c, CURLOPT_SSL_VERIFYPEER, 0);
+	curl_setopt($c, CURLOPT_CONNECTTIMEOUT, 1);
+	curl_setopt($c, CURLOPT_TIMEOUT, 2);
+	// skip: '<html xmlns="http://www.w3.org/1999/xhtml" xmlns:og="http://opengraphprotocol.org/schema/"><head><meta '
+	//curl_setopt($c, CURLOPT_RANGE, '104-'); // most server will not support this.
+	curl_setopt($c, CURLOPT_WRITEFUNCTION, $em_curl_writefn);
+	curl_setopt($c, CURLOPT_URL, 'http://localhost/admin/');
+	curl_exec($c);
+
+	preg_match('/property="og:image" content="(.*?)"/', $em_curl, $matches);
 	if($matches[1]) return ($matches[1]);
-	preg_match('/content="(.*?)" property="og:image"/', $content, $matches);
+	preg_match('/content="(.*?)" property="og:image"/', $em_curl, $matches);
 	if($matches[1]) return ($matches[1]);
 	return $url;
 }
@@ -45,14 +69,16 @@ function embedly_embed_thumbnails(&$feed) {
 		'#znl\.me\/([\d\w]+)#'				=> 'http://www.zannel.com/webservices/content/%s/Image-164x123-JPG.jpg',
 		'#twitrpix\.com\/([\d\w]+)#i'			=> 'http://img.twitrpix.com/thumb/%s',
 		// provided within og:image meta
-		'#irs[\d]\.4sqi\.net\/img\/general\/[\d]+x[\d]+/([\w.]+)#'
+		'#irs[\d]\.4sqi\.net\/img\/general\/[\d]+x[\d]+\/([\w.]+)#'
 								=> 'http://irs3.4sqi.net/img/general/150x150/%s',
-		'#vines\.s3\.amazonaws\.com\/v\/thumbs\/([\w\-\.\?\=]+)#'
+		'#vines\.s3\.amazonaws\.com\/v\/thumbs\/([\w\-\.\?\=]+)#i'
 								=> 'http://vines.s3.amazonaws.com/v/thumbs/%s',
-		'#news\.bbcimg\.co\.uk/media/images/([\w]+/[\w]+/[\w]+\.[\w]+)#'
+		'#news\.bbcimg\.co\.uk/media/images/([\w]+/[\w]+/[\w]+\.[\w]+)#i'
 								=> 'http://news.bbcimg.co.uk/media/images/%s',
 		// direct image urls that are allowed to proxy
-		'#pbs\.twimg\.com\/media\/([\w]+\.[\w]*)#'	=> 'http://pbs.twimg.com/media/%s:thumb',
+		'#pbs\.twimg\.com\/media\/([\w\-]+\.[\w]*)#'	=> 'http://pbs.twimg.com/media/%s:thumb',
+		'#si[\d]\.twimg\.com\/profile_images\/([\d]+/[\w]+.[\w]+)#i'
+								=> 'http://si0.twimg.com/profile_images/%s',
 		'#www\.speedtest\.net\/(result|iphone\/[\d]+)\.png#'
 								=> 'http://www.speedtest.net/%s.png',
 		);
