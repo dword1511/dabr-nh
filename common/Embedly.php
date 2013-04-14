@@ -4,11 +4,11 @@ function em_curl_writefn($ch, $chunk) {
 	global $em_curl;
 	$em_curl .= $chunk;
 
-	// End of html header? Kill transfer.
-	if(strpos('</head>', $em_curl) == 1) return -1;
+	// Got what we need / End of header? Kill transfer.
+	if(preg_match('#(property="og:image"|name="twitter:image").*\/\>|\<\/head\>#i', $em_curl) == 1) return -1;
 
 	return strlen($chunk);
-};
+}
 
 function get_og_image($url) {
 	// Really needs speed here, better find a way to do this in parallel.
@@ -28,14 +28,14 @@ function get_og_image($url) {
 	curl_exec($c);
 
 	// twitter:image meta is used first, then og:image, since sometimes og:image can be full-sized images
-	preg_match('/content="(.*?)" property="twitter:image"/', $em_curl, $matches);
-	if($matches[1]) return ($matches[1]);
-	preg_match('/property="twitter:image" content="(.*?)"/', $em_curl, $matches);
-	if($matches[1]) return ($matches[1]);
-	preg_match('/property="og:image" content="(.*?)"/', $em_curl, $matches);
-	if($matches[1]) return ($matches[1]);
-	preg_match('/content="(.*?)" property="og:image"/', $em_curl, $matches);
-	if($matches[1]) return ($matches[1]);
+	preg_match('#content="(.*?)" name="twitter:image"#', $em_curl, $matches);
+	if($matches[1]) return $matches[1];
+	preg_match('#name="twitter:image" content="(.*?)"#', $em_curl, $matches);
+	if($matches[1]) return $matches[1];
+	preg_match('#property="og:image" content="(.*?)"#', $em_curl, $matches);
+	if($matches[1]) return $matches[1];
+	preg_match('#content="(.*?)" property="og:image"#', $em_curl, $matches);
+	if($matches[1]) return $matches[1];
 	return $url;
 }
 
