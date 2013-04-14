@@ -5,10 +5,7 @@ function em_curl_writefn($ch, $chunk) {
 	$em_curl .= $chunk;
 
 	// Got what we need / End of header? Kill transfer.
-	if(preg_match('#(property="og:image"|name="twitter:image").*\/\>|\<\/head\>#i', $em_curl) == 1) {
-		error_log('Embedly: Stopping transfer.');
-		return -1;
-	}
+	if(preg_match('#(property="og:image"|name="twitter:image").*\/\>|\<\/head\>#i', $em_curl) == 1) return -1;
 
 	return strlen($chunk);
 }
@@ -23,13 +20,13 @@ function get_og_image($url) {
 	$c = curl_init();
 	//curl_setopt($c, CURLOPT_RETURNTRANSFER, true); // Not compatible with write function?
 	curl_setopt($c, CURLOPT_FOLLOWLOCATION, true);
-	curl_setopt($c, CURLOPT_MAXREDIRS, 1);
+	curl_setopt($c, CURLOPT_MAXREDIRS, 5); // nyti.ms produces 5 redirections.
 	curl_setopt($c, CURLOPT_SSL_VERIFYPEER, 0);
-	curl_setopt($c, CURLOPT_TIMEOUT, 1);
+	curl_setopt($c, CURLOPT_TIMEOUT, 3);
 	// skip: '<html xmlns="http://www.w3.org/1999/xhtml" xmlns:og="http://opengraphprotocol.org/schema/"><head><meta '
 	//curl_setopt($c, CURLOPT_RANGE, '104-'); // most server will not support this.
 	curl_setopt($c, CURLOPT_WRITEFUNCTION, 'em_curl_writefn');
-	curl_setopt($c, CURLOPT_URL, str_ireplace("http://", "https://", $url));
+	curl_setopt($c, CURLOPT_URL, $url);
 	curl_exec($c);
 
 	// twitter:image meta is used first, then og:image, since sometimes og:image can be full-sized images
@@ -81,15 +78,16 @@ function embedly_embed_thumbnails(&$feed) {
 		// provided within og:image or twitter:image meta
 		'#irs[\d]\.4sqi\.net\/img\/general\/[\d]+x[\d]+\/([\w.]+)#'
 								=> 'http://irs3.4sqi.net/img/general/150x150/%s',
-		'#vines\.s3\.amazonaws\.com\/v\/thumbs\/([\w\-\.\?\=]+)#i'
+		'#vines\.s3\.amazonaws\.com\/v\/thumbs\/([\w\-\.\?\=]+)#'
 								=> 'http://vines.s3.amazonaws.com/v/thumbs/%s',
-		'#news\.bbcimg\.co\.uk/media/images/([\w\/\.]+)#i'
+		'#news\.bbcimg\.co\.uk/media/images/([\w\/\.]+)#'
 								=> 'http://news.bbcimg.co.uk/media/images/%s',
-		'#graphics[\d]+\.nytimes\.com\/images\/([\w\/\-\.]+)#i'
+		'#graphics[\d]+\.nytimes\.com\/images\/([\w\/\-\.]+)#'
 								=> 'http://graphics8.nytimes.com/images/%s',
+		'#gravatar.com/avatar/([\w]+)#'			=> 'http://gravatar.com/avatar/%s?s=150',
 		// direct image urls that are allowed to proxy
 		'#pbs\.twimg\.com\/media\/([\w\-]+\.[\w]*)#'	=> 'http://pbs.twimg.com/media/%s:thumb',
-		'#si[\d]\.twimg\.com\/profile_images\/([\d]+/[\w]+.[\w]+)#i'
+		'#si[\d]\.twimg\.com\/profile_images\/([\d]+/[\w]+.[\w]+)#'
 								=> 'http://si0.twimg.com/profile_images/%s',
 		'#www\.speedtest\.net\/(result|iphone\/[\d]+)\.png#'
 								=> 'http://www.speedtest.net/%s.png',
@@ -103,32 +101,28 @@ function embedly_embed_thumbnails(&$feed) {
 			if($entities->urls) {
 				// Loop through the URL entities
 				foreach($entities->urls as $urls) {
-					// Use the expanded URL, if it exists
-					// If there is no expanded URL, use the regular URL
 					if($urls->expanded_url != "") $real_url = $urls->expanded_url;
 					else $real_url = $urls->url;
-
 					$matched = false;
 					foreach($services as $pattern => $thumbnail_url) {
 						if(preg_match_all($pattern, $real_url, $matches, PREG_PATTERN_ORDER) > 0) {
 							foreach($matches[1] as $key => $match) {
-								$html = theme('external_link', $real_url, "<img src=\"" . BASE_URL . "simpleproxy.php?url=" . sprintf($thumbnail_url, $match) . "\" />");
+								$html = theme('external_link', $real_url, '<img src="'.BASE_URL.'simpleproxy.php?url='.sprintf($thumbnail_url, $match).'" />');
 								$feed[$status->id]->text = $html . '<br />' . $feed[$status->id]->text;
 								// shall we add a link here allowing access with internal proxy?
 							}
-							$matched == true;
+							$matched = true;
 						}
 					}
 
-					if($matched) return;
-					$real_url = get_og_image($real_url);
-
-					foreach($services as $pattern => $thumbnail_url) {
-						if(preg_match_all($pattern, $real_url, $matches, PREG_PATTERN_ORDER) > 0) {
-							foreach($matches[1] as $key => $match) {
-								$html = theme('external_link', $real_url, "<img src=\"" . BASE_URL . "simpleproxy.php?url=" . sprintf($thumbnail_url, $match) . "\" />");
-								$feed[$status->id]->text = $html . '<br />' . $feed[$status->id]->text;
-								// shall we add a link here allowing access with internal proxy?
+					if($matched == false) {
+						$real_url = get_og_image($real_url);
+						foreach($services as $pattern => $thumbnail_url) {
+							if(preg_match_all($pattern, $real_url, $matches, PREG_PATTERN_ORDER) > 0) {
+								foreach($matches[1] as $key => $match) {
+									$html = '<img src="'.BASE_URL.'simpleproxy.php?url='.sprintf($thumbnail_url, $match).'" />';
+									$feed[$status->id]->text = $html.'<br />'.$feed[$status->id]->text;
+								}
 							}
 						}
 					}
