@@ -1,6 +1,6 @@
 <?php
 
-$em_curl_writefn = function($ch, $chunk) {
+function em_curl_writefn($ch, $chunk) {
 	global $em_curl;
 	$em_curl .= $chunk;
 
@@ -18,9 +18,8 @@ function get_og_image($url) {
 	$c = curl_init();
 	//curl_setopt($c, CURLOPT_RETURNTRANSFER, true); // Not compatible with write function?
 	curl_setopt($c, CURLOPT_FOLLOWLOCATION, true);
-	curl_setopt($c, CURLOPT_MAXREDIRS, 3);
+	curl_setopt($c, CURLOPT_MAXREDIRS, 2);
 	curl_setopt($c, CURLOPT_SSL_VERIFYPEER, 0);
-	curl_setopt($c, CURLOPT_CONNECTTIMEOUT, 1);
 	curl_setopt($c, CURLOPT_TIMEOUT, 2);
 	// skip: '<html xmlns="http://www.w3.org/1999/xhtml" xmlns:og="http://opengraphprotocol.org/schema/"><head><meta '
 	//curl_setopt($c, CURLOPT_RANGE, '104-'); // most server will not support this.
@@ -39,7 +38,6 @@ function get_og_image($url) {
 	if($matches[1]) return ($matches[1]);
 	return $url;
 }
-
 
 function embedly_embed_thumbnails(&$feed) {
 	if(setting_fetch('hide_inline')) return $text;
