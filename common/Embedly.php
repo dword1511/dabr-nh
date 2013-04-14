@@ -1,13 +1,35 @@
 <?php
 
+function get_og_image($url) {
+	$content = file_get_contents($url);
+	preg_match('/property="og:image" content="(.*?)"/', $content, $matches);
+	if($matches[1]) return ($matches[1]);
+	preg_match('/content="(.*?)" property="og:image"/', $content, $matches);
+	if($matches[1]) return ($matches[1]);
+	return $url;
+}
+
+
 function embedly_embed_thumbnails(&$feed) {
 	if(setting_fetch('hide_inline')) return $text;
 
 	$services = array(
 		'#youtube\.com\/watch\?v=([_-\d\w]+)#i'		=> 'http://i.ytimg.com/vi/%s/1.jpg',
 		'#youtu\.be\/([_-\d\w]+)#i'			=> 'http://i.ytimg.com/vi/%s/1.jpg',
-		'#qik\.ly\/([_-\d\w]+)#i'			=> 'http://qik.ly/%s.jpg',
+
+		'#instagr\.am\/p\/([_-\d\w]+)#i'		=> 'http://instagr.am/p/%s/media/?size=t',
+		'#instagram\.com\/p\/([_-\d\w]+)#i'		=> 'http://instagr.am/p/%s/media/?size=t',
+
+		'#imgur\.com\/([\w]+)[\s\.ls][\.\w]*#i'		=> 'http://imgur.com/%ss.png',
+		'#imgur\.com\/gallery\/([\w]+)#i'		=> 'http://imgur.com/%ss.png',
+
 		'#twitpic\.com\/([\d\w]+)#i'			=> 'http://twitpic.com/show/thumb/%s',
+
+		'#yfrog\.com\/([\d\w]+)#'			=> 'http://yfrog.com/%s:small',
+
+		'#img\.ly\/([\w\d]+)#i'				=> 'http://img.ly/show/thumb/%s',
+
+		'#qik\.ly\/([_-\d\w]+)#i'			=> 'http://qik.ly/%s.jpg',
 		'#twitgoo\.com\/([\d\w]+)#i'			=> 'http://twitgoo.com/show/thumb/%s',
 		'#hellotxt\.com\/i\/([\d\w]+)#i'		=> 'http://hellotxt.com/image/%s.s.jpg',
 		'#ts1\.in\/(\d+)#i'				=> 'http://ts1.in/mini/%s',
@@ -17,17 +39,22 @@ function embedly_embed_thumbnails(&$feed) {
 		'#tweetphoto\.com\/(\d+)#'			=> 'http://api.plixi.com/api/tpapi.svc/imagefromurl?url=http://tweetphoto.com/%s',
 		'#plixi\.com\/p\/(\d+)#'			=> 'http://api.plixi.com/api/tpapi.svc/imagefromurl?url=http://plixi.com/p/%s&size=small',
 		'#phz\.in\/([\d\w]+)#'				=> 'http://api.phreadz.com/thumb/%s?t=code',
-		'#imgur\.com\/([\w]+)[\s\.ls][\.\w]*#i'		=> 'http://imgur.com/%ss.png',
-		'#imgur\.com\/gallery\/([\w]+)#i'		=> 'http://imgur.com/%ss.png',
 		'#brizzly\.com\/pic\/([\w]+)#i'			=> 'http://pics.brizzly.com/thumb_sm_%s.jpg',
-		'#img\.ly\/([\w\d]+)#i'				=> 'http://img.ly/show/medium/%s',
 		'#pk\.gd\/([\d\w]+)#i'				=> 'http://img.pikchur.com/pic_%s_s.jpg',
 		'#pikchur\.com\/([\d\w]+)#i'			=> 'http://img.pikchur.com/pic_%s_s.jpg',
 		'#znl\.me\/([\d\w]+)#'				=> 'http://www.zannel.com/webservices/content/%s/Image-164x123-JPG.jpg',
-		'#yfrog\.com\/([\d\w]+)#'			=> 'http://yfrog.com/%s:small',
-		'#instagr\.am\/p\/([_-\d\w]+)#i'		=> 'http://instagr.am/p/%s/media/?size=t',
-		'#instagram\.com\/p\/([_-\d\w]+)#i'		=> 'http://instagr.am/p/%s/media/?size=t',
 		'#twitrpix\.com\/([\d\w]+)#i'			=> 'http://img.twitrpix.com/thumb/%s',
+		// provided within og:image meta
+		'#irs[\d]\.4sqi\.net\/img\/general\/[\d]+x[\d]+/([\w.]+)#'
+								=> 'http://irs3.4sqi.net/img/general/150x150/%s',
+		'#vines\.s3\.amazonaws\.com\/v\/thumbs\/([\w\-\.\?\=]+)#'
+								=> 'http://vines.s3.amazonaws.com/v/thumbs/%s',
+		'#news\.bbcimg\.co\.uk/media/images/([\w]+/[\w]+/[\w]+\.[\w]+)#'
+								=> 'http://news.bbcimg.co.uk/media/images/%s',
+		// direct image urls that are allowed to proxy
+		'#pbs\.twimg\.com\/media\/([\w]+\.[\w]*)#'	=> 'http://pbs.twimg.com/media/%s:thumb',
+		'#www\.speedtest\.net\/(result|iphone\/[\d]+)\.png#'
+								=> 'http://www.speedtest.net/%s.png',
 		);
 
 	// Loop through the feed
@@ -42,17 +69,22 @@ function embedly_embed_thumbnails(&$feed) {
 					// If there is no expanded URL, use the regular URL
 					if($urls->expanded_url != "") {
 						foreach($services as $pattern => $thumbnail_url) {
-							if(preg_match_all($pattern, $urls->expanded_url, $matches, PREG_PATTERN_ORDER) > 0) {
+							$real_url = $urls->expanded_url;
+							if(preg_match_all($pattern, $real_url, $matches, PREG_PATTERN_ORDER) < 1) $real_url = get_og_image($real_url);
+							if(preg_match_all($pattern, $real_url, $matches, PREG_PATTERN_ORDER) > 0) {
 								foreach($matches[1] as $key => $match) {
 									$html = theme('external_link', $urls->expanded_url, "<img src=\"" . BASE_URL . "simpleproxy.php?url=" . sprintf($thumbnail_url, $match) . "\" />");
 									$feed[$status->id]->text = $html . '<br />' . $feed[$status->id]->text;
+									// shall we add a link here allowing access with internal proxy?
 								}
 							}
 						}
 					}
 					else {
 						foreach($services as $pattern => $thumbnail_url) {
-							if(preg_match_all($pattern, $urls->url, $matches, PREG_PATTERN_ORDER) > 0) {
+							$real_url = $urls->url;
+							if(preg_match_all($pattern, $real_url, $matches, PREG_PATTERN_ORDER) < 1) $real_url = get_og_image($real_url);
+							if(preg_match_all($pattern, $real_url, $matches, PREG_PATTERN_ORDER) > 0) {
 								foreach($matches[1] as $key => $match) {
 									$html = theme('external_link', $urls->url, "<img src=\"" . BASE_URL . "simpleproxy.php?url=" . sprintf($thumbnail_url, $match) . "\" />");
 									$feed[$status->id]->text = $html . '<br />' . $feed[$status->id]->text;

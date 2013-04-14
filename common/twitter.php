@@ -1439,7 +1439,7 @@ function twitter_find_user() {
 	$name = $_GET['name'];
 	if(strpos($name, '@') === 0) twitter_refresh('user/' . str_replace('@','',$name));
 	$output  = '<form method="get" action="find">查找用户：<input name="name" id="name" value="'.urldecode($name).'" /><input type="submit" value="给我搜" /></form>';
-	$output .= '<p>（留空以便查看推荐）</p>';
+	$output .= '<p>（留空以便刷新推荐列表）</p>';
 	if($name) {
 		$request = API_NEW."users/search.json?q=" . urlencode($name);
 		$users   = twitter_process($request);
