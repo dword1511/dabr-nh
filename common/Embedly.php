@@ -15,17 +15,24 @@ function get_og_image($url) {
 	global $em_curl;
 	$em_curl = '';
 
-	$c   = curl_init();
-	curl_setopt($c, CURLOPT_RETURNTRANSFER, true);
+	$c = curl_init();
+	//curl_setopt($c, CURLOPT_RETURNTRANSFER, true); // Not compatible with write function?
+	curl_setopt($c, CURLOPT_FOLLOWLOCATION, true);
+	curl_setopt($c, CURLOPT_MAXREDIRS, 3);
 	curl_setopt($c, CURLOPT_SSL_VERIFYPEER, 0);
 	curl_setopt($c, CURLOPT_CONNECTTIMEOUT, 1);
 	curl_setopt($c, CURLOPT_TIMEOUT, 2);
 	// skip: '<html xmlns="http://www.w3.org/1999/xhtml" xmlns:og="http://opengraphprotocol.org/schema/"><head><meta '
 	//curl_setopt($c, CURLOPT_RANGE, '104-'); // most server will not support this.
-	curl_setopt($c, CURLOPT_WRITEFUNCTION, $em_curl_writefn);
-	curl_setopt($c, CURLOPT_URL, 'http://localhost/admin/');
+	curl_setopt($c, CURLOPT_WRITEFUNCTION, 'em_curl_writefn');
+	curl_setopt($c, CURLOPT_URL, $url);
 	curl_exec($c);
 
+	// twitter:image meta is used first, then og:image, since sometimes og:image can be full-sized images
+	preg_match('/content="(.*?)" property="twitter:image"/', $em_curl, $matches);
+	if($matches[1]) return ($matches[1]);
+	preg_match('/property="twitter:image" content="(.*?)"/', $em_curl, $matches);
+	if($matches[1]) return ($matches[1]);
 	preg_match('/property="og:image" content="(.*?)"/', $em_curl, $matches);
 	if($matches[1]) return ($matches[1]);
 	preg_match('/content="(.*?)" property="og:image"/', $em_curl, $matches);
@@ -68,13 +75,15 @@ function embedly_embed_thumbnails(&$feed) {
 		'#pikchur\.com\/([\d\w]+)#i'			=> 'http://img.pikchur.com/pic_%s_s.jpg',
 		'#znl\.me\/([\d\w]+)#'				=> 'http://www.zannel.com/webservices/content/%s/Image-164x123-JPG.jpg',
 		'#twitrpix\.com\/([\d\w]+)#i'			=> 'http://img.twitrpix.com/thumb/%s',
-		// provided within og:image meta
+		// provided within og:image or twitter:image meta
 		'#irs[\d]\.4sqi\.net\/img\/general\/[\d]+x[\d]+\/([\w.]+)#'
 								=> 'http://irs3.4sqi.net/img/general/150x150/%s',
 		'#vines\.s3\.amazonaws\.com\/v\/thumbs\/([\w\-\.\?\=]+)#i'
 								=> 'http://vines.s3.amazonaws.com/v/thumbs/%s',
-		'#news\.bbcimg\.co\.uk/media/images/([\w]+/[\w]+/[\w]+\.[\w]+)#i'
+		'#news\.bbcimg\.co\.uk/media/images/([\w\/\.]+)#i'
 								=> 'http://news.bbcimg.co.uk/media/images/%s',
+		'#graphics[\d]+\.nytimes\.com\/images\/([\w\/\-\.]+)#i'
+								=> 'http://graphics8.nytimes.com/images/%s',
 		// direct image urls that are allowed to proxy
 		'#pbs\.twimg\.com\/media\/([\w\-]+\.[\w]*)#'	=> 'http://pbs.twimg.com/media/%s:thumb',
 		'#si[\d]\.twimg\.com\/profile_images\/([\d]+/[\w]+.[\w]+)#i'
