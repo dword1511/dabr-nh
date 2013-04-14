@@ -34,7 +34,7 @@ if(!$matches) {
 }
 
 // Compose the request
-$req         = apache_request_headers(); // Will be replaced by getallheaders() in PHP 5.4 and above
+$req         = getallheaders();
 $req['Host'] = $matches[1];
 $request     = "GET $url HTTP/1.1\r\n";
 foreach($req as $key => $value) $request .= "$key: $value\r\n";
