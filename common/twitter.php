@@ -1241,14 +1241,14 @@ function theme_timeline($feed, $paginate = true) {
 		$link    = theme('status_time_link', $status, !$status->is_direct);
 		$actions = theme('action_icons', $status);
 		$avatar  = theme('avatar', theme_get_avatar($status->from));
-		$source  = $status->source ? "来自 ".str_replace('rel="nofollow"', 'rel="nofollow" target="' . get_target() . '"', preg_replace('/&(?![a-z][a-z0-9]*;|#[0-9]+;|#x[0-9a-f]+;)/i', '&amp;', $status->source)." 部门") : ''; //need to replace & in links with &amps and force new window on links
+		$source  = $status->source ? '来自 '.str_replace('rel="nofollow"', 'rel="nofollow" target="' . get_target() . '"', preg_replace('/&(?![a-z][a-z0-9]*;|#[0-9]+;|#x[0-9a-f]+;)/i', '&amp;', $status->source)." 部门") : ''; //need to replace & in links with &amps and force new window on links
 		if($status->place->name)           $source .= "，" . $status->place->name . "，" . $status->place->country.' 分舵';
 		if($status->in_reply_to_status_id) $source .= "，<a href='status/{$status->in_reply_to_status_id_str}'>对 {$status->in_reply_to_screen_name} 的回复</a>";
-		if($status->retweet_count)         $source .= "，<a href='retweeted_by/{$status->id}'>被转发了 ".$status->retweet_count . " 次</a>";
+		if($status->retweet_count)         $source .= "，<a href='retweeted_by/{$status->id}'>被转发了 ".$status->retweet_count.' 次</a>';
 		$retweeted = '';
 		if($status->retweeted_by) {
 			$retweeted_by = $status->retweeted_by->user->screen_name;
-			$retweeted = "<br /><small>" . theme('action_icon', "retweeted_by/{$status->id}", 'images/retweet.png', 'RT') . "被下列用户转发：<a href='user/{$retweeted_by}'>{$retweeted_by}</a></small>";
+			$retweeted = '<br /><span class="from">'.theme('action_icon', "retweeted_by/{$status->id}", 'images/retweet.png', 'RT')."被下列用户转发：<a href='user/{$retweeted_by}'>{$retweeted_by}</a></span>";
 		}
 		if($status->favorite_count)        $source .= '，被 '.$status->favorite_count.' 人收藏';
 		$html = "<b><a href='user/{$status->from->screen_name}'>{$status->from->screen_name}</a></b> $actions $link{$retweeted}<br />{$text}<br />$media<span class='from'>$source</span>";
@@ -1367,7 +1367,7 @@ function theme_action_icons($status) {
 		$actions[] = theme('action_icon',"search?query=%40{$from}",BASE_URL.'images/q.png','?');
 		$actions[] = theme('action_icon',"http://twitter.com/{$from}/statuses/{$status->id}",BASE_URL.'images/lnk.png','LINK');
 		$actions[] = theme('action_icon',"http://zh-tw.whotwi.com/user/{$from}",BASE_URL.'images/pie.png','ANAL');
-		//TODO: add embed tweet links.
+		$actions[] = theme('action_icon',"http://www.twitter-rss.com/user_timeline.php?screen_name={$from}",BASE_URL.'images/rss.png','RSS');
 	}
 	return implode(' ', $actions);
 }
