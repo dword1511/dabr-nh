@@ -1,5 +1,5 @@
 <?php
-
+/*
 function em_curl_writefn($ch, $chunk) {
 	global $em_curl;
 	$em_curl .= $chunk;
@@ -37,7 +37,7 @@ function get_og_image($url) {
 	if($matches[1]) return $matches[1];
 	return $url;
 }
-
+*/
 function embedly_embed_thumbnails(&$feed) {
 	if(setting_fetch('hide_inline')) return $text;
 
@@ -72,7 +72,7 @@ function embedly_embed_thumbnails(&$feed) {
 		'#pikchur\.com\/([\d\w]+)#i'			=> 'http://img.pikchur.com/pic_%s_s.jpg',
 		'#znl\.me\/([\d\w]+)#'				=> 'http://www.zannel.com/webservices/content/%s/Image-164x123-JPG.jpg',
 		'#twitrpix\.com\/([\d\w]+)#i'			=> 'http://img.twitrpix.com/thumb/%s',
-		// provided within og:image or twitter:image meta
+/*		// provided within og:image or twitter:image meta
 		'#irs[\d]\.4sqi\.net\/img\/general\/[\d]+x[\d]+\/([\w\.\-]+)#'
 								=> 'http://irs3.4sqi.net/img/general/150x150/%s',
 		'#vines\.s3\.amazonaws\.com\/v\/thumbs\/([\w\-\.\?\=]+)#'
@@ -82,11 +82,11 @@ function embedly_embed_thumbnails(&$feed) {
 		'#graphics[\d]+\.nytimes\.com\/images\/([\w\/\-\.]+)#'
 								=> 'http://graphics8.nytimes.com/images/%s',
 		'#gravatar.com/avatar/([\w]+)#'			=> 'http://gravatar.com/avatar/%s?s=150',
-		// direct image urls that are allowed to proxy
+*/		// direct small image urls that are allowed to proxy
 		'#pbs\.twimg\.com\/media\/([\w\-]+\.[\w]*)#'	=> 'http://pbs.twimg.com/media/%s:thumb',
-		'#si[\d]\.twimg\.com\/profile_images\/([\d]+/[\w]+.[\w]+)#'
+		'#si[\d]\.twimg\.com\/profile_images\/([\d]+\/[\w]+.[\w]+)#'
 								=> 'http://si0.twimg.com/profile_images/%s',
-		'#www\.speedtest\.net\/(result|iphone\/[\d]+)\.png#'
+		'#www\.speedtest\.net\/(result\/[\d]+|iphone\/[\d]+)\.png#'
 								=> 'http://www.speedtest.net/%s.png',
 		);
 
@@ -113,15 +113,7 @@ function embedly_embed_thumbnails(&$feed) {
 					}
 
 					if($matched == false) {
-						$real_url = get_og_image($real_url);
-						foreach($services as $pattern => $thumbnail_url) {
-							if(preg_match_all($pattern, $real_url, $matches, PREG_PATTERN_ORDER) > 0) {
-								foreach($matches[1] as $key => $match) {
-									$html = '<img src="'.simple_proxy_url(sprintf($thumbnail_url, $match)).'" />';
-									$feed[$status->id]->text = $html.'<br />'.$feed[$status->id]->text;
-								}
-							}
-						}
+						$html = theme('external_link', $real_url, '<img src="thumbnailer.php?url='.urlencode($real_url).'" />');
 					}
 				}
 			}
