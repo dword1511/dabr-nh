@@ -18,7 +18,7 @@ require 'config.php';
 
 function no_thumb() {
   header('HTTP/1.1 301 Moved Permanently');
-  header('Location: '.BASE_URL.'image/nothumb.png');
+  header('Location: '.BASE_URL.'images/nothumb.png');
   die(0);
 }
 
