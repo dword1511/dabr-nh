@@ -1,43 +1,5 @@
 <?php
-/*
-function em_curl_writefn($ch, $chunk) {
-	global $em_curl;
-	$em_curl .= $chunk;
 
-	// Got what we need / End of header? Kill transfer.
-	if(preg_match('#(property="og:image"|name="twitter:image").*\/\>|\<\/head\>#i', $em_curl) == 1) return -1;
-
-	return strlen($chunk);
-}
-
-function get_og_image($url) {
-	// Really needs speed here, better find a way to do this in parallel.
-	global $em_curl;
-	$em_curl = '';
-
-	$c = curl_init();
-	curl_setopt($c, CURLOPT_FOLLOWLOCATION, true);
-	curl_setopt($c, CURLOPT_MAXREDIRS, 5); // nyti.ms produces 5 redirections.
-	curl_setopt($c, CURLOPT_SSL_VERIFYPEER, 0);
-	curl_setopt($c, CURLOPT_TIMEOUT, 3);
-	// skip: '<html xmlns="http://www.w3.org/1999/xhtml" xmlns:og="http://opengraphprotocol.org/schema/"><head><meta '
-	//curl_setopt($c, CURLOPT_RANGE, '104-'); // most server will ignore this.
-	curl_setopt($c, CURLOPT_WRITEFUNCTION, 'em_curl_writefn');
-	curl_setopt($c, CURLOPT_URL, $url);
-	curl_exec($c);
-
-	// twitter:image meta is used first, then og:image, since sometimes og:image can be full-sized images
-	preg_match('#content="(.*?)" name="twitter:image"#', $em_curl, $matches);
-	if($matches[1]) return $matches[1];
-	preg_match('#name="twitter:image" content="(.*?)"#', $em_curl, $matches);
-	if($matches[1]) return $matches[1];
-	preg_match('#property="og:image" content="(.*?)"#', $em_curl, $matches);
-	if($matches[1]) return $matches[1];
-	preg_match('#content="(.*?)" property="og:image"#', $em_curl, $matches);
-	if($matches[1]) return $matches[1];
-	return $url;
-}
-*/
 function embedly_embed_thumbnails(&$feed) {
 	if(setting_fetch('hide_inline')) return $text;
 
@@ -72,17 +34,6 @@ function embedly_embed_thumbnails(&$feed) {
 		'#pikchur\.com\/([\d\w]+)#i'			=> 'http://img.pikchur.com/pic_%s_s.jpg',
 		'#znl\.me\/([\d\w]+)#'				=> 'http://www.zannel.com/webservices/content/%s/Image-164x123-JPG.jpg',
 		'#twitrpix\.com\/([\d\w]+)#i'			=> 'http://img.twitrpix.com/thumb/%s',
-/*		// provided within og:image or twitter:image meta
-		'#irs[\d]\.4sqi\.net\/img\/general\/[\d]+x[\d]+\/([\w\.\-]+)#'
-								=> 'http://irs3.4sqi.net/img/general/150x150/%s',
-		'#vines\.s3\.amazonaws\.com\/v\/thumbs\/([\w\-\.\?\=]+)#'
-								=> 'http://vines.s3.amazonaws.com/v/thumbs/%s',
-		'#news\.bbcimg\.co\.uk/media/images/([\w\/\.]+)#'
-								=> 'http://news.bbcimg.co.uk/media/images/%s',
-		'#graphics[\d]+\.nytimes\.com\/images\/([\w\/\-\.]+)#'
-								=> 'http://graphics8.nytimes.com/images/%s',
-		'#gravatar.com/avatar/([\w]+)#'			=> 'http://gravatar.com/avatar/%s?s=150',
-*/		// direct small image urls that are allowed to proxy
 		'#pbs\.twimg\.com\/media\/([\w\-]+\.[\w]*)#'	=> 'http://pbs.twimg.com/media/%s:thumb',
 		'#si[\d]\.twimg\.com\/profile_images\/([\d]+\/[\w]+.[\w]+)#'
 								=> 'http://si0.twimg.com/profile_images/%s',
@@ -111,7 +62,7 @@ function embedly_embed_thumbnails(&$feed) {
 							$matched = true;
 						}
 					}
-
+					// Local thumbnailer
 					if($matched == false) {
 						$html = theme('external_link', $real_url, '<img src="thumbnailer.php?url='.urlencode($real_url).'" />');
 						$feed[$status->id]->text = $html . '<br />' . $feed[$status->id]->text;

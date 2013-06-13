@@ -98,7 +98,7 @@ function process_image($url) {
 
   imagecopyresampled($ni, $i, 0, 0, $xs, $ys, $nx, $ny, $x - 2 * $xs, $y - 2 * $ys);
   header('Content-Type: image/jpeg');
-  imagejpeg($ni);
+  imagejpeg($ni, NULL, 85);
 
   imagedestroy($i);
   imagedestroy($ni);
@@ -131,7 +131,7 @@ function get_meta($url) {
   if($matches[1]) return $matches[1];
   preg_match('#content="(.*?)" property="og:image"#', $curl_data, $matches);
   if($matches[1]) return $matches[1];
-  return $url;
+  return '';
 }
 
 $url = !empty($_GET['url']) ? $_GET['url'] : null;
@@ -163,5 +163,6 @@ $matches = '';
 preg_match('#gravatar.com/avatar/([\w]+)#', $link, $matches);
 if($matches) go_proxy('http://gravatar.com/avatar/'.$matches[1].'?s=150');
 
-// Do the actual job.
-if($link === $url) process_image($url);
+// Do the actual job: $link == '' means images are unlikely included.
+if($link != '') process_image($link);
+else no_thumb();
