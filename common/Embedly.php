@@ -114,6 +114,7 @@ function embedly_embed_thumbnails(&$feed) {
 
 					if($matched == false) {
 						$html = theme('external_link', $real_url, '<img src="thumbnailer.php?url='.urlencode($real_url).'" />');
+						$feed[$status->id]->text = $html . '<br />' . $feed[$status->id]->text;
 					}
 				}
 			}
