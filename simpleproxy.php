@@ -1,7 +1,10 @@
 <?php
 
+//////////////////////////////////////////////////////////////
 // This is a simple HTTP port 80 (SSL forced off) proxy for bypassing raw data.
-// by dword1511 <zhangchi866@gmail.com>
+// (C) dword1511 <zhangchi866@gmail.com>
+// License: GNU GPLv3
+//////////////////////////////////////////////////////////////
 
 error_reporting(E_ALL ^ E_NOTICE);
 

@@ -391,7 +391,7 @@ function twitter_media_page($query) {
 }
 
 function twitter_process($url, $post_data = false) {
-	if ($post_data === true) $post_data = array();
+	if($post_data === true) $post_data = array();
 	$status    = $post_data['status'];
 	user_oauth_sign($url, $post_data);
 	$api_start = microtime(1);
@@ -578,10 +578,11 @@ function format_interval($timestamp, $granularity = 2) {
 function twitter_status_page($query) {
 	$id = (string) $query[1];
 	if (is_numeric($id)) {
-		$request = API_NEW."statuses/show.json?id={$id}";
-		$status = twitter_process($request);
-		$content = theme('status', $status);
-		$content .= '<a href="http://translate.google.com/m?hl=zh-CN&tl=zh-CN&sl=auto&ie=UTF-8&q='.urlencode($status->text).'" target="'.get_target().'">请 Google 翻译一下这货</a></p>';
+		$per_page  = setting_fetch('perPage', 20);
+		$request   = API_NEW."statuses/show.json?id={$id}";
+		$status    = twitter_process($request);
+		$content   = theme('status', $status);
+		$content  .= '<a href="http://translate.google.com/m?hl=zh-CN&tl=zh-CN&sl=auto&ie=UTF-8&q='.urlencode($status->text).'" target="'.get_target().'">请 Google 翻译一下这货</a></p>';
 		$thread_id = $status->id_str;
 		// RUNS ON /1/ API, THERE ARE NO PLANS BY TWITTER TO MAKE THIS UNPUBLISHED API CALL WORK WITH /1.1/ :(
 		//$request = API_OLD."related_results/show/{$thread_id}.json";
