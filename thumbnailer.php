@@ -60,7 +60,10 @@ function process_image($url) {
   $i = imagecreatefromstring(curl_exec($c));
 
   // If failed, call no_thumb();
-  if($i === false) no_thumb();
+  if($i === false) {
+    error_log('Thumbnailer: failed to create an image from: '.$url);
+    no_thumb();
+  }
 
   // If resize needed(x | y > 150), crop(x | y < 200) & resize & output directly.
   $x = imagesx($i);
