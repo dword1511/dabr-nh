@@ -644,7 +644,7 @@ function twitter_delete_page($query) {
 function twitter_deleteDM_page($query) {
 	twitter_ensure_post_action();
 	$id = (string) $query[1];
-	if (is_numeric($id)) {
+	if(is_numeric($id)) {
 		$request = API_NEW."direct_messages/destroy.json?id={$id}";
 		twitter_process($request, true);
 		twitter_refresh('directs/');
@@ -652,12 +652,12 @@ function twitter_deleteDM_page($query) {
 }
 
 function twitter_ensure_post_action() {
-	if ($_SERVER['REQUEST_METHOD'] !== 'POST') die('Error: Invalid HTTP request method for this action.');
+	if($_SERVER['REQUEST_METHOD'] !== 'POST') die('Error: Invalid HTTP request method for this action.');
 }
 
 function twitter_follow_page($query) {
 	$user = $query[1];
-	if ($user) {
+	if($user) {
 		if($query[0] == 'follow') $request = API_NEW."friendships/create.json?screen_name={$user}";
 		else $request = API_NEW."friendships/destroy.json?screen_name={$user}";
 		twitter_process($request, true);
@@ -791,7 +791,7 @@ function twitter_retweeters_page($query) {
 function twitter_update() {
 	twitter_ensure_post_action();
 	$status = stripslashes(trim($_POST['status']));
-	if ($status) {
+	if($status) {
 		$request = API_NEW.'statuses/update.json';
 		$post_data = array('source' => 'dabr', 'status' => $status);
 		$in_reply_to_id = (string) $_POST['in_reply_to_id'];
@@ -1437,17 +1437,19 @@ function twitter_find_user() {
 	$name = $_GET['name'];
 	if(strpos($name, '@') === 0) twitter_refresh('user/' . str_replace('@','',$name));
 	$output  = '<form method="get" action="find">查找用户：<input name="name" id="name" value="'.urldecode($name).'" /><input type="submit" value="给我搜" /></form>';
-	$output .= '<p>（留空以便刷新推荐列表）</p>';
+	//$output .= '<p>（留空以便刷新推荐列表）</p>';
 	if($name) {
 		$request = API_NEW."users/search.json?q=" . urlencode($name);
 		$users   = twitter_process($request);
 	}
 	// ELSE RUNS ON /1/ API, THERE ARE NO PLANS BY TWITTER TO MAKE THIS UNPUBLISHED API CALL WORK WITH /1.1/ :(
+	/*
 	else {
 		$request = API_OLD."users/recommendations.json?expanded_results_format=1&cursor=-1&pc=true&display_location=wtf-view-all-stream&personalized=false&force_bq=false&algorithm=&connections=true";
 		$users   = twitter_process($request);
 		$output .= "<div class='heading'>Twitter 为寂寞的你推荐：</div>\n";
 	}
+	*/
 	$output .= theme_followers_list($users, true);
 	theme('page', '找人', $output);
 }
