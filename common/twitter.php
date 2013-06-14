@@ -791,8 +791,9 @@ function twitter_retweeters_page($query) {
 function twitter_update() {
 	twitter_ensure_post_action();
 	$status = stripslashes(trim($_POST['status']));
-	$status = urlencode($status);
+
 	if($status) {
+		$status = urlencode($status);
 		$request = API_NEW.'statuses/update.json';
 		$post_data = array('source' => 'dabr', 'status' => $status);
 		$in_reply_to_id = (string) $_POST['in_reply_to_id'];
