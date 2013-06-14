@@ -42,7 +42,7 @@ function curl_writefn($ch, $chunk) {
   if(preg_match('#Content\-Type\:\ image|Content\-Type\:\ application\/octet\-stream#', $curl_data) == 1) return -1;
 
   // Got what we need / End of header? Kill transfer.
-  if(preg_match('#(property="og:image"|name="twitter:image").*\/\>|\<\/head\>#i', $curl_data) == 1) return -1;
+  if(preg_match('#(property="og:image").*\/\>|\<\/head\>#i', $curl_data) == 1) return -1;
 
   return $curl_len;
 }
@@ -129,11 +129,12 @@ function get_meta($url) {
   curl_exec($c);
 
   // will resize big ones later.
-  if(preg_match('#Content\-Type\:\ image#', $curl_data) == 1) return $url;
+  if(preg_match('#Content\-Type\:\ image#', $curl_data) == 1) error_log('MATCH: Content-Type: image');
   preg_match('#property="og:image" content="([^\<\>]*?)"#', $curl_data, $matches);
   if($matches[1]) return $matches[1];
   preg_match('#content="([^\<\>]*)" property="og:image"#', $curl_data, $matches);
   if($matches[1]) return $matches[1];
+
   return '';
 }
 
@@ -152,14 +153,13 @@ special cases that resize can be done by image providers
 */
 
 // Get what we need
-// otherwise, hand over to proxy since this script can not handle HTTP 304.
 $link = get_meta($url);
 
 // Let others do the resize-job themselves:
 // Foursquare
 $matches = '';
 preg_match('#(irs[\d]\.4sqi\.net\/img\/general\/[\d]+x[\d]+\/[\w\.\-]+)#', $link, $matches);
-if($matches) go_proxy('\/[\d]+x[\d]+\/', '150x150', $link, 1);
+if($matches) go_proxy(preg_replace('#\/[\d]+x[\d]+\/#', '/150x150/', $link));
 
 // Gravatar
 $matches = '';

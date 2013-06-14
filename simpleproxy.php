@@ -8,6 +8,9 @@
 
 error_reporting(E_ALL ^ E_NOTICE);
 
+// This workaround should solve 4sqi.net's bug
+header('Content-Type:');
+
 // CGI getallheaders workaround
 if(!function_exists('getallheaders')) {
   function getallheaders() {
