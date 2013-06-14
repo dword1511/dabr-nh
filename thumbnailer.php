@@ -130,7 +130,7 @@ function get_meta($url) {
 
   // will resize big ones later.
   if(preg_match('#Content\-Type\:\ image#', $curl_data) == 1) return $url;
-  preg_match('#property="og:image" content="([^\<\>]*)"#', $curl_data, $matches);
+  preg_match('#property="og:image" content="([^\<\>]*?)"#', $curl_data, $matches);
   if($matches[1]) return $matches[1];
   preg_match('#content="([^\<\>]*)" property="og:image"#', $curl_data, $matches);
   if($matches[1]) return $matches[1];
