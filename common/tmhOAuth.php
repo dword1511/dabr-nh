@@ -37,7 +37,7 @@ class tmhOAuth {
         'nonce'                      => false, // used for checking signatures. leave as false for auto
         'force_timestamp'            => false,
         'timestamp'                  => false, // used for checking signatures. leave as false for auto
-        'oauth_version'              => '1.0',
+        'oauth_version'              => '1.1',
 
         // you probably don't want to change any of these curl values
         'curl_connecttimeout'        => 30,
