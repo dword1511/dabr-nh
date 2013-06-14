@@ -793,7 +793,9 @@ function twitter_update() {
 	$status = stripslashes(trim($_POST['status']));
 
 	if($status) {
+		error_log('twitter_update: $status = '.$status);
 		$status = urlencode($status);
+		error_log('twitter_update: $status encoded = '.$status);
 		$request = API_NEW.'statuses/update.json';
 		$post_data = array('source' => 'dabr', 'status' => $status);
 		$in_reply_to_id = (string) $_POST['in_reply_to_id'];
