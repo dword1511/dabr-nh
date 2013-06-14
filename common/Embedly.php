@@ -1,8 +1,6 @@
 <?php
 
 function embedly_embed_thumbnails(&$feed) {
-	if(setting_fetch('hide_inline')) return $text;
-
 	$services = array(
 		'#youtube\.com\/watch\?v=([_-\d\w]+)#i'		=> 'http://i.ytimg.com/vi/%s/1.jpg',
 		'#youtu\.be\/([_-\d\w]+)#i'			=> 'http://i.ytimg.com/vi/%s/1.jpg',
@@ -41,34 +39,36 @@ function embedly_embed_thumbnails(&$feed) {
 								=> 'http://www.speedtest.net/%s.png',
 		);
 
-	// Loop through the feed
-	foreach($feed as &$status) {
-		// If there are entities
-		if($status->entities) {
-			$entities = $status->entities;
-			if($entities->urls) {
-				// Loop through the URL entities
-				foreach($entities->urls as $urls) {
-					if($urls->expanded_url != "") $real_url = $urls->expanded_url;
-					else $real_url = $urls->url;
-					$matched = false;
-					foreach($services as $pattern => $thumbnail_url) {
-						if(preg_match_all($pattern, $real_url, $matches, PREG_PATTERN_ORDER) > 0) {
-							foreach($matches[1] as $key => $match) {
-								$html = theme('external_link', $real_url, '<img src="'.simple_proxy_url(sprintf($thumbnail_url, $match)).'" />');
-								$feed[$status->id]->text = $html . '<br />' . $feed[$status->id]->text;
-								// shall we add a link here allowing access with internal proxy?
+	foreach($feed as &$status) { // Loop through the feed
+		if(stripos($status->text, 'NSFW') === FALSE) { // Ignore image fetching for tweets containing NSFW
+			if($status->entities) { // If there are entities
+				$entities = $status->entities;
+				if($entities->urls) {
+					foreach($entities->urls as $urls) { // Loop through the URL entities
+						if($urls->expanded_url != "") $real_url = $urls->expanded_url;
+						else $real_url = $urls->url;
+						$matched = false;
+						foreach($services as $pattern => $thumbnail_url) {
+							if(preg_match_all($pattern, $real_url, $matches, PREG_PATTERN_ORDER) > 0) {
+								foreach($matches[1] as $key => $match) {
+									$html = theme('external_link', $real_url, '<img src="'.simple_proxy_url(sprintf($thumbnail_url, $match)).'" />');
+									$feed[$status->id]->text = $html . '<br />' . $feed[$status->id]->text;
+									// shall we add a link here allowing access with internal proxy?
+								}
+								$matched = true;
 							}
-							$matched = true;
 						}
-					}
-					// Local thumbnailer
-					if($matched == false) {
-						$html = theme('external_link', $real_url, '<img src="thumbnailer.php?url='.urlencode($real_url).'" />');
-						$feed[$status->id]->text = $html . '<br />' . $feed[$status->id]->text;
+						// Local thumbnailer
+						if($matched == false) {
+							$html = theme('external_link', $real_url, '<img src="thumbnailer.php?url='.urlencode($real_url).'" />');
+							$feed[$status->id]->text = $html . '<br />' . $feed[$status->id]->text;
+						}
 					}
 				}
 			}
+		}
+		else {
+			// TODO: Add an icon for NSFW
 		}
 	}
 }

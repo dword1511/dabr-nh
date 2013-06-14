@@ -479,6 +479,15 @@ function twitter_fetch($url) {
 
 // http://dev.twitter.com/pages/tweet_entities
 function twitter_get_media($status) {
+	//don't display images if: a) in the settings, b) type of theme, c) NSFW
+	if(setting_fetch('hide_inline') || in_array(setting_fetch('browser'), array('text', 'worksafe')) !== FALSE) {
+		return;
+	}
+	if(stripos($status->text, 'NSFW') !== FALSE) {
+		// TODO: NSFW ICON
+		return;
+	}
+
 	if($status->entities->media) {
 		$media_html = '';
 		foreach($status->entities->media as $media) {
@@ -1219,7 +1228,7 @@ function theme_timeline($feed, $paginate = true) {
 	foreach($feed as &$status) $status->text = twitter_parse_tags($status->text, $status->entities);
 	unset($status);
 
-	if(!in_array(setting_fetch('browser'), array('text', 'worksafe')) && EMBEDLY_KEY != '') embedly_embed_thumbnails($feed);
+	if(!setting_fetch('hide_inline') && !in_array(setting_fetch('browser'), array('text', 'worksafe'))) embedly_embed_thumbnails($feed);
 	foreach($feed as $status) {
 		if($first==0) {
 			$since_id = $status->id;
