@@ -207,7 +207,7 @@ function twitter_profile_page() {
 		);
 
 		$code = $tmhOAuth->request('POST',
-			$tmhOAuth->url("1/account/update_profile_image"),
+			$tmhOAuth->url("1.1/account/update_profile_image"),
 			$params,
 			true, // use auth
 			true // multipart
@@ -365,7 +365,7 @@ function twitter_media_page($query) {
 			'user_secret'     => $oauth_token_secret,
 		));
 		$image = "{$_FILES['image']['tmp_name']};type={$_FILES['image']['type']};filename={$_FILES['image']['name']}";
-		$code = $tmhOAuth->request('POST', 'https://upload.twitter.com/1/statuses/update_with_media.json',
+		$code = $tmhOAuth->request('POST', 'https://upload.twitter.com/1.1/statuses/update_with_media.json',
 							array(
 								'media[]' => "@{$image}",
 								'status' => " " . $status,
@@ -381,7 +381,7 @@ function twitter_media_page($query) {
 		else $content = '擦！上传失败鸟！<br/>代码：'.$code.'<br/>状态：'.$status;
 	}
 	if($_POST) {
-		if(!$_POST['message']) $content .= '<p>为这张图添加点说明文字吧。</p>';
+		//if(!$_POST['message']) $content .= '<p>为这张图添加点说明文字吧。</p>';
 		if(!$_FILES['image']['tmp_name']) $content .= '<p>请选择一幅图片来上传。</p>';
 	}	
 	$content .= '<form method="post" action="picture" enctype="multipart/form-data" name="upload_pict">图片：<input type="file" name="image"/><br/>消息（可选）：<br/><textarea name="message" style="width:90%; max-width: 400px;" rows="3" id="message">'.$status.'</textarea><br><input type="submit" value="发送"><span id="remaining">119</span>';
