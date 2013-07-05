@@ -31,8 +31,8 @@ if($url == null) {
 
 // Check URL and extract destination host
 $url = str_replace('https://', 'http://', $url);
-preg_match('#http\:\/\/([\w\.\_\-]+)\/#i', $url, &$matches);
-if(!$matches) preg_match('#http\:\/\/([\w\.\_\-]+)$#i', $url, &$matches);
+preg_match('#http\:\/\/([\w\.\_\-]+)\/#i', $url, $matches);
+if(!$matches) preg_match('#http\:\/\/([\w\.\_\-]+)$#i', $url, $matches);
 
 if(!$matches) {
   echo '<html><head><title>Error</title></head><body><h1>Bad URL.</h1></body></html>';
